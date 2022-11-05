@@ -1,3 +1,6 @@
+from os import listdir
+from os.path import isfile, join
+
 
 def convertTime(time):
     # this method convert the time to ms from the beginning of the day
@@ -9,13 +12,11 @@ def convertTime(time):
     return timeInMs
 
 
-def processSessionLog(sessionLogFilePath):
+def processSessionLog(sessionLogFilePath,startTime,endTime):
     # Experiment Info Parameters
     Vsync2Photons = 0 # time from vsync to photon in seconds
     refreshRate = 0 # the targeted refresh rate
     renderTarget = {'horizontal' : 0,'vertical':0}
-    startTime = "22:00"
-    endTime = "22:05"
     startTimeInMs = convertTime(startTime)
     endTimeInMs = convertTime(endTime)
     oldExpermintInfo = ""
@@ -136,11 +137,110 @@ def processSessionLog(sessionLogFilePath):
                     batteryPercentageHMD.append(float(splittedLine[16].split(",")[0].split("}")[0].strip()))
     print("---------------------")
 
+
+def processOVRMetricsFolder(OVRMetricsFolderPath,startTime,endTime):
+    startTimeInMs = convertTime(startTime)
+    endTimeInMs = convertTime(endTime)
+    OVRMetricsResults = [] # a list of lists of tuples, each sublist containt the metrices of a file in the form of tuples
+    for fileName in listdir(OVRMetricsFolderPath):
+        fileTime = fileName.split("_")[1].split(".")[0]
+        fileHour = fileTime[:2]
+        fileMinute = fileTime[2:4]
+        fileSecond = fileTime[4:]
+        fileTimeInMs = convertTime("{}:{}:{}".format(fileHour,fileMinute,fileSecond))
+        if(fileTimeInMs>=startTimeInMs and fileTimeInMs<=endTimeInMs):
+            print("OVRMetrics files: \n{} file processing".format(fileName))
+            currentFilePath = "{}/{}".format(OVRMetricsFolderPath,fileName)
+            with open(currentFilePath,'r') as f:
+                lines = f.readlines()
+                currentFileMetrices = [] # a list of tuples, each tuple represent the metrices of the current file at a specific time stamp
+                isHeader = True
+                for line in lines:
+                    if(isHeader):
+                        isHeader = False 
+                        continue
+                    
+                    splittedLine = line.split(",") 
+                    Time_Stamp = splittedLine[0]
+                    battery_level_percentage = splittedLine[3]
+                    battery_temperature_celcius = splittedLine[4]
+                    sensor_temperature_celcius = splittedLine[6]
+                    power_level_state = splittedLine[8]
+                    average_frame_rate = splittedLine[18]
+                    display_refresh_rate = splittedLine[19]
+                    average_prediction_milliseconds = splittedLine[20]
+                    early_frame_count = splittedLine[22]
+                    stale_frame_count = splittedLine[23]
+                    maximum_rotational_speed_degrees_per_second = splittedLine[24]
+                    foveation_level = splittedLine[25]
+                    eye_buffer_width = splittedLine[26]
+                    eye_buffer_height = splittedLine[27]
+                    app_gpu_time_microseconds = splittedLine[28]
+                    timewarp_gpu_time_microseconds = splittedLine[29]
+                    guardian_gpu_time_microseconds = splittedLine[30]
+                    cpu_utilization_percentage = splittedLine[31]
+                    gpu_utilization_percentage = splittedLine[40]
+                    stale_frames_consecutive = splittedLine[49]
+                    screen_power_consumption = splittedLine[65]
+                    vrshell_average_frame_rate = splittedLine[84]
+                    vrshell_gpu_time_microseconds = splittedLine[85]
+                    vrshell_and_guardian_gpu_time_microseconds = splittedLine[86]
+                    render_scale = splittedLine[87].strip()
+                    
+                    currentTimeStampTuple = (Time_Stamp,battery_level_percentage,battery_temperature_celcius,sensor_temperature_celcius,power_level_state,
+                                                average_frame_rate,display_refresh_rate,average_prediction_milliseconds,early_frame_count,stale_frame_count,
+                                                maximum_rotational_speed_degrees_per_second,foveation_level,eye_buffer_width,eye_buffer_height,
+                                                app_gpu_time_microseconds,timewarp_gpu_time_microseconds,guardian_gpu_time_microseconds,cpu_utilization_percentage,
+                                                gpu_utilization_percentage,stale_frames_consecutive,screen_power_consumption,vrshell_average_frame_rate,
+                                                vrshell_gpu_time_microseconds,vrshell_and_guardian_gpu_time_microseconds,render_scale)
+                    print(currentTimeStampTuple)
+                    currentFileMetrices.append(currentTimeStampTuple)
+            
+
+
+            OVRMetricsResults.append(currentFileMetrices)
+    
+    print("---------------------") 
+
+
+
 def main():
+    startTime = "22:00"
+    endTime = "22:05"
+    sessionLogFilePath = 'session_log.txt'
+    OVRMetricsFolderPath = 'OVRMetrics'
+    processSessionLog(sessionLogFilePath,startTime,endTime)
+    processOVRMetricsFolder(OVRMetricsFolderPath,startTime,endTime)
+   
+        
 
-    processSessionLog('session_log.txt')
-
-
+    
+    
+    # Time_Stamp — 0
+    # battery_level_percentage — 3
+    # battery_temperature_celcius — 4
+    # sensor_temperature_celcius — 6
+    # power_level_state — 8
+    # average_frame_rate — 18
+    # display_refresh_rate — 19
+    # average_prediction_milliseconds — 20
+    # early_frame_count — 22
+    # stale_frame_count —23
+    # maximum_rotational_speed_degrees_per_second —24
+    # foveation_level —25
+    # eye_buffer_width — 26
+    # eye_buffer_height —27
+    # app_gpu_time_microseconds — 28
+    # timewarp_gpu_time_microseconds —29
+    # guardian_gpu_time_microseconds —30
+    # cpu_utilization_percentage — 31
+    # gpu_utilization_percentage — 40
+    # stale_frames_consecutive — 49
+    # screen_power_consumption — 65
+    # vrshell_average_frame_rate — 84
+    # vrshell_gpu_time_microseconds — 85
+    # vrshell_and_guardian_gpu_time_microseconds — 86
+    # render_scale — 87
                 
             
 
