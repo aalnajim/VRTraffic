@@ -193,7 +193,6 @@ def processOVRMetricsFolder(OVRMetricsFolderPath,startTime,endTime):
                                                 app_gpu_time_microseconds,timewarp_gpu_time_microseconds,guardian_gpu_time_microseconds,cpu_utilization_percentage,
                                                 gpu_utilization_percentage,stale_frames_consecutive,screen_power_consumption,vrshell_average_frame_rate,
                                                 vrshell_gpu_time_microseconds,vrshell_and_guardian_gpu_time_microseconds,render_scale)
-                    print(currentTimeStampTuple)
                     currentFileMetrices.append(currentTimeStampTuple)
             
 
@@ -204,46 +203,16 @@ def processOVRMetricsFolder(OVRMetricsFolderPath,startTime,endTime):
 
 
 
+
+
 def main():
+    
     startTime = "22:00"
     endTime = "22:05"
     sessionLogFilePath = 'session_log.txt'
     OVRMetricsFolderPath = 'OVRMetrics'
     processSessionLog(sessionLogFilePath,startTime,endTime)
     processOVRMetricsFolder(OVRMetricsFolderPath,startTime,endTime)
-   
-        
-
-    
-    
-    # Time_Stamp — 0
-    # battery_level_percentage — 3
-    # battery_temperature_celcius — 4
-    # sensor_temperature_celcius — 6
-    # power_level_state — 8
-    # average_frame_rate — 18
-    # display_refresh_rate — 19
-    # average_prediction_milliseconds — 20
-    # early_frame_count — 22
-    # stale_frame_count —23
-    # maximum_rotational_speed_degrees_per_second —24
-    # foveation_level —25
-    # eye_buffer_width — 26
-    # eye_buffer_height —27
-    # app_gpu_time_microseconds — 28
-    # timewarp_gpu_time_microseconds —29
-    # guardian_gpu_time_microseconds —30
-    # cpu_utilization_percentage — 31
-    # gpu_utilization_percentage — 40
-    # stale_frames_consecutive — 49
-    # screen_power_consumption — 65
-    # vrshell_average_frame_rate — 84
-    # vrshell_gpu_time_microseconds — 85
-    # vrshell_and_guardian_gpu_time_microseconds — 86
-    # render_scale — 87
-                
-            
-
 
 if __name__ == "__main__":
    main()
