@@ -202,7 +202,61 @@ def processOVRMetricsFolder(OVRMetricsFolderPath,startTime,endTime):
     print("---------------------") 
 
 
+def processLogcat(logcatFilePath,startTime,endTime):
+    startTimeInMs = convertTime(startTime)
+    endTimeInMs = convertTime(endTime)
+    time = []
+    targetedFPS = []
+    achievedFPS = []
+    predictionTime = [] # this is the absolute time in (ms) between when an app queries the pose before rendering and the time the frame is displayed on the HMD screen
+    tear = []  # the number of screen tears
+    earlyFrames = [] # number of frames delivered before they were needed
+    staleFrames = [] # the number of times a frame wasn’t delivered on time, and the previous frame was used instead
+    fov = [] # indicates the level of Fixed Foveated Rendering (FFR) intensity
+    CPUClockLevel, GPUClockLevel = ([] for i in range(2)) # specifies the CPU and GPU clock levels set by the app out of 4 (4 is very high and is a bottleneck)
+    PLS = [] # indicates the current power level of the device: NORMAL (0), SAVE (1), and DANGER (2)
+    batteryTemperature, sensorTemperature= ([] for i in range(2)) # indicate the battery and sensor temperature in celsius.
+    TWTime = [] # displays the ATW GPU time in (ms), which is the amount of time ATW takes to render (correlates to the number of layers used 'LCnt' and their complexity)
+    appTime = [] # displays the app GPU time in (ms), which is the amount of time the application spends rendering a single frame. If this time is longer than a single frame’s length (13.88ms for 72 frames per second), the app is GPU bound. Otherwise, the app is probably CPU bound
+    guardianTime = [] # displays the Guardian GPU time in (ms), which is the amount of GPU time used by the Guardian boundary
+    CPUandGPUTime = [] # displays the total time in (ms) it took to render a frame (CPUandGPUTime - App GPU time "appTime" = approximate clock time for the render thread)
+    LCnt = [] # specifies the number of layers that ATW is rendering per frame, including system layers (affect TWTime and guardianTime)
+    GPUUtilization = [] # displays the GPU utilization percentage
+    CPUUtilizationAverage =[] # displays the average utilization percentage of all CPU cores
+    CPUUtilizationWorst = [] # displays the utilization percentage of the worst-performing core
 
+    with open(logcatFilePath,'r') as f:
+        lines = f.readlines()
+        print("{} file processing".format(logcatFilePath))
+        for line in lines:
+            if ("beginning" in line):
+                continue
+            words = line.split(" ")
+            currentTimeInMs = convertTime(words[1])
+            if(currentTimeInMs>=startTimeInMs and currentTimeInMs <= endTimeInMs and 'Prd=' in line):        
+                matrices = words[len(words)-1]
+                splittedMatrices = matrices.split(",")
+                time.append(currentTimeInMs)
+                targetedFPS.append(splittedMatrices[0].split("=")[1].split("/")[1])
+                achievedFPS.append(splittedMatrices[0].split("=")[1].split("/")[0])
+                predictionTime.append(splittedMatrices[1].split("=")[1].replace("ms",""))
+                tear.append(splittedMatrices[2].split("=")[1])
+                earlyFrames.append(splittedMatrices[3].split("=")[1])
+                staleFrames.append(splittedMatrices[4].split("=")[1])
+                fov.append(splittedMatrices[7].split("=")[1].replace("D",""))
+                CPUClockLevel.append(splittedMatrices[8].split("=")[1].split("/")[0])
+                GPUClockLevel.append(splittedMatrices[8].split("=")[1].split("/")[1])
+                PLS.append(splittedMatrices[15].split("=")[1])
+                batteryTemperature.append(splittedMatrices[16].split("=")[1].split("/")[0].replace("C",""))
+                sensorTemperature.append(splittedMatrices[16].split("=")[1].split("/")[1].replace("C",""))
+                TWTime.append(splittedMatrices[17].split("=")[1].replace("ms",""))
+                appTime.append(splittedMatrices[18].split("=")[1].replace("ms",""))
+                guardianTime.append(splittedMatrices[19].split("=")[1].replace("ms",""))
+                CPUandGPUTime.append(splittedMatrices[20].split("=")[1].replace("ms",""))
+                LCnt.append(splittedMatrices[21].split("=")[1].split("(")[0])
+                GPUUtilization.append(str(round(float(splittedMatrices[23].split("=")[1])*100,2)))
+                CPUUtilizationAverage.append(str(round(float(splittedMatrices[24].split("=")[1].split("(")[0])*100,2)))
+                CPUUtilizationWorst.append(str(round(float(splittedMatrices[24].split("=")[1].split("(")[1].split(")")[0].replace("W",""))*100,2)))
 
 
 def main():
@@ -211,8 +265,11 @@ def main():
     endTime = "22:05"
     sessionLogFilePath = 'session_log.txt'
     OVRMetricsFolderPath = 'OVRMetrics'
+    logcatFilePath = 'logcat3.txt'
     processSessionLog(sessionLogFilePath,startTime,endTime)
     processOVRMetricsFolder(OVRMetricsFolderPath,startTime,endTime)
+    processLogcat(logcatFilePath,startTime,endTime)
+
 
 if __name__ == "__main__":
    main()

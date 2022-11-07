@@ -4,3 +4,4 @@ a python project to analyze the traffic characteristics of Quest 2. We gather th
 
 useful links:
     (1) https://developer.oculus.com/documentation/unity/ts-ovrstats/
+    (2) https://developer.oculus.com/documentation/native/android/ts-logcat-stats/
