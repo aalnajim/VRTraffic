@@ -1,12 +1,12 @@
 # VRTraffic
-a python project to analyze the traffic characteristics of Quest 2. We gather the matrices using multiple tools including (OVRMetrics,logcat,openXR,0 wireshark, ...). Then, we did post processing to analyze these matrices and get some insights out of it. All the project files will be available on (xxx)
+a python project to analyze the traffic characteristics of Quest 2. We gather the matrices using multiple tools including (OVRMetrics,logcat,ALVR_session log file, wireshark, ...). Then, we did post processing to analyze these matrices and get some insights out of it. All the project files will be available on (xxx)
 
 * This repo is missing the results file due to the file size limitation of github. All the project files will be available on (xxx). The structure of the project is as follow:
         VRTraffic -- /main.py
         		   - /plotGraph.py
                    - /README.md
                    - /requirements.txt
-                   - /plots (This folder is an output folder of plots)
+                   - /plots (This is an output folder of of folders contain results plots)
                    - /venv  (This folder for virtual environment if used)
                    - /traces    - /gameName(s) - /HMD_traces      - /WLAN_BOTH_DataFramesType1.csv
                    									              - /WLAN_BOTH_DataFramesType2.csv
