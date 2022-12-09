@@ -1507,11 +1507,12 @@ def main():
     logsFolder = "log_files"
 
     
-    LogsFolderResults = processLogsFolder(logsFolder,startTime,endTime)
-    #serverTracesResults, HMDTracesResults = processTracesFolder(tracesFolder,startTime,endTime,HMD_IP,server_IP,HMD_MAC,server_MAC,AP_MAC1,AP_MAC2)
+    # LogsFolderResults = processLogsFolder(logsFolder,startTime,endTime)
+    serverTracesResults, HMDTracesResults = processTracesFolder(tracesFolder,startTime,endTime,HMD_IP,server_IP,HMD_MAC,server_MAC,AP_MAC1,AP_MAC2)
     
-
-    plotGraph.plotResults(LogsFolderResults)
+    # plotGraph.plotLogsResults(LogsFolderResults)
+    plotGraph.plotServerTracesResults(serverTracesResults)
+    # plotGraph.plotHMDTracesResults(HMDTracesResults)
 
 
     # for resultItem in HMDTracesResults:

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def plotResults(results):
+def plotLogsResults(results):
     root_folder = "plots"
 
     for resultItem in results:
@@ -13,35 +13,24 @@ def plotResults(results):
             os.mkdir("{}/{}".format(root_folder,gameName))
         except:
             pass
-        # plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults,steamVRLogResults)
-        # plotFPS(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults)
-        # plotpktsstats(root_folder,gameName,sessionLogResult)
-        # plotBatteryPercentage(root_folder,gameName,sessionLogResult,OVRMetricsResult)
-        # plotTemperature(root_folder,gameName,OVRMetricsResult,logcatResults)
-        # plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRLogResults)
-        # plotUtilization(root_folder,gameName,OVRMetricsResult,logcatResults)
-        # plotMaxRotationalSpeed(root_folder,gameName,OVRMetricsResult)
-        # plotFoveationLevel(root_folder,gameName,OVRMetricsResult,logcatResults)
-        # plotNumberOfTears(root_folder,gameName,logcatResults)
-        # plotPowerLevel(root_folder,gameName,logcatResults)
-        # plotLayersCount(root_folder,gameName,logcatResults)
-        # plotRunningTime(root_folder,gameName,steamVRLogResults)
-    
-
-        
-    
-
-
-    
-
-    
+        plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults,steamVRLogResults)
+        plotFPS(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults)
+        plotpktsstats(root_folder,gameName,sessionLogResult)
+        plotBatteryPercentage(root_folder,gameName,sessionLogResult,OVRMetricsResult)
+        plotTemperature(root_folder,gameName,OVRMetricsResult,logcatResults)
+        plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRLogResults)
+        plotUtilization(root_folder,gameName,OVRMetricsResult,logcatResults)
+        plotMaxRotationalSpeed(root_folder,gameName,OVRMetricsResult)
+        plotFoveationLevel(root_folder,gameName,OVRMetricsResult,logcatResults)
+        plotNumberOfTears(root_folder,gameName,logcatResults)
+        plotPowerLevel(root_folder,gameName,logcatResults)
+        plotLayersCount(root_folder,gameName,logcatResults)
+        plotRunningTime(root_folder,gameName,steamVRLogResults)
 
 
 
-
-    
-    
-
+def plotServerTracesResults(serverTracesResults):
+    print("hello")
 
 
 
@@ -1482,8 +1471,6 @@ def plotRunningTime(root_folder,gameName,steamVRLogResults):
     plt.ylabel('time in seconds', fontsize=12)
     plt.savefig('{}/results1.png'.format(prefix))
     plt.show()
-    for i in range(len (appPerformanceStatsNewTimeStamp)):
-        print("{}   |   {}".format(round(float(AppSeconds[i]),4),round(float(AppHeadsetActiveSeconds[i]),4)))
     ####################################################
 
 
