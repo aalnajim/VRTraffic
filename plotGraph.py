@@ -13,27 +13,20 @@ def plotResults(results):
             os.mkdir("{}/{}".format(root_folder,gameName))
         except:
             pass
-        # plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults)
+        # plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults,steamVRLogResults)
         # plotFPS(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults)
         # plotpktsstats(root_folder,gameName,sessionLogResult)
         # plotBatteryPercentage(root_folder,gameName,sessionLogResult,OVRMetricsResult)
         # plotTemperature(root_folder,gameName,OVRMetricsResult,logcatResults)
-        plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRLogResults)
+        # plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRLogResults)
         # plotUtilization(root_folder,gameName,OVRMetricsResult,logcatResults)
         # plotMaxRotationalSpeed(root_folder,gameName,OVRMetricsResult)
         # plotFoveationLevel(root_folder,gameName,OVRMetricsResult,logcatResults)
         # plotNumberOfTears(root_folder,gameName,logcatResults)
         # plotPowerLevel(root_folder,gameName,logcatResults)
         # plotLayersCount(root_folder,gameName,logcatResults)
-    appPerformanceStatsMonitorFile,appPerformanceStatsCompositorFile = steamVRLogResults
-    appPerformanceStatsTimeStamp,appID,NumFramePresents,NumDroppedFrames,NumReprojected,\
-        NumFramePresentsOnStartup,NumDroppedFramesOnStartup,NumReprojectedFramesOnStartup,\
-        NumLoading,NumFramePresentsLoading,NumDroppedFramesLoading,NumReprojectedFramesLoading,\
-        NumTimedOut,NumFramePresentsTimedOut,NumDroppedFramesTimedOut,NumReprojectedFramesTimedOut,\
-        AvgSubmitsPerFrame,AvgCompositorCPUTimeMS,AvgCompositorGPUTimeMS,AvgTargetFPS,\
-        AvgApplicationCPUTimeMS,AvgApplicationGPUTimeMS,AppSeconds,AppHeadsetActiveSeconds,\
-        NumSingleDroppedFramesOverEntireRun,Num2DroppedFramesOverEntireRun,Num3DroppedFramesOverEntireRun,\
-        Num4MoreDroppedFramesOverEntireRun,totalNumOfFramesEntireRun,totalNumOfExpectedFrameEntireRun = appPerformanceStatsMonitorFile
+        # plotRunningTime(root_folder,gameName,steamVRLogResults)
+    
 
         
     
@@ -52,7 +45,7 @@ def plotResults(results):
 
 
 
-def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults):
+def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults,steamVRLogResults):
     result_folder_name = "latency"
     prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
     try:
@@ -358,6 +351,132 @@ def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatRes
     plt.title("{}".format(gameName))
     plt.yticks([0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0])
     plt.savefig('{}/results6.png'.format(prefix))
+    plt.show()
+    ####################################################
+
+
+
+    ############ Latency Components Line Graph ##############
+    # from the appPerformanceStatsMonitorFile of steamVRLogResults
+    appPerformanceStatsMonitorFile,appPerformanceStatsCompositorFile = steamVRLogResults
+    appPerformanceStatsTimeStamp,appID,NumFramePresents,NumDroppedFrames,NumReprojected,\
+        NumFramePresentsOnStartup,NumDroppedFramesOnStartup,NumReprojectedFramesOnStartup,\
+        NumLoading,NumFramePresentsLoading,NumDroppedFramesLoading,NumReprojectedFramesLoading,\
+        NumTimedOut,NumFramePresentsTimedOut,NumDroppedFramesTimedOut,NumReprojectedFramesTimedOut,\
+        AvgSubmitsPerFrame,AvgCompositorCPUTimeMS,AvgCompositorGPUTimeMS,AvgTargetFPS,\
+        AvgApplicationCPUTimeMS,AvgApplicationGPUTimeMS,AppSeconds,AppHeadsetActiveSeconds,\
+        NumSingleDroppedFramesOverEntireRun,Num2DroppedFramesOverEntireRun,Num3DroppedFramesOverEntireRun,\
+        Num4MoreDroppedFramesOverEntireRun,totalNumOfFramesEntireRun,totalNumOfExpectedFrameEntireRun = appPerformanceStatsMonitorFile
+    appPerformanceStatsNewTimeStamp = relativeTime(appPerformanceStatsTimeStamp)
+    x = [float(i)/1000 for i in appPerformanceStatsNewTimeStamp]
+    y1 = [float(i) for i in AvgCompositorCPUTimeMS]
+    y1Label = 'compositor cpu'
+    plt.plot(x,y1,label=y1Label,c='blue',linestyle='-.',marker="x")
+    y2 = [float(i) for i in AvgCompositorGPUTimeMS]
+    y2Label = 'compositor gpu'
+    plt.plot(x,y2,label=y2Label,c='red',linestyle='-',marker="v")
+    y3 = [float(i) for i in AvgApplicationCPUTimeMS]
+    y3Label = 'app cpu'
+    plt.plot(x,y3,label=y3Label,c='green',linestyle='--',marker="D")
+    y4 = [float(i) for i in AvgApplicationGPUTimeMS]
+    y4Label = 'app gpu'
+    plt.plot(x,y4,label=y4Label,c='black',linestyle=':',marker=".")
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('timestamp in (sec)', fontsize=12)
+    plt.ylabel('avg latency (ms)', fontsize=12)
+    plt.savefig('{}/results7.png'.format(prefix))
+    plt.show()
+    ####################################################
+
+
+
+    #################### CDF  Graph ####################
+    # from the appPerformanceStatsMonitorFile of steamVRLogResults    
+    data1 = [float(i) for i in AvgCompositorCPUTimeMS]
+    data2 = [float(i) for i in AvgCompositorGPUTimeMS]
+    data3 = [float(i) for i in AvgApplicationCPUTimeMS]
+    data4 = [float(i) for i in AvgApplicationGPUTimeMS]
+    x1 = np.sort(data1)
+    x2 = np.sort(data2)
+    x3 = np.sort(data3)
+    x4 = np.sort(data4)
+    y1 = np.arange(len(x1))/float(len(x1))
+    y2 = np.arange(len(x2))/float(len(x2))
+    y3 = np.arange(len(x3))/float(len(x3))
+    y4 = np.arange(len(x4))/float(len(x4))
+    plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.',marker="x")
+    plt.plot(x2, y2,label=y2Label,c='blue',linestyle='-',marker="v")
+    plt.plot(x3, y3,label=y3Label,c='black',linestyle=':',marker="D")
+    plt.plot(x4, y4,label=y4Label,c='purple',linestyle='--',marker=".")
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('latency in (ms)', fontsize=12)
+    plt.ylabel('CDF', fontsize=12)
+    plt.title("{}".format(gameName))
+    plt.yticks([0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0])
+    plt.savefig('{}/results8.png'.format(prefix))
+    plt.show()
+    ####################################################
+
+
+
+    ############ Latency Components Line Graph ##############
+    # from the appPerformanceStatsCompositorFile of steamVRLogResults
+    appPerformanceStatsTimeStamp,appName,appProcessID,NumFramePresents,NumDroppedFrames,NumReprojected,\
+        NumFramePresentsOnStartup,NumDroppedFramesOnStartup,NumReprojectedFramesOnStartup,NumLoading,NumFramePresentsLoading,\
+        NumDroppedFramesLoading,NumReprojectedFramesLoading,NumTimedOut,NumFramePresentsTimedOut,NumDroppedFramesTimedOut,\
+        NumReprojectedFramesTimedOut,AvgCompositorCPUTimeMS,AvgCompositorGPUTimeMS,AvgTargetFPS,AvgApplicationCPUTimeMS,\
+        AvgApplicationGPUTimeMS,totalDroppedFramesOverEntireRun = appPerformanceStatsCompositorFile
+    appPerformanceStatsNewTimeStamp = relativeTime(appPerformanceStatsTimeStamp)
+    x = [float(i)/1000 for i in appPerformanceStatsNewTimeStamp]
+    y1 = [float(i) for i in AvgCompositorCPUTimeMS]
+    y1Label = 'compositor cpu'
+    plt.plot(x,y1,label=y1Label,c='blue',linestyle='-.',marker="x")
+    y2 = [float(i) for i in AvgCompositorGPUTimeMS]
+    y2Label = 'compositor gpu'
+    plt.plot(x,y2,label=y2Label,c='red',linestyle='-',marker="v")
+    y3 = [float(i) for i in AvgApplicationCPUTimeMS]
+    y3Label = 'app cpu'
+    plt.plot(x,y3,label=y3Label,c='green',linestyle='--',marker="D")
+    y4 = [float(i) for i in AvgApplicationGPUTimeMS]
+    y4Label = 'app gpu'
+    plt.plot(x,y4,label=y4Label,c='black',linestyle=':',marker=".")
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('timestamp in (sec)', fontsize=12)
+    plt.ylabel('avg latency (ms)', fontsize=12)
+    plt.savefig('{}/results9.png'.format(prefix))
+    plt.show()
+    ####################################################
+
+
+
+    #################### CDF  Graph ####################
+    # from the appPerformanceStatsCompositorFile of steamVRLogResults    
+    data1 = [float(i) for i in AvgCompositorCPUTimeMS]
+    data2 = [float(i) for i in AvgCompositorGPUTimeMS]
+    data3 = [float(i) for i in AvgApplicationCPUTimeMS]
+    data4 = [float(i) for i in AvgApplicationGPUTimeMS]
+    x1 = np.sort(data1)
+    x2 = np.sort(data2)
+    x3 = np.sort(data3)
+    x4 = np.sort(data4)
+    y1 = np.arange(len(x1))/float(len(x1))
+    y2 = np.arange(len(x2))/float(len(x2))
+    y3 = np.arange(len(x3))/float(len(x3))
+    y4 = np.arange(len(x4))/float(len(x4))
+    plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.',marker="x")
+    plt.plot(x2, y2,label=y2Label,c='blue',linestyle='-',marker="v")
+    plt.plot(x3, y3,label=y3Label,c='black',linestyle=':',marker="D")
+    plt.plot(x4, y4,label=y4Label,c='purple',linestyle='--',marker=".")
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('latency in (ms)', fontsize=12)
+    plt.ylabel('CDF', fontsize=12)
+    plt.title("{}".format(gameName))
+    plt.yticks([0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0])
+    plt.savefig('{}/results10.png'.format(prefix))
     plt.show()
     ####################################################
 
@@ -852,6 +971,195 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
 
 
 
+    ##### Frames Stats During the Entire Run Graph #####
+    # Dropped frames
+    # from the appPerformanceStatsMonitorFile of steamVRLogResults
+    x = [float(i)/1000 for i in appPerformanceStatsNewTimeStamp]
+    y0 = [float(i) for i in NumSingleDroppedFramesOverEntireRun]
+    y0Label = 'single frames'
+    plt.plot(x,y0,label=y0Label,c='black',linestyle='--',marker="D")    
+    y1 = [float(i) for i in Num2DroppedFramesOverEntireRun]
+    y1Label = '2 frames'
+    plt.plot(x,y1,label=y1Label,c='blue',linestyle='-.',marker="x")
+    y2 = [float(i) for i in Num3DroppedFramesOverEntireRun]
+    y2Label = '3 frames'
+    plt.plot(x,y2,label=y2Label,c='red',linestyle='-',marker="v")
+    y3 = [float(i) for i in Num4MoreDroppedFramesOverEntireRun]
+    y3Label = '> 4 frames'
+    plt.plot(x,y3,label=y3Label,c='green',linestyle=':',marker=".")
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('timestamp in (sec)', fontsize=12)
+    plt.ylabel('# of dropped frames', fontsize=12)
+    plt.title("dropped frames stats of {}".format(gameName),fontsize=12)
+    plt.savefig('{}/results7.png'.format(prefix))
+    plt.show()
+    ####################################################
+
+
+
+    ##### Frames Stats During the Entire Run Graph #####
+    # Delivered vs. Expected
+    # from the appPerformanceStatsMonitorFile of steamVRLogResults
+    x = [float(i)/1000 for i in appPerformanceStatsNewTimeStamp]
+    y0 = [float(i) for i in totalNumOfFramesEntireRun]
+    y0Label = 'Delivered'
+    plt.plot(x,y0,label=y0Label,c='black',linestyle='--',marker="D")    
+    y1 = [float(i) for i in totalNumOfExpectedFrameEntireRun]
+    y1Label = 'Expected'
+    plt.plot(x,y1,label=y1Label,c='blue',linestyle='-.',marker="x")
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('timestamp in (sec)', fontsize=12)
+    plt.ylabel('# of frames', fontsize=12)
+    plt.title("Expected vs. Delivered # of frames of {}".format(gameName),fontsize=12)
+    plt.savefig('{}/results8.png'.format(prefix))
+    plt.show()
+    ####################################################
+
+
+
+    ##### Frames Stats During the Entire Run Graph #####
+    # average submit of a frame (based on re-submission)
+    # from the appPerformanceStatsMonitorFile of steamVRLogResults
+    x = [float(i)/1000 for i in appPerformanceStatsNewTimeStamp]
+    y0 = [float(i) for i in AvgSubmitsPerFrame]
+    y0Label = 'frame re-submitting'
+    plt.plot(x,y0,label=y0Label,c='black',linestyle='--',marker="D")    
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('timestamp in (sec)', fontsize=12)
+    plt.ylabel('avg # of frame submitting', fontsize=12)
+    plt.title("frames re-submitting of {}".format(gameName),fontsize=12)
+    plt.savefig('{}/results9.png'.format(prefix))
+    plt.show()
+    ####################################################
+
+
+
+   ##### Frames Stats During Normal Running Graph #####
+    # from the appPerformanceStatsCompositorFile of steamVRLogResults
+    appPerformanceStatsTimeStamp,appName,appProcessID,NumFramePresents,NumDroppedFrames,NumReprojected,\
+        NumFramePresentsOnStartup,NumDroppedFramesOnStartup,NumReprojectedFramesOnStartup,NumLoading,NumFramePresentsLoading,\
+        NumDroppedFramesLoading,NumReprojectedFramesLoading,NumTimedOut,NumFramePresentsTimedOut,NumDroppedFramesTimedOut,\
+        NumReprojectedFramesTimedOut,AvgCompositorCPUTimeMS,AvgCompositorGPUTimeMS,AvgTargetFPS,AvgApplicationCPUTimeMS,\
+        AvgApplicationGPUTimeMS,totalDroppedFramesOverEntireRun = appPerformanceStatsCompositorFile
+    appPerformanceStatsNewTimeStamp = relativeTime(appPerformanceStatsTimeStamp)
+
+    x = [float(i)/1000 for i in appPerformanceStatsNewTimeStamp]
+    y1 = [float(i) for i in NumFramePresents]
+    y1Label = 'presented frames'
+    plt.plot(x,y1,label=y1Label,c='blue',linestyle='-.',marker="x")
+    y2 = [float(i) for i in NumDroppedFrames]
+    y2Label = 'dropped frames'
+    plt.plot(x,y2,label=y2Label,c='red',linestyle='-',marker="v")
+    y3 = [float(i) for i in NumReprojected]
+    y3Label = 'reprojected frames'
+    plt.plot(x,y3,label=y3Label,c='green',linestyle=':',marker=".")
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('timestamp in (sec)', fontsize=12)
+    plt.ylabel('# of frames', fontsize=12)
+    plt.title("frames stats of {} during game running".format(gameName),fontsize=12)
+    plt.savefig('{}/results10.png'.format(prefix))
+    plt.show()
+    ####################################################
+
+
+
+    ##### Frames Stats During the App Startup Graph #####
+    # from the appPerformanceStatsCompositorFile of steamVRLogResults
+    x = [float(i)/1000 for i in appPerformanceStatsNewTimeStamp]
+    y1 = [float(i) for i in NumFramePresentsOnStartup]
+    y1Label = 'presented frames'
+    plt.plot(x,y1,label=y1Label,c='blue',linestyle='-.',marker="x")
+    y2 = [float(i) for i in NumDroppedFramesOnStartup]
+    y2Label = 'dropped frames'
+    plt.plot(x,y2,label=y2Label,c='red',linestyle='-',marker="v")
+    y3 = [float(i) for i in NumReprojectedFramesOnStartup]
+    y3Label = 'reprojected frames'
+    plt.plot(x,y3,label=y3Label,c='green',linestyle=':',marker=".")
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('timestamp in (sec)', fontsize=12)
+    plt.ylabel('# of frames', fontsize=12)
+    plt.title("frames stats of {} during game startup".format(gameName),fontsize=12)
+    plt.savefig('{}/results11.png'.format(prefix))
+    plt.show()
+    ####################################################
+
+
+
+    ##### Frames Stats During the App Loading Graph #####
+    # from the appPerformanceStatsCompositorFile of steamVRLogResults
+    x = [float(i)/1000 for i in appPerformanceStatsNewTimeStamp]
+    y0 = [float(i) for i in NumLoading]
+    y0Label = '# of loadings'
+    plt.plot(x,y0,label=y0Label,c='black',linestyle='--',marker="D")    
+    y1 = [float(i) for i in NumFramePresentsLoading]
+    y1Label = 'presented frames'
+    plt.plot(x,y1,label=y1Label,c='blue',linestyle='-.',marker="x")
+    y2 = [float(i) for i in NumDroppedFramesLoading]
+    y2Label = 'dropped frames'
+    plt.plot(x,y2,label=y2Label,c='red',linestyle='-',marker="v")
+    y3 = [float(i) for i in NumReprojectedFramesLoading]
+    y3Label = 'reprojected frames'
+    plt.plot(x,y3,label=y3Label,c='green',linestyle=':',marker=".")
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('timestamp in (sec)', fontsize=12)
+    plt.ylabel('# of frames', fontsize=12)
+    plt.title("frames stats of {} during game loading".format(gameName),fontsize=12)
+    plt.savefig('{}/results12.png'.format(prefix))
+    plt.show()
+    ####################################################
+
+
+
+    ##### Frames Stats During the App timeouts Graph #####
+    # from the appPerformanceStatsCompositorFile of steamVRLogResults
+    x = [float(i)/1000 for i in appPerformanceStatsNewTimeStamp]
+    y0 = [float(i) for i in NumTimedOut]
+    y0Label = '# of timeouts'
+    plt.plot(x,y0,label=y0Label,c='black',linestyle='--',marker="D")    
+    y1 = [float(i) for i in NumFramePresentsTimedOut]
+    y1Label = 'presented frames'
+    plt.plot(x,y1,label=y1Label,c='blue',linestyle='-.',marker="x")
+    y2 = [float(i) for i in NumDroppedFramesTimedOut]
+    y2Label = 'dropped frames'
+    plt.plot(x,y2,label=y2Label,c='red',linestyle='-',marker="v")
+    y3 = [float(i) for i in NumReprojectedFramesTimedOut]
+    y3Label = 'reprojected frames'
+    plt.plot(x,y3,label=y3Label,c='green',linestyle=':',marker=".")
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('timestamp in (sec)', fontsize=12)
+    plt.ylabel('# of frames', fontsize=12)
+    plt.title("frames stats of {} during game timeouts".format(gameName),fontsize=12)
+    plt.savefig('{}/results13.png'.format(prefix))
+    plt.show()
+    ####################################################
+
+
+
+    ##### Frames Stats During the Entire Run Graph #####
+    # Delivered vs. Expected
+    # from the appPerformanceStatsCompositorFile of steamVRLogResults
+    x = [float(i)/1000 for i in appPerformanceStatsNewTimeStamp]
+    y0 = [float(i) for i in totalDroppedFramesOverEntireRun]
+    y0Label = 'dropped'
+    plt.plot(x,y0,label=y0Label,c='black',linestyle='--',marker="D")    
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('timestamp in (sec)', fontsize=12)
+    plt.ylabel('# of dropped frames', fontsize=12)
+    plt.title("# of dropped frames of {} over the entire run".format(gameName),fontsize=12)
+    plt.savefig('{}/results14.png'.format(prefix))
+    plt.show()
+    ####################################################
+
+
+
 def plotUtilization(root_folder,gameName,OVRMetricsResult,logcatResults):
 
     result_folder_name = "GPU_CPU_utilization"
@@ -1139,8 +1447,79 @@ def plotLayersCount(root_folder,gameName,logcatResults):
 
 
 
+def plotRunningTime(root_folder,gameName,steamVRLogResults):
+    result_folder_name = "running_time"
+    prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
+    try:
+        os.mkdir(prefix)
+    except:
+        pass
+    
+
+
+    ############### Running Time Graph #################
+    # from the appPerformanceStatsMonitorFile of steamVRLogResults
+    appPerformanceStatsMonitorFile,appPerformanceStatsCompositorFile = steamVRLogResults
+    appPerformanceStatsTimeStamp,appID,NumFramePresents,NumDroppedFrames,NumReprojected,\
+        NumFramePresentsOnStartup,NumDroppedFramesOnStartup,NumReprojectedFramesOnStartup,\
+        NumLoading,NumFramePresentsLoading,NumDroppedFramesLoading,NumReprojectedFramesLoading,\
+        NumTimedOut,NumFramePresentsTimedOut,NumDroppedFramesTimedOut,NumReprojectedFramesTimedOut,\
+        AvgSubmitsPerFrame,AvgCompositorCPUTimeMS,AvgCompositorGPUTimeMS,AvgTargetFPS,\
+        AvgApplicationCPUTimeMS,AvgApplicationGPUTimeMS,AppSeconds,AppHeadsetActiveSeconds,\
+        NumSingleDroppedFramesOverEntireRun,Num2DroppedFramesOverEntireRun,Num3DroppedFramesOverEntireRun,\
+        Num4MoreDroppedFramesOverEntireRun,totalNumOfFramesEntireRun,totalNumOfExpectedFrameEntireRun = appPerformanceStatsMonitorFile
+    appPerformanceStatsNewTimeStamp = relativeTime(appPerformanceStatsTimeStamp)
+    x = [float(i)/1000 for i in appPerformanceStatsNewTimeStamp]
+    y1 = [float(i) for i in AppSeconds]
+    y1Label = 'app time'
+    plt.plot(x,y1,label=y1Label,c='blue',linestyle='-.',marker="x")
+    y2 = [float(i) for i in AppHeadsetActiveSeconds]
+    y2Label = 'app HMD active time'
+    plt.plot(x,y2,label=y2Label,c='red',linestyle='-',marker="v")
+    plt.legend(loc='best', fontsize=10)
+    plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    plt.xlabel('timestamp in (sec)', fontsize=12)
+    plt.ylabel('time in seconds', fontsize=12)
+    plt.savefig('{}/results1.png'.format(prefix))
+    plt.show()
+    for i in range(len (appPerformanceStatsNewTimeStamp)):
+        print("{}   |   {}".format(round(float(AppSeconds[i]),4),round(float(AppHeadsetActiveSeconds[i]),4)))
+    ####################################################
+
+
+
 def relativeTime(arrayOfTimes=[]):
     if(len(arrayOfTimes)<1):
         return[]
     else:
         return [float(x)-float(arrayOfTimes[0]) for x in arrayOfTimes]
+
+
+
+def convertgameName(gameName):
+    words = []
+    temp = gameName.split("_")
+    for j in range(len(temp)):
+        if j == len(temp)-1:
+            tempX = temp[j].split("-")[0].capitalize()
+        else:
+            tempX = temp[j].capitalize()
+        words.append(tempX)
+    return ' '.join(words)
+
+
+
+def getGameStats(gameName,appName):
+    gameStatsIndices = []
+    for i in range(len(appName)):
+        if appName[i] == gameName:
+            gameStatsIndices.append(i)
+    return gameStatsIndices
+
+
+
+def getElementsAtIndices(listOfElemets,listOfIndices):
+    result = []
+    for index in listOfIndices:
+        result.append(listOfElemets[index])
+    return result
