@@ -34,6 +34,11 @@ def plotServerTracesResults(serverTracesResults):
 
 
 
+def plotHMDTracesResults(HMDTracesResults):
+    print('hello')
+
+
+
 def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults,steamVRLogResults):
     result_folder_name = "latency"
     prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
