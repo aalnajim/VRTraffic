@@ -1491,10 +1491,10 @@ def processTracesFolder(tracesFolder,startTime,endTime,HMD_IP,server_IP,HMD_MAC,
 def main():
     
 
-    startTime = "00:00:00"
-    endTime = "23:59:59"
-    # startTime = "22:00"   §
-    # endTime = "22:05"
+    # startTime = "00:00:00"
+    # endTime = "23:59:59"
+    startTime = "22:00"   
+    endTime = "22:05"
     # startTime = "15:15"
     # endTime = "15:20"
     HMD_IP = "192.168.1.179"      # the HMD is linked wirelessly to the access point

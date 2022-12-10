@@ -3,9 +3,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
+root_folder = "plots"
 def plotLogsResults(results):
-    root_folder = "plots"
 
     for resultItem in results:
         gameName,sessionLogResult,OVRMetricsResult,logcatResults,steamVRLogResults = resultItem
@@ -30,7 +29,22 @@ def plotLogsResults(results):
 
 
 def plotServerTracesResults(serverTracesResults):
-    print("hello")
+    
+    for resultItem in serverTracesResults:
+        gameName,results = resultItem
+        try:
+            os.mkdir("{}/{}".format(root_folder,gameName))
+        except:
+            pass
+        server_UP_BOTH_NBs,server_UP_BOTH_Times,server_UP_BOTH_Data_Sizes,server_UP_BOTH_Frames_Sizes,server_UP_TCP_NBs,\
+            server_UP_TCP_Times,server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,\
+            server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,\
+            server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
+            server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results
+        newTimes = relativeTime(server_UP_BOTH_Times)
+    for i in range(len(server_UP_BOTH_Times)):
+        print(server_UP_BOTH_Times[i])
+        print(newTimes[i])
 
 
 
