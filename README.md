@@ -1,5 +1,5 @@
 # VRTraffic
-### a *python* project to analyze the traffic characteristics of *Quest 2*. We gather the matrices using multiple tools including (*OVRMetrics*,*logcat*,*ALVR_session log file*, *wireshark*, ...). Then, we did post processing to analyze these matrices and get some insights out of it. All the project files will be available on (xxx).  
+#### a *python* project to analyze the traffic characteristics of *Quest 2*. We gather the matrices using multiple tools including (*OVRMetrics*,*logcat*,*ALVR_session log file*, *wireshark*, ...). Then, we did post processing to analyze these matrices and get some insights out of it. All the project files will be available on (xxx).  
 
 ---
 
