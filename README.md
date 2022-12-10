@@ -118,7 +118,7 @@
             
             > wlan.fc.retry == 1 and ((wlan.sa == 80:f3:ef:63:35:01 and (wlan.da == 74:78:27:31:58:70 or wlan.da == 3c:bd:c5:26:74:c3 or wlan.da == 3c:bd:c5:26:74:c1)) or (wlan.da == 80:f3:ef:63:35:01 and (wlan.sa == 74:78:27:31:58:70 or wlan.sa == 3c:bd:c5:26:74:c3 or wlan.sa == 3c:bd:c5:26:74:c1)))
 
-            To split these **re-transmitted data frames** based on the categories mentioned in (3), we can use the following filters to create four different files:
+            To split these **re-transmitted data frames** based on the categories mentioned in (c), we can use the following filters to create four different files:
             * This filter is used to filter the captured frames to get *only* the **re-transmitted data frames** (*QoS data*) that is coming *from* or going *to* the **server** or the **HMD** (***TYPE III***). These frames include *QoS data*
 
                 > wlan.fc.retry == 1 and ((wlan.sa == 80:f3:ef:63:35:01 and wlan.da == 74:78:27:31:58:70) or (wlan.da == 80:f3:ef:63:35:01 and wlan.sa == 74:78:27:31:58:70))
