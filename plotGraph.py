@@ -39,6 +39,11 @@ def plotLogsResults(results):
 
 def plotServerTracesResults(serverTracesResults):
     
+    try:
+        os.mkdir("{}".format(root_folder))
+    except:
+        pass
+
     for resultItem in serverTracesResults:
         gameName,results = resultItem
         try:
@@ -51,6 +56,12 @@ def plotServerTracesResults(serverTracesResults):
             server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
             server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results
         newTimes = relativeTime(server_UP_BOTH_Times)
+        listOfNBOfFrames = computeNBOfFrames(newTimes,1)
+        listOfTotalFrameSizes = computeTotalSizeOfFrames(newTimes,server_UP_BOTH_Frames_Sizes,1)
+        listOfAvgFramesSize = computeAVGSizeOfFrames(newTimes,server_UP_BOTH_Frames_Sizes,1)
+
+        for i in range(len(listOfNBOfFrames)):
+            print("{} - {}".format(listOfAvgFramesSize[i],listOfTotalFrameSizes[i]/listOfNBOfFrames[i]))
 
 
 
@@ -1610,12 +1621,12 @@ def computeTotalSizeOfFrames(listOfTimeStamps,listOfSizes,duration=1):
     for i in range(len(newListOfTimeStamps)):
         intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
         if intervalTime < duration:
-            size = size + listOfSizes[i]
+            size = size + float(listOfSizes[i])
         else:
             listOfSizesOfFrames.append(size)
             beginningOfInterval = beginningOfInterval + duration
             intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
-            size = listOfSizes[i]
+            size = float(listOfSizes[i])
     if(len(listOfSizesOfFrames) < math.ceil((float(newListOfTimeStamps[len(newListOfTimeStamps)-1]) - float(newListOfTimeStamps[0]))/duration)):
             size = size/intervalTime * duration
             listOfSizesOfFrames.append(size)
@@ -1623,7 +1634,7 @@ def computeTotalSizeOfFrames(listOfTimeStamps,listOfSizes,duration=1):
 
 
 
-def computeTotalSizeOfFrames(listOfTimeStamps,listOfSizes,duration=1):
+def computeAVGSizeOfFrames(listOfTimeStamps,listOfSizes,duration=1):
     # This method is used to compute the average frame size for a specific period of time
     # input: listOfTimeStamps in ms starting from 0
     #        listOfSizes in bytes
@@ -1639,14 +1650,14 @@ def computeTotalSizeOfFrames(listOfTimeStamps,listOfSizes,duration=1):
     for i in range(len(newListOfTimeStamps)):
         intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
         if intervalTime < duration:
-            size = size + listOfSizes[i]
+            size = size + float(listOfSizes[i])
             counter = counter + 1
         else:
             avgSize = size/counter
             listOfAvgSizeOfFrames.append(avgSize)
             beginningOfInterval = beginningOfInterval + duration
             intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
-            size = listOfSizes[i]
+            size = float(listOfSizes[i])
             counter = 1
     if(len(listOfAvgSizeOfFrames) < math.ceil((float(newListOfTimeStamps[len(newListOfTimeStamps)-1]) - float(newListOfTimeStamps[0]))/duration)):
             avgSize = size/counter
