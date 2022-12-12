@@ -1,6 +1,8 @@
 import sys
 from os import listdir
 from os.path import isfile, join
+import os
+import shutil
 import plotGraph
 
 
@@ -1042,129 +1044,270 @@ def processLogsFolder(logsFolder,startTime,endTime):
 
 
 def processServerTraces(tracesFolder,startTimeInMs,endTimeInMs,HMD_IP,server_IP):
+    cacheFolder = "temp"
+    cacheSubFolder = "server"
+    cacheFileName = "serverCacheFile.txt"
     gamesFolders = listdir(tracesFolder)
     serverTracesResults = []
+    if(os.path.isdir("{}/{}".format(cacheFolder,cacheSubFolder))):
+        try:
+            print("getting the {} results from the cache folder '{}/{}'".format(cacheSubFolder,cacheFolder,cacheSubFolder))
+            print("{} traces cached files:".format(cacheSubFolder))
+            for gameFolder in gamesFolders:
+                if("." in gameFolder): # to skip hidden files and folders
+                    continue
+                gameName = gameFolder
+                cacheFilePath = "{}/{}/{}/{}".format(cacheFolder,cacheSubFolder,gameName,cacheFileName)
 
-    print("server traces files:")
-    for gameFolder in gamesFolders:
-        if("." in gameFolder): # to skip hidden files and folders
-            continue
-        gameName = gameFolder
-        gameFolderPath = "{}/{}".format(tracesFolder,gameName)
-        if("server_traces" in listdir(gameFolderPath)):     
-            serverTracesFolderPath = "{}/{}".format(gameFolderPath,"server_traces")
-            if("server.csv" in listdir(serverTracesFolderPath)):
-                filePath = "{}/{}".format(serverTracesFolderPath,"server.csv")
 
-                server_UP_BOTH_NBs           = [] # A list of the frames' numbers of the server's uplink for both (TCP and UDP) frames
-                server_UP_BOTH_Times         = [] # A list of the frames' times of the server's uplink for both (TCP and UDP) frames
-                server_UP_BOTH_Data_Sizes    = [] # A list of the frames' data sizes (the application layer payloads) in bytes of the server's uplink for both (TCP and UDP) frames
-                server_UP_BOTH_Frames_Sizes  = [] # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's uplink for both (TCP and UDP) frames
-                server_UP_TCP_NBs            = [] # A list of the frames' numbers of the server's uplink for TCP frames
-                server_UP_TCP_Times          = [] # A list of the frames' times of the server's uplink for TCP frames
-                server_UP_TCP_Data_Sizes     = [] # A list of the frames' data sizes (the application layer payloads) in bytes of the server's uplink for TCP frames
-                server_UP_TCP_Frames_Sizes   = [] # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's uplink for TCP frames
-                server_UP_UDP_NBs            = [] # A list of the frames' numbers of the server's uplink for UDP frames
-                server_UP_UDP_Times          = [] # A list of the frames' times of the server's uplink for UDP frames
-                server_UP_UDP_Data_Sizes     = [] # A list of the frames' data sizes (the application layer payloads) in bytes of the server's uplink for UDP frames
-                server_UP_UDP_Frames_Sizes   = [] # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's uplink for UDP frames
-                server_DWN_BOTH_NBs          = [] # A list of the frames' numbers of the server's downlink for both (TCP and UDP) frames
-                server_DWN_BOTH_Times        = [] # A list of the frames' times of the server's downlink for both (TCP and UDP) frames
-                server_DWN_BOTH_Data_Sizes   = [] # A list of the frames' data sizes (the application layer payloads) in bytes of the server's downlink for both (TCP and UDP) frames
-                server_DWN_BOTH_Frames_Sizes = [] # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's downlink for both (TCP and UDP) frames
-                server_DWN_TCP_NBs           = [] # A list of the frames' numbers of the server's downlink for TCP frames
-                server_DWN_TCP_Times         = [] # A list of the frames' times of the server's downlink for TCP frames
-                server_DWN_TCP_Data_Sizes    = [] # A list of the frames' data sizes (the application layer payloads) in bytes of the server's downlink for TCP frames
-                server_DWN_TCP_Frames_Sizes  = [] # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's downlink for TCP frames
-                server_DWN_UDP_NBs           = [] # A list of the frames' numbers of the server's downlink for UDP frames
-                server_DWN_UDP_Times         = [] # A list of the frames' times of the server's downlink for UDP frames
-                server_DWN_UDP_Data_Sizes    = [] # A list of the frames' data sizes (the application layer payloads) in bytes of the server's downlink for UDP frames
-                server_DWN_UDP_Frames_Sizes  = [] # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's downlink for UDP frames
-
-                print("{} file processing".format(filePath))
-
-                isHeader = True
-                with open(filePath,'rb') as f:
-                    for line in f:
-                        if(isHeader):
-                            isHeader = False
-                            continue
-
-                        splittedLine = line.decode('cp1252').replace('"','').strip().split(",")
-                        timeInMs = convertTime(splittedLine[1].split(" ")[1])
-                        if(timeInMs > endTimeInMs):
-                            break
-                        if(timeInMs < startTimeInMs):
-                            continue
-
-                        if(splittedLine[2] == server_IP):     # server uplink (Ethernet)
-                            if(splittedLine[3] == HMD_IP):
-                                if(splittedLine[4] == "TCP"):
-                                    infoPart = splittedLine[len(splittedLine)-1].strip()
-                                    tempDataSizeField = infoPart.split()
-                                    dataSizeField = [x for x in tempDataSizeField if "Len" in x]
-                                    dataSize = dataSizeField[0].strip().split("=")[1].strip()
-                                    server_UP_BOTH_NBs.append(splittedLine[0])
-                                    server_UP_TCP_NBs.append(splittedLine[0])
-                                    server_UP_BOTH_Times.append(timeInMs)
-                                    server_UP_TCP_Times.append(timeInMs)
-                                    server_UP_BOTH_Data_Sizes.append(dataSize)
-                                    server_UP_TCP_Data_Sizes.append(dataSize)
-                                    server_UP_BOTH_Frames_Sizes.append(splittedLine[5].strip())
-                                    server_UP_TCP_Frames_Sizes.append(splittedLine[5].strip())
-                                    
-                                elif(splittedLine[4] == "UDP"):
-                                    infoPart = splittedLine[len(splittedLine)-1].strip()
-                                    tempDataSizeField = infoPart.split()
-                                    dataSizeField = [x for x in tempDataSizeField if "Len" in x]
-                                    dataSize = dataSizeField[0].strip().split("=")[1].strip()
-                                    server_UP_BOTH_NBs.append(splittedLine[0])
-                                    server_UP_UDP_NBs.append(splittedLine[0])
-                                    server_UP_BOTH_Times.append(timeInMs)
-                                    server_UP_UDP_Times.append(timeInMs)
-                                    server_UP_BOTH_Data_Sizes.append(dataSize)
-                                    server_UP_UDP_Data_Sizes.append(dataSize)
-                                    server_UP_BOTH_Frames_Sizes.append(splittedLine[5].strip())
-                                    server_UP_UDP_Frames_Sizes.append(splittedLine[5].strip())
-                    
-                        elif(splittedLine[2] == HMD_IP):     # server uplink (Ethernet)
-                            if(splittedLine[3] == server_IP):
-                                if(splittedLine[4] == "TCP"):
-                                    infoPart = splittedLine[len(splittedLine)-1].strip()
-                                    tempDataSizeField = infoPart.split()
-                                    dataSizeField = [x for x in tempDataSizeField if "Len" in x]
-                                    dataSize = dataSizeField[0].strip().split("=")[1].strip()
-                                    server_DWN_BOTH_NBs.append(splittedLine[0])
-                                    server_DWN_TCP_NBs.append(splittedLine[0])
-                                    server_DWN_BOTH_Times.append(timeInMs)
-                                    server_DWN_TCP_Times.append(timeInMs)
-                                    server_DWN_BOTH_Data_Sizes.append(dataSize)
-                                    server_DWN_TCP_Data_Sizes.append(dataSize)
-                                    server_DWN_BOTH_Frames_Sizes.append(splittedLine[5].strip())
-                                    server_DWN_TCP_Frames_Sizes.append(splittedLine[5].strip())
-                                    
-                                elif(splittedLine[4] == "UDP"):
-                                    infoPart = splittedLine[len(splittedLine)-1].strip()
-                                    tempDataSizeField = infoPart.split()
-                                    dataSizeField = [x for x in tempDataSizeField if "Len" in x]
-                                    dataSize = dataSizeField[0].strip().split("=")[1].strip()
-                                    server_DWN_BOTH_NBs.append(splittedLine[0])
-                                    server_DWN_UDP_NBs.append(splittedLine[0])
-                                    server_DWN_BOTH_Times.append(timeInMs)
-                                    server_DWN_UDP_Times.append(timeInMs)
-                                    server_DWN_BOTH_Data_Sizes.append(dataSize)
-                                    server_DWN_UDP_Data_Sizes.append(dataSize)
-                                    server_DWN_BOTH_Frames_Sizes.append(splittedLine[5].strip())
-                                    server_DWN_UDP_Frames_Sizes.append(splittedLine[5].strip())
+                # reading the results from the cache file 
+                f = open(cacheFilePath, "r")
+                cachedResults = f.read()
+                f.close()
+                print("{} file processing".format(cacheFilePath))
+                cachedResultsLines = cachedResults.split("\n")
+                server_UP_BOTH_NBs           = cachedResultsLines[0].split("|")  # A list of the frames' numbers of the server's uplink for both (TCP and UDP) frames
+                server_UP_BOTH_Times         = cachedResultsLines[1].split("|")  # A list of the frames' times of the server's uplink for both (TCP and UDP) frames
+                server_UP_BOTH_Data_Sizes    = cachedResultsLines[2].split("|")  # A list of the frames' data sizes (the application layer payloads) in bytes of the server's uplink for both (TCP and UDP) frames
+                server_UP_BOTH_Frames_Sizes  = cachedResultsLines[3].split("|")  # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's uplink for both (TCP and UDP) frames
+                server_UP_TCP_NBs            = cachedResultsLines[4].split("|")  # A list of the frames' numbers of the server's uplink for TCP frames
+                server_UP_TCP_Times          = cachedResultsLines[5].split("|")  # A list of the frames' times of the server's uplink for TCP frames
+                server_UP_TCP_Data_Sizes     = cachedResultsLines[6].split("|")  # A list of the frames' data sizes (the application layer payloads) in bytes of the server's uplink for TCP frames
+                server_UP_TCP_Frames_Sizes   = cachedResultsLines[7].split("|")  # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's uplink for TCP frames
+                server_UP_UDP_NBs            = cachedResultsLines[8].split("|")  # A list of the frames' numbers of the server's uplink for UDP frames
+                server_UP_UDP_Times          = cachedResultsLines[9].split("|")  # A list of the frames' times of the server's uplink for UDP frames
+                server_UP_UDP_Data_Sizes     = cachedResultsLines[10].split("|") # A list of the frames' data sizes (the application layer payloads) in bytes of the server's uplink for UDP frames
+                server_UP_UDP_Frames_Sizes   = cachedResultsLines[11].split("|") # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's uplink for UDP frames
+                server_DWN_BOTH_NBs          = cachedResultsLines[12].split("|") # A list of the frames' numbers of the server's downlink for both (TCP and UDP) frames
+                server_DWN_BOTH_Times        = cachedResultsLines[13].split("|") # A list of the frames' times of the server's downlink for both (TCP and UDP) frames
+                server_DWN_BOTH_Data_Sizes   = cachedResultsLines[14].split("|") # A list of the frames' data sizes (the application layer payloads) in bytes of the server's downlink for both (TCP and UDP) frames
+                server_DWN_BOTH_Frames_Sizes = cachedResultsLines[15].split("|") # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's downlink for both (TCP and UDP) frames
+                server_DWN_TCP_NBs           = cachedResultsLines[16].split("|") # A list of the frames' numbers of the server's downlink for TCP frames
+                server_DWN_TCP_Times         = cachedResultsLines[17].split("|") # A list of the frames' times of the server's downlink for TCP frames
+                server_DWN_TCP_Data_Sizes    = cachedResultsLines[18].split("|") # A list of the frames' data sizes (the application layer payloads) in bytes of the server's downlink for TCP frames
+                server_DWN_TCP_Frames_Sizes  = cachedResultsLines[19].split("|") # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's downlink for TCP frames
+                server_DWN_UDP_NBs           = cachedResultsLines[20].split("|") # A list of the frames' numbers of the server's downlink for UDP frames
+                server_DWN_UDP_Times         = cachedResultsLines[21].split("|") # A list of the frames' times of the server's downlink for UDP frames
+                server_DWN_UDP_Data_Sizes    = cachedResultsLines[22].split("|") # A list of the frames' data sizes (the application layer payloads) in bytes of the server's downlink for UDP frames
+                server_DWN_UDP_Frames_Sizes  = cachedResultsLines[23].split("|") # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's downlink for UDP frames
+                server_UP_BOTH_Times = [float(x) for x in server_UP_BOTH_Times]
+                server_UP_TCP_Times = [float(x) for x in server_UP_TCP_Times]
+                server_UP_UDP_Times = [float(x) for x in server_UP_UDP_Times]
+                server_DWN_BOTH_Times = [float(x) for x in server_DWN_BOTH_Times]
+                server_DWN_TCP_Times = [float(x) for x in server_DWN_TCP_Times]
+                server_DWN_UDP_Times = [float(x) for x in server_DWN_UDP_Times]
                 results = (server_UP_BOTH_NBs,server_UP_BOTH_Times,server_UP_BOTH_Data_Sizes,server_UP_BOTH_Frames_Sizes,server_UP_TCP_NBs,server_UP_TCP_Times,
-                    server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,
-                    server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,
-                    server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes)
+                        server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,
+                        server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,
+                        server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes)
                 serverTracesResults.append((gameName,results))
+        except Exception as e:
+            print("the cache files are corrupted\nre-processing the server traces")
+            shutil.rmtree("{}/{}".format(cacheFolder,cacheSubFolder), ignore_errors=True)
+            serverTracesResults = processServerTraces(tracesFolder,startTimeInMs,endTimeInMs,HMD_IP,server_IP)
+
+    else:
+        print("server traces files:")
+        for gameFolder in gamesFolders:
+            if("." in gameFolder): # to skip hidden files and folders
+                continue
+            gameName = gameFolder
+            gameFolderPath = "{}/{}".format(tracesFolder,gameName)
+            if("server_traces" in listdir(gameFolderPath)):     
+                serverTracesFolderPath = "{}/{}".format(gameFolderPath,"server_traces")
+                if("server.csv" in listdir(serverTracesFolderPath)):
+                    filePath = "{}/{}".format(serverTracesFolderPath,"server.csv")
+
+                    server_UP_BOTH_NBs           = [] # A list of the frames' numbers of the server's uplink for both (TCP and UDP) frames
+                    server_UP_BOTH_Times         = [] # A list of the frames' times of the server's uplink for both (TCP and UDP) frames
+                    server_UP_BOTH_Data_Sizes    = [] # A list of the frames' data sizes (the application layer payloads) in bytes of the server's uplink for both (TCP and UDP) frames
+                    server_UP_BOTH_Frames_Sizes  = [] # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's uplink for both (TCP and UDP) frames
+                    server_UP_TCP_NBs            = [] # A list of the frames' numbers of the server's uplink for TCP frames
+                    server_UP_TCP_Times          = [] # A list of the frames' times of the server's uplink for TCP frames
+                    server_UP_TCP_Data_Sizes     = [] # A list of the frames' data sizes (the application layer payloads) in bytes of the server's uplink for TCP frames
+                    server_UP_TCP_Frames_Sizes   = [] # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's uplink for TCP frames
+                    server_UP_UDP_NBs            = [] # A list of the frames' numbers of the server's uplink for UDP frames
+                    server_UP_UDP_Times          = [] # A list of the frames' times of the server's uplink for UDP frames
+                    server_UP_UDP_Data_Sizes     = [] # A list of the frames' data sizes (the application layer payloads) in bytes of the server's uplink for UDP frames
+                    server_UP_UDP_Frames_Sizes   = [] # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's uplink for UDP frames
+                    server_DWN_BOTH_NBs          = [] # A list of the frames' numbers of the server's downlink for both (TCP and UDP) frames
+                    server_DWN_BOTH_Times        = [] # A list of the frames' times of the server's downlink for both (TCP and UDP) frames
+                    server_DWN_BOTH_Data_Sizes   = [] # A list of the frames' data sizes (the application layer payloads) in bytes of the server's downlink for both (TCP and UDP) frames
+                    server_DWN_BOTH_Frames_Sizes = [] # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's downlink for both (TCP and UDP) frames
+                    server_DWN_TCP_NBs           = [] # A list of the frames' numbers of the server's downlink for TCP frames
+                    server_DWN_TCP_Times         = [] # A list of the frames' times of the server's downlink for TCP frames
+                    server_DWN_TCP_Data_Sizes    = [] # A list of the frames' data sizes (the application layer payloads) in bytes of the server's downlink for TCP frames
+                    server_DWN_TCP_Frames_Sizes  = [] # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's downlink for TCP frames
+                    server_DWN_UDP_NBs           = [] # A list of the frames' numbers of the server's downlink for UDP frames
+                    server_DWN_UDP_Times         = [] # A list of the frames' times of the server's downlink for UDP frames
+                    server_DWN_UDP_Data_Sizes    = [] # A list of the frames' data sizes (the application layer payloads) in bytes of the server's downlink for UDP frames
+                    server_DWN_UDP_Frames_Sizes  = [] # A list of the frames' sizes in the link (payloads + headers sizes) in bytes of the server's downlink for UDP frames
+
+                    print("{} file processing".format(filePath))
+
+                    isHeader = True
+                    with open(filePath,'rb') as f:
+                        for line in f:
+                            if(isHeader):
+                                isHeader = False
+                                continue
+
+                            splittedLine = line.decode('cp1252').replace('"','').strip().split(",")
+                            timeInMs = convertTime(splittedLine[1].split(" ")[1])
+                            if(timeInMs > endTimeInMs):
+                                break
+                            if(timeInMs < startTimeInMs):
+                                continue
+
+                            if(splittedLine[2] == server_IP):     # server uplink (Ethernet)
+                                if(splittedLine[3] == HMD_IP):
+                                    if(splittedLine[4] == "TCP"):
+                                        infoPart = splittedLine[len(splittedLine)-1].strip()
+                                        tempDataSizeField = infoPart.split()
+                                        dataSizeField = [x for x in tempDataSizeField if "Len" in x]
+                                        dataSize = dataSizeField[0].strip().split("=")[1].strip()
+                                        server_UP_BOTH_NBs.append(splittedLine[0])
+                                        server_UP_TCP_NBs.append(splittedLine[0])
+                                        server_UP_BOTH_Times.append(timeInMs)
+                                        server_UP_TCP_Times.append(timeInMs)
+                                        server_UP_BOTH_Data_Sizes.append(dataSize)
+                                        server_UP_TCP_Data_Sizes.append(dataSize)
+                                        server_UP_BOTH_Frames_Sizes.append(splittedLine[5].strip())
+                                        server_UP_TCP_Frames_Sizes.append(splittedLine[5].strip())
+                                        
+                                    elif(splittedLine[4] == "UDP"):
+                                        infoPart = splittedLine[len(splittedLine)-1].strip()
+                                        tempDataSizeField = infoPart.split()
+                                        dataSizeField = [x for x in tempDataSizeField if "Len" in x]
+                                        dataSize = dataSizeField[0].strip().split("=")[1].strip()
+                                        server_UP_BOTH_NBs.append(splittedLine[0])
+                                        server_UP_UDP_NBs.append(splittedLine[0])
+                                        server_UP_BOTH_Times.append(timeInMs)
+                                        server_UP_UDP_Times.append(timeInMs)
+                                        server_UP_BOTH_Data_Sizes.append(dataSize)
+                                        server_UP_UDP_Data_Sizes.append(dataSize)
+                                        server_UP_BOTH_Frames_Sizes.append(splittedLine[5].strip())
+                                        server_UP_UDP_Frames_Sizes.append(splittedLine[5].strip())
+                        
+                            elif(splittedLine[2] == HMD_IP):     # server uplink (Ethernet)
+                                if(splittedLine[3] == server_IP):
+                                    if(splittedLine[4] == "TCP"):
+                                        infoPart = splittedLine[len(splittedLine)-1].strip()
+                                        tempDataSizeField = infoPart.split()
+                                        dataSizeField = [x for x in tempDataSizeField if "Len" in x]
+                                        dataSize = dataSizeField[0].strip().split("=")[1].strip()
+                                        server_DWN_BOTH_NBs.append(splittedLine[0])
+                                        server_DWN_TCP_NBs.append(splittedLine[0])
+                                        server_DWN_BOTH_Times.append(timeInMs)
+                                        server_DWN_TCP_Times.append(timeInMs)
+                                        server_DWN_BOTH_Data_Sizes.append(dataSize)
+                                        server_DWN_TCP_Data_Sizes.append(dataSize)
+                                        server_DWN_BOTH_Frames_Sizes.append(splittedLine[5].strip())
+                                        server_DWN_TCP_Frames_Sizes.append(splittedLine[5].strip())
+                                        
+                                    elif(splittedLine[4] == "UDP"):
+                                        infoPart = splittedLine[len(splittedLine)-1].strip()
+                                        tempDataSizeField = infoPart.split()
+                                        dataSizeField = [x for x in tempDataSizeField if "Len" in x]
+                                        dataSize = dataSizeField[0].strip().split("=")[1].strip()
+                                        server_DWN_BOTH_NBs.append(splittedLine[0])
+                                        server_DWN_UDP_NBs.append(splittedLine[0])
+                                        server_DWN_BOTH_Times.append(timeInMs)
+                                        server_DWN_UDP_Times.append(timeInMs)
+                                        server_DWN_BOTH_Data_Sizes.append(dataSize)
+                                        server_DWN_UDP_Data_Sizes.append(dataSize)
+                                        server_DWN_BOTH_Frames_Sizes.append(splittedLine[5].strip())
+                                        server_DWN_UDP_Frames_Sizes.append(splittedLine[5].strip())
+                    results = (server_UP_BOTH_NBs,server_UP_BOTH_Times,server_UP_BOTH_Data_Sizes,server_UP_BOTH_Frames_Sizes,server_UP_TCP_NBs,server_UP_TCP_Times,
+                        server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,
+                        server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,
+                        server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes)
+                    serverTracesResults.append((gameName,results))
+
+
+                    # writing to the results to the cache file 
+                    cacheSubFolderPath = "{}/{}".format(cacheFolder,cacheSubFolder)
+                    cacheFilesFolderPath = "{}/{}".format(cacheSubFolderPath,gameName)
+                    cacheFilePath = "{}/{}".format(cacheFilesFolderPath,cacheFileName)
+
+                    try:
+                        os.mkdir(cacheFolder)
+                    except:
+                        pass
+                    os.mkdir(cacheSubFolderPath)
+                    os.mkdir(cacheFilesFolderPath)
+
+                    floatIndices = [1,5,9,13,17,21]
+                    cachedResults = ""
+                    for i in range(len(results)):
+                        if(i in floatIndices):
+                            strList = [str(x) for x in results.__getitem__(i)]
+                            cachedResults = cachedResults + "|".join(strList)
+                        else:
+                            cachedResults = cachedResults + "|".join(results.__getitem__(i))
+                        cachedResults = cachedResults + "\n"
+                    
+                    # cachedResults = "|".join(server_UP_BOTH_NBs)
+                    # cachedResults = cachedResults + "\n"
+                    # server_UP_BOTH_Times = [str(x) for x in server_UP_BOTH_Times]
+                    # cachedResults = cachedResults + "|".join(server_UP_BOTH_Times)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_UP_BOTH_Data_Sizes)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_UP_BOTH_Frames_Sizes)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_UP_TCP_NBs)
+                    # cachedResults = cachedResults + "\n"
+                    # server_UP_TCP_Times = [str(x) for x in server_UP_TCP_Times]
+                    # cachedResults = cachedResults + "|".join(server_UP_TCP_Times)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_UP_TCP_Data_Sizes)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_UP_TCP_Frames_Sizes)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_UP_UDP_NBs)
+                    # cachedResults = cachedResults + "\n"
+                    # server_UP_UDP_Times = [str(x) for x in server_UP_UDP_Times]
+                    # cachedResults = cachedResults + "|".join(server_UP_UDP_Times)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_UP_UDP_Data_Sizes)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_UP_UDP_Frames_Sizes)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_DWN_BOTH_NBs)
+                    # cachedResults = cachedResults + "\n"
+                    # server_DWN_BOTH_Times = [str(x) for x in server_DWN_BOTH_Times]
+                    # cachedResults = cachedResults + "|".join(server_DWN_BOTH_Times)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_DWN_BOTH_Data_Sizes)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_DWN_BOTH_Frames_Sizes)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_DWN_TCP_NBs)
+                    # cachedResults = cachedResults + "\n"
+                    # server_DWN_TCP_Times = [str(x) for x in server_DWN_TCP_Times]
+                    # cachedResults = cachedResults + "|".join(server_DWN_TCP_Times)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_DWN_TCP_Data_Sizes)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_DWN_TCP_Frames_Sizes)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_DWN_UDP_NBs)
+                    # cachedResults = cachedResults + "\n"
+                    # server_DWN_UDP_Times = [str(x) for x in server_DWN_UDP_Times]
+                    # cachedResults = cachedResults + "|".join(server_DWN_UDP_Times)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_DWN_UDP_Data_Sizes)
+                    # cachedResults = cachedResults + "\n"
+                    # cachedResults = cachedResults + "|".join(server_DWN_UDP_Frames_Sizes)
+                    f = open(cacheFilePath, "a")
+                    f.write(cachedResults.strip())
+                    f.close()
+
+                else:
+                    print("make sure that the trace file 'server.csv' is in the 'server_traces' folder in the path and its name is 'server.csv'".format(serverTracesFolderPath))
             else:
-                print("make sure that the trace file 'server.csv' is in the 'server_traces' folder in the path and its name is 'server.csv'".format(serverTracesFolderPath))
-        else:
-            print("make sure that 'server_traces' folder is inside the game folder {} in the path {}".format(gameName,gameFolderPath))
+                print("make sure that 'server_traces' folder is inside the game folder {} in the path {}".format(gameName,gameFolderPath))
             
     
 
@@ -1303,164 +1446,367 @@ def processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,MAC2,d
 
 def processHMDTraces(tracesFolder,startTimeInMs,endTimeInMs,HMD_MAC,server_MAC,AP_MAC1,AP_MAC2):
     gamesFolders = listdir(tracesFolder)
+    cacheFolder = "temp"
+    cacheSubFolder = "HMD"
+    cacheFileNames = ["WLAN_BOTH_ManagementFramesCacheFile.txt","WLAN_BOTH_DataFramesType1CacheFile.txt",
+                        "WLAN_BOTH_RetransmittedDataFramesType1CacheFile.txt","WLAN_BOTH_DataFramesType2CacheFile.txt",
+                        "WLAN_BOTH_RetransmittedDataFramesType2CacheFile.txt","WLAN_BOTH_DataFramesType3CacheFile.txt",
+                        "WLAN_BOTH_RetransmittedDataFramesType3CacheFile.txt"]
     HMDTracesResults = []
 
-    print("HMD traces files:")
-    for gameFolder in gamesFolders:
-        if("." in gameFolder): # to skip hidden files and folders
-            continue
-        gameName = gameFolder
-        gameFolderPath = "{}/{}".format(tracesFolder,gameName)
-        if("HMD_traces" in listdir(gameFolderPath)):    
-            HMDTracesFolderPath = "{}/{}".format(gameFolderPath,"HMD_traces")
+    if(os.path.isdir("{}/{}".format(cacheFolder,cacheSubFolder))):
+        try:
+            print("getting the {} results from the cache folder '{}/{}'".format(cacheSubFolder,cacheFolder,cacheSubFolder))
+            print("{} traces cached files:".format(cacheSubFolder))
+            for gameFolder in gamesFolders:
+                if("." in gameFolder): # to skip hidden files and folders
+                    continue
+                gameName = gameFolder
+                cacheFilesPaths = ["{}/{}/{}/{}".format(cacheFolder,cacheSubFolder,gameName,x) for x in cacheFileNames]
 
-            ### MANAGEMENT FRAMES ###
-            if("WLAN_BOTH_ManagementFrames.csv" in listdir(HMDTracesFolderPath)):
-                filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_ManagementFrames.csv")
-                print("{} file processing".format(filePath))
 
-                HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
-                    HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes,HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
-                    HMD_DWN_MANAGEMENT_FRAMES_DataRates,HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes = processHMDManagementFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,AP_MAC2)
+                # reading the results from the cache files 
+                
+                # reading the MANAGEMENT FRAMES cache file
+                f = open(cacheFilesPaths[0], "r")
+                cachedResults = f.read()
+                f.close()
+                print("{} file processing".format(cacheFilesPaths[0]))
+                cachedResultsLines = cachedResults.split("\n")
+                HMD_UP_MANAGEMENT_FRAMES_NBs           = cachedResultsLines[0].split("|")
+                tmpList                                = cachedResultsLines[1].split("|")
+                HMD_UP_MANAGEMENT_FRAMES_Times         = [float(x) for x in tmpList] 
+                HMD_UP_MANAGEMENT_FRAMES_DataRates     = cachedResultsLines[2].split("|")  
+                HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes  = cachedResultsLines[3].split("|") 
+                HMD_DWN_MANAGEMENT_FRAMES_NBs          = cachedResultsLines[4].split("|")
+                tmpList                                = cachedResultsLines[5].split("|")  
+                HMD_DWN_MANAGEMENT_FRAMES_Times        = [float(x) for x in tmpList]
+                HMD_DWN_MANAGEMENT_FRAMES_DataRates    = cachedResultsLines[6].split("|") 
+                HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes = cachedResultsLines[7].split("|") 
+                
+                # reading the DATA FRAMES TYPE I cache file
+                f = open(cacheFilesPaths[1], "r")
+                cachedResults = f.read()
+                f.close()
+                print("{} file processing".format(cacheFilesPaths[1]))
+                cachedResultsLines = cachedResults.split("\n")
+                HMD_UP_DATA1_FRAMES_NBs                = cachedResultsLines[0].split("|")  
+                tmpList                                = cachedResultsLines[1].split("|")  
+                HMD_UP_DATA1_FRAMES_Times              = [float(x) for x in tmpList]  
+                HMD_UP_DATA1_FRAMES_DataRates          = cachedResultsLines[2].split("|")  
+                HMD_UP_DATA1_FRAMES_Frames_Sizes       = cachedResultsLines[3].split("|") 
+                HMD_UP_DATA1_FRAMES_Frames_SeqNB       = cachedResultsLines[4].split("|")  
+                
+                # reading the RETRANSMITTED DATA FRAMES TYPE I cache file
+                f = open(cacheFilesPaths[2], "r")
+                cachedResults = f.read()
+                f.close()
+                print("{} file processing".format(cacheFilesPaths[2]))
+                cachedResultsLines = cachedResults.split("\n")
+                HMD_UP_RE_DATA1_FRAMES_NBs                = cachedResultsLines[0].split("|")  
+                tmpList                                   = cachedResultsLines[1].split("|")  
+                HMD_UP_RE_DATA1_FRAMES_Times              = [float(x) for x in tmpList] 
+                HMD_UP_RE_DATA1_FRAMES_DataRates          = cachedResultsLines[2].split("|")  
+                HMD_UP_RE_DATA1_FRAMES_Frames_Sizes       = cachedResultsLines[3].split("|") 
+                HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB       = cachedResultsLines[4].split("|")  
+                
+                # reading the DATA FRAMES TYPE II cache file
+                f = open(cacheFilesPaths[3], "r")
+                cachedResults = f.read()
+                f.close()
+                print("{} file processing".format(cacheFilesPaths[3]))
+                cachedResultsLines = cachedResults.split("\n")
+                HMD_UP_DATA2_FRAMES_NBs                = cachedResultsLines[0].split("|")  
+                tmpList                                = cachedResultsLines[1].split("|")  
+                HMD_UP_DATA2_FRAMES_Times              = [float(x) for x in tmpList]
+                HMD_UP_DATA2_FRAMES_DataRates          = cachedResultsLines[2].split("|") 
+                HMD_UP_DATA2_FRAMES_Data_Sizes         = cachedResultsLines[3].split("|") 
+                HMD_UP_DATA2_FRAMES_Frames_Sizes       = cachedResultsLines[4].split("|") 
+                HMD_UP_DATA2_FRAMES_Frames_SeqNB       = cachedResultsLines[5].split("|")  
+                HMD_DWN_DATA2_FRAMES_NBs               = cachedResultsLines[6].split("|")  
+                tmpList                                = cachedResultsLines[7].split("|")  
+                HMD_DWN_DATA2_FRAMES_Times             = [float(x) for x in tmpList]
+                HMD_DWN_DATA2_FRAMES_DataRates         = cachedResultsLines[8].split("|")  
+                HMD_DWN_DATA2_FRAMES_Data_Sizes        = cachedResultsLines[9].split("|")  
+                HMD_DWN_DATA2_FRAMES_Frames_Sizes      = cachedResultsLines[10].split("|") 
+                HMD_DWN_DATA2_FRAMES_Frames_SeqNB      = cachedResultsLines[11].split("|")  
+                
+                # reading the RETRANSMITTED DATA FRAMES TYPE II cache file
+                f = open(cacheFilesPaths[4], "r")
+                cachedResults = f.read()
+                f.close()
+                print("{} file processing".format(cacheFilesPaths[4]))
+                cachedResultsLines = cachedResults.split("\n")
+                HMD_UP_RE_DATA2_FRAMES_NBs                = cachedResultsLines[0].split("|")  
+                tmpList                                   = cachedResultsLines[1].split("|")  
+                HMD_UP_RE_DATA2_FRAMES_Times              = [float(x) for x in tmpList]
+                HMD_UP_RE_DATA2_FRAMES_DataRates          = cachedResultsLines[2].split("|") 
+                HMD_UP_RE_DATA2_FRAMES_Data_Sizes         = cachedResultsLines[3].split("|") 
+                HMD_UP_RE_DATA2_FRAMES_Frames_Sizes       = cachedResultsLines[4].split("|") 
+                HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB       = cachedResultsLines[5].split("|")  
+                HMD_DWN_RE_DATA2_FRAMES_NBs               = cachedResultsLines[6].split("|")  
+                tmpList                                   = cachedResultsLines[7].split("|")  
+                HMD_DWN_RE_DATA2_FRAMES_Times             = [float(x) for x in tmpList]
+                HMD_DWN_RE_DATA2_FRAMES_DataRates         = cachedResultsLines[8].split("|")  
+                HMD_DWN_RE_DATA2_FRAMES_Data_Sizes        = cachedResultsLines[9].split("|")  
+                HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes      = cachedResultsLines[10].split("|") 
+                HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB      = cachedResultsLines[11].split("|") 
+                
+                # reading the DATA FRAMES TYPE III cache file
+                f = open(cacheFilesPaths[5], "r")
+                cachedResults = f.read()
+                f.close()
+                print("{} file processing".format(cacheFilesPaths[5]))
+                cachedResultsLines = cachedResults.split("\n")
+                HMD_UP_DATA3_FRAMES_NBs                = cachedResultsLines[0].split("|")  
+                tmpList                                = cachedResultsLines[1].split("|")  
+                HMD_UP_DATA3_FRAMES_Times              = [float(x) for x in tmpList]  
+                HMD_UP_DATA3_FRAMES_DataRates          = cachedResultsLines[2].split("|") 
+                HMD_UP_DATA3_FRAMES_Data_Sizes         = cachedResultsLines[3].split("|") 
+                HMD_UP_DATA3_FRAMES_Frames_Sizes       = cachedResultsLines[4].split("|") 
+                HMD_UP_DATA3_FRAMES_Frames_SeqNB       = cachedResultsLines[5].split("|")  
+                HMD_DWN_DATA3_FRAMES_NBs               = cachedResultsLines[6].split("|")  
+                tmpList                                = cachedResultsLines[7].split("|")  
+                HMD_DWN_DATA3_FRAMES_Times             = [float(x) for x in tmpList]
+                HMD_DWN_DATA3_FRAMES_DataRates         = cachedResultsLines[8].split("|")  
+                HMD_DWN_DATA3_FRAMES_Data_Sizes        = cachedResultsLines[9].split("|")  
+                HMD_DWN_DATA3_FRAMES_Frames_Sizes      = cachedResultsLines[10].split("|") 
+                HMD_DWN_DATA3_FRAMES_Frames_SeqNB      = cachedResultsLines[11].split("|")  
+                
+                # reading the RETRANSMITTED DATA FRAMES TYPE III cache file
+                f = open(cacheFilesPaths[6], "r")
+                cachedResults = f.read()
+                f.close()
+                print("{} file processing".format(cacheFilesPaths[6]))
+                cachedResultsLines = cachedResults.split("\n")
+                HMD_UP_RE_DATA3_FRAMES_NBs                = cachedResultsLines[0].split("|")  
+                tmpList                                   = cachedResultsLines[1].split("|")  
+                HMD_UP_RE_DATA3_FRAMES_Times              = [float(x) for x in tmpList]
+                HMD_UP_RE_DATA3_FRAMES_DataRates          = cachedResultsLines[2].split("|") 
+                HMD_UP_RE_DATA3_FRAMES_Data_Sizes         = cachedResultsLines[3].split("|") 
+                HMD_UP_RE_DATA3_FRAMES_Frames_Sizes       = cachedResultsLines[4].split("|") 
+                HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB       = cachedResultsLines[5].split("|")  
+                HMD_DWN_RE_DATA3_FRAMES_NBs               = cachedResultsLines[6].split("|")  
+                tmpList                                   = cachedResultsLines[7].split("|")  
+                HMD_DWN_RE_DATA3_FRAMES_Times             = [float(x) for x in tmpList]  
+                HMD_DWN_RE_DATA3_FRAMES_DataRates         = cachedResultsLines[8].split("|")  
+                HMD_DWN_RE_DATA3_FRAMES_Data_Sizes        = cachedResultsLines[9].split("|")  
+                HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes      = cachedResultsLines[10].split("|") 
+                HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB      = cachedResultsLines[11].split("|") 
+
+
+                results = (HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,
+                        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,
+                        HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, HMD_UP_DATA1_FRAMES_NBs, 
+                        HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,
+                        HMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, 
+                        HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,
+                        HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,
+                        HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, 
+                        HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes, HMD_DWN_DATA2_FRAMES_Frames_Sizes, 
+                        HMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,
+                        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, 
+                        HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,
+                        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, 
+                        HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB,
+                        HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,
+                        HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, 
+                        HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, 
+                        HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, 
+                        HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB)
+                HMDTracesResults.append((gameName,results))
+
+
+        except Exception as e:
+            print("the cache files are corrupted\nre-processing the HMD traces")
+            shutil.rmtree("{}/{}".format(cacheFolder,cacheSubFolder), ignore_errors=True)
+            HMDTracesResults = processHMDTraces(tracesFolder,startTimeInMs,endTimeInMs,HMD_MAC,server_MAC,AP_MAC1,AP_MAC2)
+    else:
+        print("HMD traces files:")
+        for gameFolder in gamesFolders:
+            if("." in gameFolder): # to skip hidden files and folders
+                continue
+            gameName = gameFolder
+            gameFolderPath = "{}/{}".format(tracesFolder,gameName)
+            if("HMD_traces" in listdir(gameFolderPath)):    
+                HMDTracesFolderPath = "{}/{}".format(gameFolderPath,"HMD_traces")
+
+                ### MANAGEMENT FRAMES ###
+                if("WLAN_BOTH_ManagementFrames.csv" in listdir(HMDTracesFolderPath)):
+                    filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_ManagementFrames.csv")
+                    print("{} file processing".format(filePath))
+
+                    HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
+                        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes,HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
+                        HMD_DWN_MANAGEMENT_FRAMES_DataRates,HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes = processHMDManagementFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,AP_MAC2)
+                else:
+                    HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
+                        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes,HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
+                        HMD_DWN_MANAGEMENT_FRAMES_DataRates,HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes = []
+                    print("make sure that the trace file 'WLAN_BOTH_ManagementFrames.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_ManagementFrames.csv'".format(HMDTracesFolderPath))
+                
+
+                ### DATA FRAMES TYPE I ###
+                if("WLAN_BOTH_DataFramesType1.csv" in listdir(HMDTracesFolderPath)):
+                    filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_DataFramesType1.csv")
+                    print("{} file processing".format(filePath))
+
+                    HMD_UP_DATA1_FRAMES_NBs, HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates,\
+                        HMD_UP_DATA1_FRAMES_Frames_Sizes,HMD_UP_DATA1_FRAMES_Frames_SeqNB= processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,AP_MAC2,1)
+
+                else:
+                    HMD_UP_DATA1_FRAMES_NBs, HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates,\
+                        HMD_UP_DATA1_FRAMES_Frames_Sizes,HMD_UP_DATA1_FRAMES_Frames_SeqNB = []
+                    print("make sure that the trace file 'WLAN_BOTH_DataFramesType1.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_DataFramesType1.csv'".format(HMDTracesFolderPath))
+
+                
+                ### RETRANSMITTED DATA FRAMES TYPE I ###
+                if("WLAN_BOTH_RetransmittedDataFramesType1.csv" in listdir(HMDTracesFolderPath)):
+                    filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_RetransmittedDataFramesType1.csv")
+                    print("{} file processing".format(filePath))
+
+                    HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, HMD_UP_RE_DATA1_FRAMES_DataRates,\
+                        HMD_UP_RE_DATA1_FRAMES_Frames_Sizes,HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB= processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,AP_MAC2,1)
+
+                else:
+                    HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, HMD_UP_RE_DATA1_FRAMES_DataRates,\
+                        HMD_UP_RE_DATA1_FRAMES_Frames_Sizes,HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB = []
+                    print("make sure that the trace file 'WLAN_BOTH_RetransmittedDataFramesType1.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_RetransmittedDataFramesType1.csv'".format(HMDTracesFolderPath))
+
+                
+                ### DATA FRAMES TYPE II ###
+                if("WLAN_BOTH_DataFramesType2.csv" in listdir(HMDTracesFolderPath)):
+                    filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_DataFramesType2.csv")
+                    print("{} file processing".format(filePath))
+
+                    HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates,\
+                        HMD_UP_DATA2_FRAMES_Data_Sizes, HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, \
+                        HMD_DWN_DATA2_FRAMES_NBs,HMD_DWN_DATA2_FRAMES_Times, HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes,\
+                        HMD_DWN_DATA2_FRAMES_Frames_Sizes,HMD_DWN_DATA2_FRAMES_Frames_SeqNB = \
+                            processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,AP_MAC1,2)
+
+                else:
+                    HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates,\
+                        HMD_UP_DATA2_FRAMES_Data_Sizes, HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, \
+                        HMD_DWN_DATA2_FRAMES_NBs,HMD_DWN_DATA2_FRAMES_Times, HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes,\
+                        HMD_DWN_DATA2_FRAMES_Frames_Sizes,HMD_DWN_DATA2_FRAMES_Frames_SeqNB = []
+                    print("make sure that the trace file 'WLAN_BOTH_DataFramesType2.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_DataFramesType2.csv'".format(HMDTracesFolderPath))
+                
+
+                ### RETRANSMITTED DATA FRAMES TYPE II ###
+                if("WLAN_BOTH_RetransmittedDataFramesType2.csv" in listdir(HMDTracesFolderPath)):
+                    filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_RetransmittedDataFramesType2.csv")
+                    print("{} file processing".format(filePath))
+
+                    HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
+                        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
+                        HMD_DWN_RE_DATA2_FRAMES_NBs,HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
+                        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes,HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB = \
+                            processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,AP_MAC1,2)
+
+                else:
+                    HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
+                        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
+                        HMD_DWN_RE_DATA2_FRAMES_NBs,HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
+                        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes,HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB = []
+                    print("make sure that the trace file 'WLAN_BOTH_RetransmittedDataFramesType2.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_RetransmittedDataFramesType2.csv'".format(HMDTracesFolderPath))
+
+
+                ### DATA FRAMES TYPE III ###
+                if("WLAN_BOTH_DataFramesType3.csv" in listdir(HMDTracesFolderPath)):
+                    filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_DataFramesType3.csv")
+                    print("{} file processing".format(filePath))
+
+                    HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, HMD_UP_DATA3_FRAMES_DataRates,\
+                        HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB, \
+                        HMD_DWN_DATA3_FRAMES_NBs,HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
+                        HMD_DWN_DATA3_FRAMES_Frames_Sizes,HMD_DWN_DATA3_FRAMES_Frames_SeqNB = \
+                            processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,server_MAC,3)
+
+                else:
+                    HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, HMD_UP_DATA3_FRAMES_DataRates,\
+                        HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB, \
+                        HMD_DWN_DATA3_FRAMES_NBs,HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
+                        HMD_DWN_DATA3_FRAMES_Frames_Sizes,HMD_DWN_DATA3_FRAMES_Frames_SeqNB = []
+                    print("make sure that the trace file 'WLAN_BOTH_DataFramesType3.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_DataFramesType3.csv'".format(HMDTracesFolderPath))
+                
+
+                ### RETRANSMITTED DATA FRAMES TYPE III ###
+                if("WLAN_BOTH_RetransmittedDataFramesType3.csv" in listdir(HMDTracesFolderPath)):
+                    filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_RetransmittedDataFramesType3.csv")
+                    print("{} file processing".format(filePath))
+
+                    HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, HMD_UP_RE_DATA3_FRAMES_DataRates,\
+                        HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, \
+                        HMD_DWN_RE_DATA3_FRAMES_NBs,HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, HMD_DWN_RE_DATA3_FRAMES_Data_Sizes,\
+                        HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes,HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = \
+                            processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,server_MAC,3)
+
+                else:
+                    HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, HMD_UP_RE_DATA3_FRAMES_DataRates,\
+                        HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, \
+                        HMD_DWN_RE_DATA3_FRAMES_NBs,HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, HMD_DWN_RE_DATA3_FRAMES_Data_Sizes,\
+                        HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes,HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = []
+                    print("make sure that the trace file 'WLAN_BOTH_RetransmittedDataFramesType3.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_RetransmittedDataFramesType3.csv'".format(HMDTracesFolderPath))
+
+
+
             else:
-                HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
-                    HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes,HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
-                    HMD_DWN_MANAGEMENT_FRAMES_DataRates,HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes = []
-                print("make sure that the trace file 'WLAN_BOTH_ManagementFrames.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_ManagementFrames.csv'".format(HMDTracesFolderPath))
+                print("make sure that 'HMD_traces' folder is inside the game folder {} in the path {}".format(gameName,gameFolderPath))
+
+            results = (HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,
+                        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,
+                        HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, HMD_UP_DATA1_FRAMES_NBs, 
+                        HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,
+                        HMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, 
+                        HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,
+                        HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,
+                        HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, 
+                        HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes, HMD_DWN_DATA2_FRAMES_Frames_Sizes, 
+                        HMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,
+                        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, 
+                        HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,
+                        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, 
+                        HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB,
+                        HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,
+                        HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, 
+                        HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, 
+                        HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, 
+                        HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB)
+            HMDTracesResults.append((gameName,results))
+
+
+            # writing to the results to the cache file 
+            cacheSubFolderPath = "{}/{}".format(cacheFolder,cacheSubFolder)
+            cacheFilesFolderPath = "{}/{}".format(cacheSubFolderPath,gameName)
+            cacheFilesPaths = ["{}/{}".format(cacheFilesFolderPath,x) for x in cacheFileNames]
+            try:
+                os.mkdir(cacheFolder)
+            except:
+                pass
+            os.mkdir(cacheSubFolderPath)
+            os.mkdir(cacheFilesFolderPath)
+
+            writeIndices = [7,12,17,29,41,53,65]
+            floatIndices = [1,5,9,14,19,25,31,37,43,49,55,61]
+            counter = 0 
+            cachedResults = ""
+            for i in range(len(results)):
+                if(i in writeIndices):
+                    cachedResults = cachedResults + "|".join(results.__getitem__(i))
+                    f = open(cacheFilesPaths[counter], "a")
+                    f.write(cachedResults)
+                    f.close()
+                    counter = counter + 1
+                    cachedResults = ""
+                elif(i in floatIndices):
+                    strList = [str(x) for x in results.__getitem__(i)]
+                    cachedResults = cachedResults + "|".join(strList)
+                    cachedResults = cachedResults + "\n"
+                else:
+                    cachedResults = cachedResults + "|".join(results.__getitem__(i))
+                    cachedResults = cachedResults + "\n"
             
-
-            ### DATA FRAMES TYPE I ###
-            if("WLAN_BOTH_DataFramesType1.csv" in listdir(HMDTracesFolderPath)):
-                filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_DataFramesType1.csv")
-                print("{} file processing".format(filePath))
-
-                HMD_UP_DATA1_FRAMES_NBs, HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates,\
-                    HMD_UP_DATA1_FRAMES_Frames_Sizes,HMD_UP_DATA1_FRAMES_Frames_SeqNB= processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,AP_MAC2,1)
-
-            else:
-                HMD_UP_DATA1_FRAMES_NBs, HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates,\
-                    HMD_UP_DATA1_FRAMES_Frames_Sizes,HMD_UP_DATA1_FRAMES_Frames_SeqNB = []
-                print("make sure that the trace file 'WLAN_BOTH_DataFramesType1.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_DataFramesType1.csv'".format(HMDTracesFolderPath))
-
-            
-            ### RETRANSMITTED DATA FRAMES TYPE I ###
-            if("WLAN_BOTH_RetransmittedDataFramesType1.csv" in listdir(HMDTracesFolderPath)):
-                filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_RetransmittedDataFramesType1.csv")
-                print("{} file processing".format(filePath))
-
-                HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, HMD_UP_RE_DATA1_FRAMES_DataRates,\
-                    HMD_UP_RE_DATA1_FRAMES_Frames_Sizes,HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB= processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,AP_MAC2,1)
-
-            else:
-                HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, HMD_UP_RE_DATA1_FRAMES_DataRates,\
-                    HMD_UP_RE_DATA1_FRAMES_Frames_Sizes,HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB = []
-                print("make sure that the trace file 'WLAN_BOTH_RetransmittedDataFramesType1.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_RetransmittedDataFramesType1.csv'".format(HMDTracesFolderPath))
-
-            
-            ### DATA FRAMES TYPE II ###
-            if("WLAN_BOTH_DataFramesType2.csv" in listdir(HMDTracesFolderPath)):
-                filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_DataFramesType2.csv")
-                print("{} file processing".format(filePath))
-
-                HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates,\
-                    HMD_UP_DATA2_FRAMES_Data_Sizes, HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, \
-                    HMD_DWN_DATA2_FRAMES_NBs,HMD_DWN_DATA2_FRAMES_Times, HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes,\
-                    HMD_DWN_DATA2_FRAMES_Frames_Sizes,HMD_DWN_DATA2_FRAMES_Frames_SeqNB = \
-                        processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,AP_MAC1,2)
-
-            else:
-                HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates,\
-                    HMD_UP_DATA2_FRAMES_Data_Sizes, HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, \
-                    HMD_DWN_DATA2_FRAMES_NBs,HMD_DWN_DATA2_FRAMES_Times, HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes,\
-                    HMD_DWN_DATA2_FRAMES_Frames_Sizes,HMD_DWN_DATA2_FRAMES_Frames_SeqNB = []
-                print("make sure that the trace file 'WLAN_BOTH_DataFramesType2.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_DataFramesType2.csv'".format(HMDTracesFolderPath))
-            
-
-            ### RETRANSMITTED DATA FRAMES TYPE II ###
-            if("WLAN_BOTH_RetransmittedDataFramesType2.csv" in listdir(HMDTracesFolderPath)):
-                filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_RetransmittedDataFramesType2.csv")
-                print("{} file processing".format(filePath))
-
-                HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
-                    HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
-                    HMD_DWN_RE_DATA2_FRAMES_NBs,HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
-                    HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes,HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB = \
-                        processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,AP_MAC1,2)
-
-            else:
-                HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
-                    HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
-                    HMD_DWN_RE_DATA2_FRAMES_NBs,HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
-                    HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes,HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB = []
-                print("make sure that the trace file 'WLAN_BOTH_RetransmittedDataFramesType2.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_RetransmittedDataFramesType2.csv'".format(HMDTracesFolderPath))
-
-
-            ### DATA FRAMES TYPE III ###
-            if("WLAN_BOTH_DataFramesType3.csv" in listdir(HMDTracesFolderPath)):
-                filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_DataFramesType3.csv")
-                print("{} file processing".format(filePath))
-
-                HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, HMD_UP_DATA3_FRAMES_DataRates,\
-                    HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB, \
-                    HMD_DWN_DATA3_FRAMES_NBs,HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
-                    HMD_DWN_DATA3_FRAMES_Frames_Sizes,HMD_DWN_DATA3_FRAMES_Frames_SeqNB = \
-                        processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,server_MAC,3)
-
-            else:
-                HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, HMD_UP_DATA3_FRAMES_DataRates,\
-                    HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB, \
-                    HMD_DWN_DATA3_FRAMES_NBs,HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
-                    HMD_DWN_DATA3_FRAMES_Frames_Sizes,HMD_DWN_DATA3_FRAMES_Frames_SeqNB = []
-                print("make sure that the trace file 'WLAN_BOTH_DataFramesType3.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_DataFramesType3.csv'".format(HMDTracesFolderPath))
-            
-
-            ### RETRANSMITTED DATA FRAMES TYPE III ###
-            if("WLAN_BOTH_RetransmittedDataFramesType3.csv" in listdir(HMDTracesFolderPath)):
-                filePath = "{}/{}".format(HMDTracesFolderPath,"WLAN_BOTH_RetransmittedDataFramesType3.csv")
-                print("{} file processing".format(filePath))
-
-                HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, HMD_UP_RE_DATA3_FRAMES_DataRates,\
-                    HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, \
-                    HMD_DWN_RE_DATA3_FRAMES_NBs,HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, HMD_DWN_RE_DATA3_FRAMES_Data_Sizes,\
-                    HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes,HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = \
-                        processHMDDataFramesTraces(filePath,startTimeInMs,endTimeInMs,HMD_MAC,server_MAC,3)
-
-            else:
-                HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, HMD_UP_RE_DATA3_FRAMES_DataRates,\
-                    HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, \
-                    HMD_DWN_RE_DATA3_FRAMES_NBs,HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, HMD_DWN_RE_DATA3_FRAMES_Data_Sizes,\
-                    HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes,HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = []
-                print("make sure that the trace file 'WLAN_BOTH_RetransmittedDataFramesType3.csv' is in the 'HMD_traces' folder in the path {} and its name is 'WLAN_BOTH_RetransmittedDataFramesType3.csv'".format(HMDTracesFolderPath))
-
-
-
-        else:
-            print("make sure that 'HMD_traces' folder is inside the game folder {} in the path {}".format(gameName,gameFolderPath))
-
-        results = (HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,
-                    HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,
-                    HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, HMD_UP_DATA1_FRAMES_NBs, 
-                    HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,
-                    HMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, 
-                    HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,
-                    HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,
-                    HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, 
-                    HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes, HMD_DWN_DATA2_FRAMES_Frames_Sizes, 
-                    HMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,
-                    HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, 
-                    HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,
-                    HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, 
-                    HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB,
-                    HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,
-                    HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, 
-                    HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, 
-                    HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, 
-                    HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB)
-        HMDTracesResults.append((gameName,results))
-    
-
-     
-
     return HMDTracesResults
 
         
