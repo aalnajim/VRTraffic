@@ -3,8 +3,17 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import math
+
+
 root_folder = "plots"
+
 def plotLogsResults(results):
+
+    try:
+        os.mkdir("{}".format(root_folder))
+    except:
+        pass
 
     for resultItem in results:
         gameName,sessionLogResult,OVRMetricsResult,logcatResults,steamVRLogResults = resultItem
@@ -42,9 +51,6 @@ def plotServerTracesResults(serverTracesResults):
             server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
             server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results
         newTimes = relativeTime(server_UP_BOTH_Times)
-    for i in range(len(server_UP_BOTH_Times)):
-        print(server_UP_BOTH_Times[i])
-        print(newTimes[i])
 
 
 
@@ -1529,3 +1535,120 @@ def getElementsAtIndices(listOfElemets,listOfIndices):
     for index in listOfIndices:
         result.append(listOfElemets[index])
     return result
+
+
+
+def computeInstantaneousRates(listOfTimeStamps,listOfSizes,duration=1):
+    # This method is used to compute the transmission rate (capacity) from the traces
+    # input: listOfTimeStamps in ms starting from 0
+    #        listOfSizes in bytes
+    #        duration of the rate in seconds
+    # output: a list of instantaneous rates in Mbps
+    listOfInstantaneousRates = []
+    beginningOfInterval = 0
+    intervalTime = 0
+    sumOfSizes = 0
+    relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    newListOfTimeStamps = [float(x)/1000 for x in relativeListOfTimeStamps]
+
+    for i in range(len(newListOfTimeStamps)):
+        intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+        if intervalTime < duration:
+            sumOfSizes = sumOfSizes + float(listOfSizes[i])
+        else:
+            instantaneousRate = (sumOfSizes * 8)/(duration * ((1024)**2))
+            listOfInstantaneousRates.append(instantaneousRate)
+            beginningOfInterval = beginningOfInterval + duration
+            intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+            sumOfSizes = float(listOfSizes[i])
+    if(len(listOfInstantaneousRates) < math.ceil((float(newListOfTimeStamps[len(newListOfTimeStamps)-1]) - float(newListOfTimeStamps[0]))/duration)):
+            instantaneousRate = (sumOfSizes * 8)/(intervalTime * ((1024)**2)) 
+            listOfInstantaneousRates.append(instantaneousRate)
+    return listOfInstantaneousRates
+
+
+
+def computeNBOfFrames(listOfTimeStamps,duration=1):
+    # This method is used to compute the # of frames for a specific period of time
+    # input: listOfTimeStamps in ms starting from 0
+    #        duration of the # of frames in seconds
+    # output: a list of average NB of frames for a period = the duration
+    listOfNBOfFrames = []   
+    beginningOfInterval = 0
+    intervalTime = 0
+    counter = 0
+    relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    newListOfTimeStamps = [float(x)/1000 for x in relativeListOfTimeStamps]
+    for i in range(len(newListOfTimeStamps)):
+        intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+        if intervalTime < duration:
+            counter = counter + 1
+        else:
+            listOfNBOfFrames.append(counter)
+            beginningOfInterval = beginningOfInterval + duration
+            intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+            counter = 1
+    if(len(listOfNBOfFrames) < math.ceil((float(newListOfTimeStamps[len(newListOfTimeStamps)-1]) - float(newListOfTimeStamps[0]))/duration)):
+            counter = counter/intervalTime * duration
+            listOfNBOfFrames.append(counter)
+    return listOfNBOfFrames
+
+
+
+def computeTotalSizeOfFrames(listOfTimeStamps,listOfSizes,duration=1):
+    # This method is used to compute the total size of frames (transmitted data) for a specific period of time
+    # input: listOfTimeStamps in ms starting from 0
+    #        listOfSizes in bytes
+    #        duration of the total size of frames in seconds
+    # output: a list of total sizes of frames (transmitted data) for a the specified duration
+    listOfSizesOfFrames = []   
+    beginningOfInterval = 0
+    intervalTime = 0
+    size = 0
+    relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    newListOfTimeStamps = [float(x)/1000 for x in relativeListOfTimeStamps]
+    for i in range(len(newListOfTimeStamps)):
+        intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+        if intervalTime < duration:
+            size = size + listOfSizes[i]
+        else:
+            listOfSizesOfFrames.append(size)
+            beginningOfInterval = beginningOfInterval + duration
+            intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+            size = listOfSizes[i]
+    if(len(listOfSizesOfFrames) < math.ceil((float(newListOfTimeStamps[len(newListOfTimeStamps)-1]) - float(newListOfTimeStamps[0]))/duration)):
+            size = size/intervalTime * duration
+            listOfSizesOfFrames.append(size)
+    return listOfSizesOfFrames
+
+
+
+def computeTotalSizeOfFrames(listOfTimeStamps,listOfSizes,duration=1):
+    # This method is used to compute the average frame size for a specific period of time
+    # input: listOfTimeStamps in ms starting from 0
+    #        listOfSizes in bytes
+    #        duration of the average frame's size in seconds
+    # output: a list of average size of frames for a period = the duration
+    listOfAvgSizeOfFrames = []   
+    beginningOfInterval = 0
+    intervalTime = 0
+    size = 0
+    counter = 0
+    relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    newListOfTimeStamps = [float(x)/1000 for x in relativeListOfTimeStamps]
+    for i in range(len(newListOfTimeStamps)):
+        intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+        if intervalTime < duration:
+            size = size + listOfSizes[i]
+            counter = counter + 1
+        else:
+            avgSize = size/counter
+            listOfAvgSizeOfFrames.append(avgSize)
+            beginningOfInterval = beginningOfInterval + duration
+            intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+            size = listOfSizes[i]
+            counter = 1
+    if(len(listOfAvgSizeOfFrames) < math.ceil((float(newListOfTimeStamps[len(newListOfTimeStamps)-1]) - float(newListOfTimeStamps[0]))/duration)):
+            avgSize = size/counter
+            listOfAvgSizeOfFrames.append(avgSize)
+    return listOfAvgSizeOfFrames
