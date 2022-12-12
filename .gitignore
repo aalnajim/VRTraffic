@@ -1,5 +1,6 @@
 .DS_Store
 log_files
 venv
+temp
 traces
 __pycache__
