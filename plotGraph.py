@@ -50,18 +50,22 @@ def plotServerTracesResults(serverTracesResults):
             os.mkdir("{}/{}".format(root_folder,gameName))
         except:
             pass
-        server_UP_BOTH_NBs,server_UP_BOTH_Times,server_UP_BOTH_Data_Sizes,server_UP_BOTH_Frames_Sizes,server_UP_TCP_NBs,\
-            server_UP_TCP_Times,server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,\
-            server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,\
-            server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
-            server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results
-        newTimes = relativeTime(server_UP_BOTH_Times)
-        listOfNBOfFrames = computeNBOfFrames(newTimes,1)
-        listOfTotalFrameSizes = computeTotalSizeOfFrames(newTimes,server_UP_BOTH_Frames_Sizes,1)
-        listOfAvgFramesSize = computeAVGSizeOfFrames(newTimes,server_UP_BOTH_Frames_Sizes,1)
+        try:
+            os.mkdir("{}/{}/{}".format(root_folder,gameName,"server"))
+        except:
+            pass
+        plotServerNBofFrames(root_folder,gameName,results)
+        plotServerFramesInstantaneousRates(root_folder,gameName,results)
+        plotServerDataInstantaneousRates(root_folder,gameName,results)
+        plotServerSizeofFrames(root_folder,gameName,results)
+        plotServerSizeofData(root_folder,gameName,results)
+        plotServerAVGSizeofFrames(root_folder,gameName,results)
+        plotServerAVGSizeofData(root_folder,gameName,results)
 
-        for i in range(len(listOfNBOfFrames)):
-            print("{} - {}".format(listOfAvgFramesSize[i],listOfTotalFrameSizes[i]/listOfNBOfFrames[i]))
+
+
+
+
 
 
 
@@ -1511,11 +1515,964 @@ def plotRunningTime(root_folder,gameName,steamVRLogResults):
 
 
 
+def plotServerNBofFrames(root_folder,gameName,results):
+    result_folder_name = "server/NB_of_frames"
+    prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
+    
+    try:
+        os.mkdir(prefix)
+    except:
+        pass
+
+
+    server_UP_BOTH_NBs,server_UP_BOTH_Times,server_UP_BOTH_Data_Sizes,server_UP_BOTH_Frames_Sizes,server_UP_TCP_NBs,\
+        server_UP_TCP_Times,server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,\
+        server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,\
+        server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
+        server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results     
+
+    #################### Line Graph ####################
+    # line graph for nb of frames for different time durations from server.csv trace
+    durations = [1,10,15,30,60]  # in seconds
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
+    
+    
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            listOfNBOfFramesBoth = computeNBOfFrames(newTimesBoth,duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            listOfNBOfFramesUDP = computeNBOfFrames(newTimesUDP,duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            listOfNBOfFramesTCP = computeNBOfFrames(newTimesTCP,duration)
+            x1 = newTimesPeriodsBoth
+            y1 = listOfNBOfFramesBoth
+            y1Label = 'Both'
+            x2 = newTimesPeriodsUDP
+            y2 = listOfNBOfFramesUDP
+            y2Label = 'UDP'
+            x3 = newTimesPeriodsTCP
+            y3 = listOfNBOfFramesTCP
+            y3Label = 'TCP'      
+            plt.plot(x1,y1,label=y1Label,c='red',marker = '.',linestyle='-')
+            plt.plot(x2,y2,label=y2Label,c='blue',marker = '.',linestyle='-')
+            plt.plot(x3,y3,label=y3Label,c='green',marker = '.',linestyle='-')
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('# of frames', fontsize=12)
+            plt.title("{} # of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_NBFrames.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+    #################### CDF  Graph ####################
+    # CDF Graph for nb of frames for different time durations from server.csv trace
+    for duration in durations:
+        for i in range(len(flowDirections)):    
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            listOfNBOfFramesBoth = computeNBOfFrames(newTimesBoth,duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            listOfNBOfFramesUDP = computeNBOfFrames(newTimesUDP,duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            listOfNBOfFramesTCP = computeNBOfFrames(newTimesTCP,duration)
+            
+            data1 = [float(i) for i in listOfNBOfFramesBoth]
+            data2 = [float(i) for i in listOfNBOfFramesUDP]
+            data3 = [float(i) for i in listOfNBOfFramesTCP]
+            
+            x1 = np.sort(data1)
+            x2 = np.sort(data2)
+            x3 = np.sort(data3)
+
+            y1 = np.arange(len(x1))/float(len(x1))
+            y2 = np.arange(len(x2))/float(len(x2))
+            y3 = np.arange(len(x3))/float(len(x3))
+
+            y1Label =  'Both'
+            y2Label =  'UDP'
+            y3Label =  'TCP'
+
+            plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.')
+            plt.plot(x2, y2,label=y2Label,c='blue',linestyle=':')
+            plt.plot(x3, y3,label=y3Label,c='green',linestyle='--')
+
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('# of frames', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF {} # of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_duration_{}_NBFrames_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+def plotServerFramesInstantaneousRates(root_folder,gameName,results):
+    result_folder_name = "server/frames_instantaneous_rates"
+    prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
+    
+    try:
+        os.mkdir(prefix)
+    except:
+        pass
+
+
+    server_UP_BOTH_NBs,server_UP_BOTH_Times,server_UP_BOTH_Data_Sizes,server_UP_BOTH_Frames_Sizes,server_UP_TCP_NBs,\
+        server_UP_TCP_Times,server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,\
+        server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,\
+        server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
+        server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results     
+
+    #################### Line Graph ####################
+    # line graph for instantaneous rates for different time durations from server.csv trace
+    durations = [1,10,15,30,60]  # in seconds
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
+    listOfFrameSizes = [(server_UP_BOTH_Frames_Sizes,server_UP_UDP_Frames_Sizes,server_UP_TCP_Frames_Sizes),
+                        (server_DWN_BOTH_Frames_Sizes,server_DWN_UDP_Frames_Sizes,server_DWN_TCP_Frames_Sizes)]
+    
+    
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            listOfRatesOfFramesBoth = computeInstantaneousRates(newTimesBoth,listOfFrameSizes[i].__getitem__(0),duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            listOfRatesOfFramesUDP = computeInstantaneousRates(newTimesUDP,listOfFrameSizes[i].__getitem__(1),duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            listOfRatesOfFramesTCP = computeInstantaneousRates(newTimesTCP,listOfFrameSizes[i].__getitem__(2),duration)
+            x1 = newTimesPeriodsBoth
+            y1 = listOfRatesOfFramesBoth
+            y1Label = 'Both'
+            x2 = newTimesPeriodsUDP
+            y2 = listOfRatesOfFramesUDP
+            y2Label = 'UDP'
+            x3 = newTimesPeriodsTCP
+            y3 = listOfRatesOfFramesTCP
+            y3Label = 'TCP'      
+            plt.plot(x1,y1,label=y1Label,c='red',marker = '.',linestyle='-')
+            plt.plot(x2,y2,label=y2Label,c='blue',marker = '.',linestyle='-')
+            plt.plot(x3,y3,label=y3Label,c='green',marker = '.',linestyle='-')
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
+            plt.title("{} instantaneous rates of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+    #################### CDF  Graph ####################
+    # CDF Graph for instantaneous rates for different time durations from server.csv trace
+    for duration in durations:
+        for i in range(len(flowDirections)):    
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            listOfRatesOfFramesBoth = computeInstantaneousRates(newTimesBoth,listOfFrameSizes[i].__getitem__(0),duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            listOfRatesOfFramesUDP = computeInstantaneousRates(newTimesUDP,listOfFrameSizes[i].__getitem__(1),duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            listOfRatesOfFramesTCP = computeInstantaneousRates(newTimesTCP,listOfFrameSizes[i].__getitem__(2),duration)
+            
+            data1 = [float(i) for i in listOfRatesOfFramesBoth]
+            data2 = [float(i) for i in listOfRatesOfFramesUDP]
+            data3 = [float(i) for i in listOfRatesOfFramesTCP]
+            
+            x1 = np.sort(data1)
+            x2 = np.sort(data2)
+            x3 = np.sort(data3)
+
+            y1 = np.arange(len(x1))/float(len(x1))
+            y2 = np.arange(len(x2))/float(len(x2))
+            y3 = np.arange(len(x3))/float(len(x3))
+
+            y1Label =  'Both'
+            y2Label =  'UDP'
+            y3Label =  'TCP'
+
+            plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.')
+            plt.plot(x2, y2,label=y2Label,c='blue',linestyle=':')
+            plt.plot(x3, y3,label=y3Label,c='green',linestyle='--')
+
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('instantaneous rates (Mbps)', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF {} instantaneous rates of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+def plotServerDataInstantaneousRates(root_folder,gameName,results):
+    result_folder_name = "server/data_instantaneous_rates"
+    prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
+    
+    try:
+        os.mkdir(prefix)
+    except:
+        pass
+
+
+    server_UP_BOTH_NBs,server_UP_BOTH_Times,server_UP_BOTH_Data_Sizes,server_UP_BOTH_Frames_Sizes,server_UP_TCP_NBs,\
+        server_UP_TCP_Times,server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,\
+        server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,\
+        server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
+        server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results     
+
+    #################### Line Graph ####################
+    # line graph for instantaneous rates for different time durations from server.csv trace
+    durations = [1,10,15,30,60]  # in seconds
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
+    listOfDataSizes = [(server_UP_BOTH_Data_Sizes,server_UP_UDP_Data_Sizes,server_UP_TCP_Data_Sizes),
+                        (server_DWN_BOTH_Data_Sizes,server_DWN_UDP_Data_Sizes,server_DWN_TCP_Data_Sizes)]
+    
+    
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            listOfRatesOfDataBoth = computeInstantaneousRates(newTimesBoth,listOfDataSizes[i].__getitem__(0),duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            listOfRatesOfDataUDP = computeInstantaneousRates(newTimesUDP,listOfDataSizes[i].__getitem__(1),duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            listOfRatesOfDataTCP = computeInstantaneousRates(newTimesTCP,listOfDataSizes[i].__getitem__(2),duration)
+            x1 = newTimesPeriodsBoth
+            y1 = listOfRatesOfDataBoth
+            y1Label = 'Both'
+            x2 = newTimesPeriodsUDP
+            y2 = listOfRatesOfDataUDP
+            y2Label = 'UDP'
+            x3 = newTimesPeriodsTCP
+            y3 = listOfRatesOfDataTCP
+            y3Label = 'TCP'      
+            plt.plot(x1,y1,label=y1Label,c='red',marker = '.',linestyle='-')
+            plt.plot(x2,y2,label=y2Label,c='blue',marker = '.',linestyle='-')
+            plt.plot(x3,y3,label=y3Label,c='green',marker = '.',linestyle='-')
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
+            plt.title("{} instantaneous rates of data of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+    #################### CDF  Graph ####################
+    # CDF Graph for instantaneous rates for different time durations from server.csv trace
+    for duration in durations:
+        for i in range(len(flowDirections)):    
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            listOfRatesOfDataBoth = computeInstantaneousRates(newTimesBoth,listOfDataSizes[i].__getitem__(0),duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            listOfRatesOfDataUDP = computeInstantaneousRates(newTimesUDP,listOfDataSizes[i].__getitem__(1),duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            listOfRatesOfDataTCP = computeInstantaneousRates(newTimesTCP,listOfDataSizes[i].__getitem__(2),duration)
+            
+            data1 = [float(i) for i in listOfRatesOfDataBoth]
+            data2 = [float(i) for i in listOfRatesOfDataUDP]
+            data3 = [float(i) for i in listOfRatesOfDataTCP]
+            
+            x1 = np.sort(data1)
+            x2 = np.sort(data2)
+            x3 = np.sort(data3)
+
+            y1 = np.arange(len(x1))/float(len(x1))
+            y2 = np.arange(len(x2))/float(len(x2))
+            y3 = np.arange(len(x3))/float(len(x3))
+
+            y1Label =  'Both'
+            y2Label =  'UDP'
+            y3Label =  'TCP'
+
+            plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.')
+            plt.plot(x2, y2,label=y2Label,c='blue',linestyle=':')
+            plt.plot(x3, y3,label=y3Label,c='green',linestyle='--')
+
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('instantaneous rates (Mbps)', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF {} instantaneous rates (Mbps) of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+def plotServerSizeofFrames(root_folder,gameName,results):
+    result_folder_name = "server/size_of_frames"
+    prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
+    
+    try:
+        os.mkdir(prefix)
+    except:
+        pass
+
+
+    server_UP_BOTH_NBs,server_UP_BOTH_Times,server_UP_BOTH_Data_Sizes,server_UP_BOTH_Frames_Sizes,server_UP_TCP_NBs,\
+        server_UP_TCP_Times,server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,\
+        server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,\
+        server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
+        server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results     
+
+    #################### Line Graph ####################
+    # line graph for size of frames for all frames from server.csv trace
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
+    listOfFrameSizes = [(server_UP_BOTH_Frames_Sizes,server_UP_UDP_Frames_Sizes,server_UP_TCP_Frames_Sizes),
+                        (server_DWN_BOTH_Frames_Sizes,server_DWN_UDP_Frames_Sizes,server_DWN_TCP_Frames_Sizes)]
+    protocols = ["Both","UDP","TCP"]
+    colors = ['red','blue','green']
+    NBofFrames = 50
+    plotStartTime = 50 # It starts at the specified second
+    for i in range(len(flowDirections)):
+        protocolIndex = 0
+        for protocol in protocols:
+            newTimes = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(protocolIndex)[0],flowDirectionsLists[i].__getitem__(protocolIndex))
+            newTimesSec = [float(x)/1000 for x in newTimes]
+            timesOfFrames = []
+            sizeOfFrames = []
+            counter = 0
+            for j in range(len(newTimesSec)):
+                if(newTimesSec[j]>=plotStartTime):
+                    timesOfFrames.append(newTimesSec[j])
+                    sizeOfFrames.append(float(listOfFrameSizes[i].__getitem__(protocolIndex)[j]))
+                    counter = counter + 1
+                    if counter>=NBofFrames:
+                        break
+            x = timesOfFrames
+            y = sizeOfFrames
+            yLabel = '{}'.format(protocol)   
+            plt.plot(x,y,label=yLabel,c='{}'.format(colors[protocolIndex]),marker = '.',linestyle='-')
+            protocolIndex = protocolIndex + 1
+   
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('frame size (Bytes)', fontsize=12)
+        plt.title("{} size of all frames of {} for {} frames starting from the second {}".format(flowDirections[i],gameName,NBofFrames,plotStartTime),fontsize="9")
+        plt.savefig('{}/{}_sizes_of_all_frames.png'.format(prefix,flowDirections[i]))
+        plt.show()
+    ####################################################
+
+
+
+    #################### Line Graph ####################
+    # line graph for size of frames for all frames from server.csv trace (separate protocols)
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
+    listOfFrameSizes = [(server_UP_BOTH_Frames_Sizes,server_UP_UDP_Frames_Sizes,server_UP_TCP_Frames_Sizes),
+                        (server_DWN_BOTH_Frames_Sizes,server_DWN_UDP_Frames_Sizes,server_DWN_TCP_Frames_Sizes)]
+    protocols = ["Both","UDP","TCP"]
+    colors = ['red','blue','green']
+    NBofFrames = 50
+    plotStartTime = 50 # It starts at the specified second
+    for i in range(len(flowDirections)):
+        protocolIndex = 0
+        for protocol in protocols:
+            newTimes = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(protocolIndex)[0],flowDirectionsLists[i].__getitem__(protocolIndex))
+            newTimesSec = [float(x)/1000 for x in newTimes]
+            timesOfFrames = []
+            sizeOfFrames = []
+            counter = 0
+            for j in range(len(newTimesSec)):
+                if(newTimesSec[j]>=plotStartTime):
+                    timesOfFrames.append(newTimesSec[j])
+                    sizeOfFrames.append(float(listOfFrameSizes[i].__getitem__(protocolIndex)[j]))
+                    counter = counter + 1
+                    if counter>=NBofFrames:
+                        break
+
+            x1 = timesOfFrames
+            y1 = sizeOfFrames
+            y1Label = '{}'.format(protocol)   
+            plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[protocolIndex]),marker = '.',linestyle='-')
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('frame size (Bytes)', fontsize=12)
+            plt.title("{} size of {} frames of {} for {} frames starting from the second {}".format(flowDirections[i],protocol,gameName,NBofFrames,plotStartTime),fontsize=9)
+            plt.savefig('{}/{}_sizes_of_{}_frames.png'.format(prefix,flowDirections[i],protocol))
+            plt.show()
+            protocolIndex = protocolIndex + 1
+   
+
+    ####################################################
+
+
+
+    #################### Line Graph ####################
+    # line graph for size of frames for different time durations from server.csv trace
+    durations = [1,10,15,30,60]  # in seconds
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
+    listOfFrameSizes = [([float(x)/(1024**2) for x in server_UP_BOTH_Frames_Sizes],[float(x)/(1024**2) for x in server_UP_UDP_Frames_Sizes]
+                        ,[float(x)/(1024**2) for x in server_UP_TCP_Frames_Sizes]),([float(x)/(1024**2) for x in server_DWN_BOTH_Frames_Sizes]
+                        ,[float(x)/(1024**2) for x in server_DWN_UDP_Frames_Sizes],[float(x)/(1024**2) for x in server_DWN_TCP_Frames_Sizes])]
+    
+    
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            totalSizeOfFramesBoth = computeTotalSize(newTimesBoth,listOfFrameSizes[i].__getitem__(0),duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            totalSizeOfFramesUDP = computeTotalSize(newTimesUDP,listOfFrameSizes[i].__getitem__(1),duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            totalSizeOfFramesTCP = computeTotalSize(newTimesTCP,listOfFrameSizes[i].__getitem__(2),duration)
+            x1 = newTimesPeriodsBoth
+            y1 = totalSizeOfFramesBoth
+            y1Label = 'Both'
+            x2 = newTimesPeriodsUDP
+            y2 = totalSizeOfFramesUDP
+            y2Label = 'UDP'
+            x3 = newTimesPeriodsTCP
+            y3 = totalSizeOfFramesTCP
+            y3Label = 'TCP'      
+            plt.plot(x1,y1,label=y1Label,c='red',marker = '.',linestyle='-')
+            plt.plot(x2,y2,label=y2Label,c='blue',marker = '.',linestyle='-')
+            plt.plot(x3,y3,label=y3Label,c='green',marker = '.',linestyle='-')
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('total frames size (MB)', fontsize=12)
+            plt.title("{} total size of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_duration_{}_size_of_frames.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+    #################### CDF  Graph ####################
+    # CDF Graph for size of frames for different time durations from server.csv trace
+    for duration in durations:
+        for i in range(len(flowDirections)):    
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            totalSizeOfFramesBoth = computeTotalSize(newTimesBoth,listOfFrameSizes[i].__getitem__(0),duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            totalSizeOfFramesUDP = computeTotalSize(newTimesUDP,listOfFrameSizes[i].__getitem__(1),duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            totalSizeOfFramesTCP = computeTotalSize(newTimesTCP,listOfFrameSizes[i].__getitem__(2),duration)
+            
+            data1 = [float(i) for i in totalSizeOfFramesBoth]
+            data2 = [float(i) for i in totalSizeOfFramesUDP]
+            data3 = [float(i) for i in totalSizeOfFramesTCP]
+            
+            x1 = np.sort(data1)
+            x2 = np.sort(data2)
+            x3 = np.sort(data3)
+
+            y1 = np.arange(len(x1))/float(len(x1))
+            y2 = np.arange(len(x2))/float(len(x2))
+            y3 = np.arange(len(x3))/float(len(x3))
+
+            y1Label =  'Both'
+            y2Label =  'UDP'
+            y3Label =  'TCP'
+
+            plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.')
+            plt.plot(x2, y2,label=y2Label,c='blue',linestyle=':')
+            plt.plot(x3, y3,label=y3Label,c='green',linestyle='--')
+
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('total frames size (MB)', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF {} size of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_duration_{}_sizs_of_frames_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+def plotServerSizeofData(root_folder,gameName,results):
+    result_folder_name = "server/size_of_data"
+    prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
+    
+    try:
+        os.mkdir(prefix)
+    except:
+        pass
+
+
+    server_UP_BOTH_NBs,server_UP_BOTH_Times,server_UP_BOTH_Data_Sizes,server_UP_BOTH_Frames_Sizes,server_UP_TCP_NBs,\
+        server_UP_TCP_Times,server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,\
+        server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,\
+        server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
+        server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results     
+
+    #################### Line Graph ####################
+    # line graph for size of frames for all frames from server.csv trace
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
+    listOfFrameSizes = [(server_UP_BOTH_Data_Sizes,server_UP_UDP_Data_Sizes,server_UP_TCP_Data_Sizes),
+                        (server_DWN_BOTH_Data_Sizes,server_DWN_UDP_Data_Sizes,server_DWN_TCP_Data_Sizes)]
+    protocols = ["Both","UDP","TCP"]
+    colors = ['red','blue','green']
+    NBofFrames = 50
+    plotStartTime = 50 # It starts at the specified second
+    for i in range(len(flowDirections)):
+        protocolIndex = 0
+        for protocol in protocols:
+            newTimes = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(protocolIndex)[0],flowDirectionsLists[i].__getitem__(protocolIndex))
+            newTimesSec = [float(x)/1000 for x in newTimes]
+            timesOfFrames = []
+            sizeOfFrames = []
+            counter = 0
+            for j in range(len(newTimesSec)):
+                if(newTimesSec[j]>=plotStartTime):
+                    timesOfFrames.append(newTimesSec[j])
+                    sizeOfFrames.append(float(listOfFrameSizes[i].__getitem__(protocolIndex)[j]))
+                    counter = counter + 1
+                    if counter>=NBofFrames:
+                        break
+            x = timesOfFrames
+            y = sizeOfFrames
+            yLabel = '{}'.format(protocol)   
+            plt.plot(x,y,label=yLabel,c='{}'.format(colors[protocolIndex]),marker = '.',linestyle='-')
+            protocolIndex = protocolIndex + 1
+   
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('data size (Bytes)', fontsize=12)
+        plt.title("{} size of data of {} for {} frames starting from the second {}".format(flowDirections[i],gameName,NBofFrames,plotStartTime),fontsize="9")
+        plt.savefig('{}/{}_sizes_of_all_data.png'.format(prefix,flowDirections[i]))
+        plt.show()
+    ####################################################
+
+
+
+    #################### Line Graph ####################
+    # line graph for size of frames for all frames from server.csv trace (separate protocols)
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
+    listOfFrameSizes = [(server_UP_BOTH_Data_Sizes,server_UP_UDP_Data_Sizes,server_UP_TCP_Data_Sizes),
+                        (server_DWN_BOTH_Data_Sizes,server_DWN_UDP_Data_Sizes,server_DWN_TCP_Data_Sizes)]
+    protocols = ["Both","UDP","TCP"]
+    colors = ['red','blue','green']
+    NBofFrames = 50
+    plotStartTime = 50 # It starts at the specified second
+    for i in range(len(flowDirections)):
+        protocolIndex = 0
+        for protocol in protocols:
+            newTimes = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(protocolIndex)[0],flowDirectionsLists[i].__getitem__(protocolIndex))
+            newTimesSec = [float(x)/1000 for x in newTimes]
+            timesOfFrames = []
+            sizeOfFrames = []
+            counter = 0
+            for j in range(len(newTimesSec)):
+                if(newTimesSec[j]>=plotStartTime):
+                    timesOfFrames.append(newTimesSec[j])
+                    sizeOfFrames.append(float(listOfFrameSizes[i].__getitem__(protocolIndex)[j]))
+                    counter = counter + 1
+                    if counter>=NBofFrames:
+                        break
+
+            x1 = timesOfFrames
+            y1 = sizeOfFrames
+            y1Label = '{}'.format(protocol)   
+            plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[protocolIndex]),marker = '.',linestyle='-')
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('frame size (Bytes)', fontsize=12)
+            plt.title("{} size of {} data of {} for {} frames starting from the second {}".format(flowDirections[i],protocol,gameName,NBofFrames,plotStartTime),fontsize=9)
+            plt.savefig('{}/{}_sizes_of_{}_data.png'.format(prefix,flowDirections[i],protocol))
+            plt.show()
+            protocolIndex = protocolIndex + 1
+   
+
+    ####################################################
+
+
+
+    #################### Line Graph ####################
+    # line graph for size of frames for different time durations from server.csv trace
+    durations = [1,10,15,30,60]  # in seconds
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
+    listOfFrameSizes = [([float(x)/(1024**2) for x in server_UP_BOTH_Data_Sizes],[float(x)/(1024**2) for x in server_UP_UDP_Data_Sizes]
+                        ,[float(x)/(1024**2) for x in server_UP_TCP_Data_Sizes]),([float(x)/(1024**2) for x in server_DWN_BOTH_Data_Sizes]
+                        ,[float(x)/(1024**2) for x in server_DWN_UDP_Data_Sizes],[float(x)/(1024**2) for x in server_DWN_TCP_Data_Sizes])]
+    
+    
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            totalSizeOfFramesBoth = computeTotalSize(newTimesBoth,listOfFrameSizes[i].__getitem__(0),duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            totalSizeOfFramesUDP = computeTotalSize(newTimesUDP,listOfFrameSizes[i].__getitem__(1),duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            totalSizeOfFramesTCP = computeTotalSize(newTimesTCP,listOfFrameSizes[i].__getitem__(2),duration)
+            x1 = newTimesPeriodsBoth
+            y1 = totalSizeOfFramesBoth
+            y1Label = 'Both'
+            x2 = newTimesPeriodsUDP
+            y2 = totalSizeOfFramesUDP
+            y2Label = 'UDP'
+            x3 = newTimesPeriodsTCP
+            y3 = totalSizeOfFramesTCP
+            y3Label = 'TCP'      
+            plt.plot(x1,y1,label=y1Label,c='red',marker = '.',linestyle='-')
+            plt.plot(x2,y2,label=y2Label,c='blue',marker = '.',linestyle='-')
+            plt.plot(x3,y3,label=y3Label,c='green',marker = '.',linestyle='-')
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('total data size (MB)', fontsize=12)
+            plt.title("{} total size data of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_duration_{}_size_of_data.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+    #################### CDF  Graph ####################
+    # CDF Graph for size of frames for different time durations from server.csv trace
+    for duration in durations:
+        for i in range(len(flowDirections)):    
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            totalSizeOfFramesBoth = computeTotalSize(newTimesBoth,listOfFrameSizes[i].__getitem__(0),duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            totalSizeOfFramesUDP = computeTotalSize(newTimesUDP,listOfFrameSizes[i].__getitem__(1),duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            totalSizeOfFramesTCP = computeTotalSize(newTimesTCP,listOfFrameSizes[i].__getitem__(2),duration)
+            
+            data1 = [float(i) for i in totalSizeOfFramesBoth]
+            data2 = [float(i) for i in totalSizeOfFramesUDP]
+            data3 = [float(i) for i in totalSizeOfFramesTCP]
+            
+            x1 = np.sort(data1)
+            x2 = np.sort(data2)
+            x3 = np.sort(data3)
+
+            y1 = np.arange(len(x1))/float(len(x1))
+            y2 = np.arange(len(x2))/float(len(x2))
+            y3 = np.arange(len(x3))/float(len(x3))
+
+            y1Label =  'Both'
+            y2Label =  'UDP'
+            y3Label =  'TCP'
+
+            plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.')
+            plt.plot(x2, y2,label=y2Label,c='blue',linestyle=':')
+            plt.plot(x3, y3,label=y3Label,c='green',linestyle='--')
+
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('total data size (MB)', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF {} size of data of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_duration_{}_sizs_of_data_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+def plotServerAVGSizeofFrames(root_folder,gameName,results):
+    result_folder_name = "server/avg_size_of_frames"
+    prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
+    
+    try:
+        os.mkdir(prefix)
+    except:
+        pass
+
+
+    server_UP_BOTH_NBs,server_UP_BOTH_Times,server_UP_BOTH_Data_Sizes,server_UP_BOTH_Frames_Sizes,server_UP_TCP_NBs,\
+        server_UP_TCP_Times,server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,\
+        server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,\
+        server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
+        server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results     
+
+
+
+    #################### Line Graph ####################
+    # line graph for avg size of frames for different time durations from server.csv trace
+    durations = [1,10,15,30,60]  # in seconds
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
+    listOfFrameSizes = [([float(x) for x in server_UP_BOTH_Frames_Sizes],[float(x) for x in server_UP_UDP_Frames_Sizes]
+                        ,[float(x) for x in server_UP_TCP_Frames_Sizes]),([float(x) for x in server_DWN_BOTH_Frames_Sizes]
+                        ,[float(x) for x in server_DWN_UDP_Frames_Sizes],[float(x) for x in server_DWN_TCP_Frames_Sizes])]
+    
+    
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            avgSizeOfFramesBoth = computeAVGSize(newTimesBoth,listOfFrameSizes[i].__getitem__(0),duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            avgSizeOfFramesUDP = computeAVGSize(newTimesUDP,listOfFrameSizes[i].__getitem__(1),duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            avgSizeOfFramesTCP = computeAVGSize(newTimesTCP,listOfFrameSizes[i].__getitem__(2),duration)
+            x1 = newTimesPeriodsBoth
+            y1 = avgSizeOfFramesBoth
+            y1Label = 'Both'
+            x2 = newTimesPeriodsUDP
+            y2 = avgSizeOfFramesUDP
+            y2Label = 'UDP'
+            x3 = newTimesPeriodsTCP
+            y3 = avgSizeOfFramesTCP
+            y3Label = 'TCP'      
+            plt.plot(x1,y1,label=y1Label,c='red',marker = '.',linestyle='-')
+            plt.plot(x2,y2,label=y2Label,c='blue',marker = '.',linestyle='-')
+            plt.plot(x3,y3,label=y3Label,c='green',marker = '.',linestyle='-')
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('avg frames size (bytes)', fontsize=12)
+            plt.title("{} avg size of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_duration_{}_avg_size_of_frames.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+    #################### CDF  Graph ####################
+    # CDF Graph for size of frames for different time durations from server.csv trace
+    for duration in durations:
+        for i in range(len(flowDirections)):    
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            avgSizeOfFramesBoth = computeAVGSize(newTimesBoth,listOfFrameSizes[i].__getitem__(0),duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            avgSizeOfFramesUDP = computeAVGSize(newTimesUDP,listOfFrameSizes[i].__getitem__(1),duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            avgSizeOfFramesTCP = computeAVGSize(newTimesTCP,listOfFrameSizes[i].__getitem__(2),duration)
+            
+            data1 = [float(i) for i in avgSizeOfFramesBoth]
+            data2 = [float(i) for i in avgSizeOfFramesUDP]
+            data3 = [float(i) for i in avgSizeOfFramesTCP]
+            
+            x1 = np.sort(data1)
+            x2 = np.sort(data2)
+            x3 = np.sort(data3)
+
+            y1 = np.arange(len(x1))/float(len(x1))
+            y2 = np.arange(len(x2))/float(len(x2))
+            y3 = np.arange(len(x3))/float(len(x3))
+
+            y1Label =  'Both'
+            y2Label =  'UDP'
+            y3Label =  'TCP'
+
+            plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.')
+            plt.plot(x2, y2,label=y2Label,c='blue',linestyle=':')
+            plt.plot(x3, y3,label=y3Label,c='green',linestyle='--')
+
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('avg frames size (bytes)', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF {} avg size of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_duration_{}_avg_sizs_of_frames_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+def plotServerAVGSizeofData(root_folder,gameName,results):
+    result_folder_name = "server/avg_size_of_data"
+    prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
+    
+    try:
+        os.mkdir(prefix)
+    except:
+        pass
+
+
+    server_UP_BOTH_NBs,server_UP_BOTH_Times,server_UP_BOTH_Data_Sizes,server_UP_BOTH_Frames_Sizes,server_UP_TCP_NBs,\
+        server_UP_TCP_Times,server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,\
+        server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,\
+        server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
+        server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results     
+
+
+    #################### Line Graph ####################
+    # line graph for avg size of frames for different time durations from server.csv trace
+    durations = [1,10,15,30,60]  # in seconds
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
+    listOfFrameSizes = [([float(x) for x in server_UP_BOTH_Data_Sizes],[float(x) for x in server_UP_UDP_Data_Sizes]
+                        ,[float(x) for x in server_UP_TCP_Data_Sizes]),([float(x) for x in server_DWN_BOTH_Data_Sizes]
+                        ,[float(x) for x in server_DWN_UDP_Data_Sizes],[float(x) for x in server_DWN_TCP_Data_Sizes])]
+    
+    
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            avgSizeOfFramesBoth = computeAVGSize(newTimesBoth,listOfFrameSizes[i].__getitem__(0),duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            avgSizeOfFramesUDP = computeAVGSize(newTimesUDP,listOfFrameSizes[i].__getitem__(1),duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            avgSizeOfFramesTCP = computeAVGSize(newTimesTCP,listOfFrameSizes[i].__getitem__(2),duration)
+            x1 = newTimesPeriodsBoth
+            y1 = avgSizeOfFramesBoth
+            y1Label = 'Both'
+            x2 = newTimesPeriodsUDP
+            y2 = avgSizeOfFramesUDP
+            y2Label = 'UDP'
+            x3 = newTimesPeriodsTCP
+            y3 = avgSizeOfFramesTCP
+            y3Label = 'TCP'      
+            plt.plot(x1,y1,label=y1Label,c='red',marker = '.',linestyle='-')
+            plt.plot(x2,y2,label=y2Label,c='blue',marker = '.',linestyle='-')
+            plt.plot(x3,y3,label=y3Label,c='green',marker = '.',linestyle='-')
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('avg data size (bytes)', fontsize=12)
+            plt.title("{} avg size data of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_duration_{}_avg_size_of_data.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+    #################### CDF  Graph ####################
+    # CDF Graph for size of frames for different time durations from server.csv trace
+    for duration in durations:
+        for i in range(len(flowDirections)):    
+            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+            avgSizeOfFramesBoth = computeAVGSize(newTimesBoth,listOfFrameSizes[i].__getitem__(0),duration)
+            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+            avgSizeOfFramesUDP = computeAVGSize(newTimesUDP,listOfFrameSizes[i].__getitem__(1),duration)
+            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+            avgSizeOfFramesTCP = computeAVGSize(newTimesTCP,listOfFrameSizes[i].__getitem__(2),duration)
+            
+            data1 = [float(i) for i in avgSizeOfFramesBoth]
+            data2 = [float(i) for i in avgSizeOfFramesUDP]
+            data3 = [float(i) for i in avgSizeOfFramesTCP]
+            
+            x1 = np.sort(data1)
+            x2 = np.sort(data2)
+            x3 = np.sort(data3)
+
+            y1 = np.arange(len(x1))/float(len(x1))
+            y2 = np.arange(len(x2))/float(len(x2))
+            y3 = np.arange(len(x3))/float(len(x3))
+
+            y1Label =  'Both'
+            y2Label =  'UDP'
+            y3Label =  'TCP'
+
+            plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.')
+            plt.plot(x2, y2,label=y2Label,c='blue',linestyle=':')
+            plt.plot(x3, y3,label=y3Label,c='green',linestyle='--')
+
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('avg data size (bytes)', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF {} avg size of data of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_duration_{}_avg_sizs_of_data_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
 def relativeTime(arrayOfTimes=[]):
     if(len(arrayOfTimes)<1):
         return[]
     else:
         return [float(x)-float(arrayOfTimes[0]) for x in arrayOfTimes]
+
+
+
+def relativeTimeFromAPointOfTime(firstTime,arrayOfTimes=[]):
+    if(len(arrayOfTimes)<1):
+        return[]
+    else:
+        return [float(x)-firstTime for x in arrayOfTimes]
+
+
+
+def convertTimeToPeriods(listOfTimeStamps,duration=1):
+    # This method is used to convert the list of times to a list of periods based on a duration
+    # input: listOfTimeStamps in ms starting from 0
+    #        duration of the resulted times
+    # output: a list of periods based on the duration
+    duration = 1 if duration == 0 else duration
+    listOfTimesPeriods = []   
+    beginningOfInterval = 0
+    intervalTime = 0
+    counter = 1
+    #relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    relativeListOfTimeStamps = listOfTimeStamps 
+    newListOfTimeStamps = [float(x)/1000 for x in relativeListOfTimeStamps]
+    beginningOfInterval = math.floor(newListOfTimeStamps[0]/duration) * duration
+    counter = counter + beginningOfInterval/duration
+    for i in range(len(newListOfTimeStamps)):
+        intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+        if intervalTime >= duration:
+            listOfTimesPeriods.append(counter*duration)
+            beginningOfInterval = beginningOfInterval + duration
+            intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+            counter = counter + 1
+            
+    if(len(listOfTimesPeriods) < math.ceil((float(newListOfTimeStamps[len(newListOfTimeStamps)-1]) - float(newListOfTimeStamps[0]))/duration)):
+            listOfTimesPeriods.append(counter*duration)
+    return listOfTimesPeriods
 
 
 
@@ -1559,8 +2516,10 @@ def computeInstantaneousRates(listOfTimeStamps,listOfSizes,duration=1):
     beginningOfInterval = 0
     intervalTime = 0
     sumOfSizes = 0
-    relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    #relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    relativeListOfTimeStamps = listOfTimeStamps 
     newListOfTimeStamps = [float(x)/1000 for x in relativeListOfTimeStamps]
+    beginningOfInterval = math.floor(newListOfTimeStamps[0]/duration) * duration
 
     for i in range(len(newListOfTimeStamps)):
         intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
@@ -1583,13 +2542,17 @@ def computeNBOfFrames(listOfTimeStamps,duration=1):
     # This method is used to compute the # of frames for a specific period of time
     # input: listOfTimeStamps in ms starting from 0
     #        duration of the # of frames in seconds
-    # output: a list of average NB of frames for a period = the duration
-    listOfNBOfFrames = []   
+    # output: a list of average NB of frames for a period = the duration   
+    duration = 1 if duration == 0 else duration
+    listOfNBOfFrames = []
     beginningOfInterval = 0
     intervalTime = 0
     counter = 0
-    relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    #relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    relativeListOfTimeStamps = listOfTimeStamps 
     newListOfTimeStamps = [float(x)/1000 for x in relativeListOfTimeStamps]
+    beginningOfInterval = math.floor(newListOfTimeStamps[0]/duration) * duration
+
     for i in range(len(newListOfTimeStamps)):
         intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
         if intervalTime < duration:
@@ -1606,7 +2569,7 @@ def computeNBOfFrames(listOfTimeStamps,duration=1):
 
 
 
-def computeTotalSizeOfFrames(listOfTimeStamps,listOfSizes,duration=1):
+def computeTotalSize(listOfTimeStamps,listOfSizes,duration=1):
     # This method is used to compute the total size of frames (transmitted data) for a specific period of time
     # input: listOfTimeStamps in ms starting from 0
     #        listOfSizes in bytes
@@ -1616,8 +2579,11 @@ def computeTotalSizeOfFrames(listOfTimeStamps,listOfSizes,duration=1):
     beginningOfInterval = 0
     intervalTime = 0
     size = 0
-    relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    #relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    relativeListOfTimeStamps = listOfTimeStamps     
     newListOfTimeStamps = [float(x)/1000 for x in relativeListOfTimeStamps]
+    beginningOfInterval = math.floor(newListOfTimeStamps[0]/duration) * duration
+
     for i in range(len(newListOfTimeStamps)):
         intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
         if intervalTime < duration:
@@ -1634,7 +2600,7 @@ def computeTotalSizeOfFrames(listOfTimeStamps,listOfSizes,duration=1):
 
 
 
-def computeAVGSizeOfFrames(listOfTimeStamps,listOfSizes,duration=1):
+def computeAVGSize(listOfTimeStamps,listOfSizes,duration=1):
     # This method is used to compute the average frame size for a specific period of time
     # input: listOfTimeStamps in ms starting from 0
     #        listOfSizes in bytes
@@ -1645,8 +2611,11 @@ def computeAVGSizeOfFrames(listOfTimeStamps,listOfSizes,duration=1):
     intervalTime = 0
     size = 0
     counter = 0
-    relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    #relativeListOfTimeStamps = listOfTimeStamps if listOfTimeStamps[0] == 0 else relativeTime(listOfTimeStamps)
+    relativeListOfTimeStamps = listOfTimeStamps 
     newListOfTimeStamps = [float(x)/1000 for x in relativeListOfTimeStamps]
+    beginningOfInterval = math.floor(newListOfTimeStamps[0]/duration) * duration
+
     for i in range(len(newListOfTimeStamps)):
         intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
         if intervalTime < duration:
