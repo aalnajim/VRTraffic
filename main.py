@@ -1839,10 +1839,10 @@ def main():
 
     # startTime = "00:00:00"
     # endTime = "23:59:59"
-    startTime = "22:00"   
-    endTime = "22:05"
-    # startTime = "15:15"
-    # endTime = "15:20"
+    # startTime = "22:00"   
+    # endTime = "22:05"
+    startTime = "15:15"
+    endTime = "15:20"
     HMD_IP = "192.168.1.179"      # the HMD is linked wirelessly to the access point
     server_IP = "192.168.1.14"    # the server is linked by a wired link to the access point
     HMD_MAC = "Facebook_63:35:01" # the HMD is linked wirelessly to the access point
@@ -1857,8 +1857,8 @@ def main():
     serverTracesResults, HMDTracesResults = processTracesFolder(tracesFolder,startTime,endTime,HMD_IP,server_IP,HMD_MAC,server_MAC,AP_MAC1,AP_MAC2)
     
     # plotGraph.plotLogsResults(LogsFolderResults)
-    plotGraph.plotServerTracesResults(serverTracesResults)
-    # plotGraph.plotHMDTracesResults(HMDTracesResults)
+    # plotGraph.plotServerTracesResults(serverTracesResults)
+    plotGraph.plotHMDTracesResults(HMDTracesResults)
 
 
     # for resultItem in HMDTracesResults:

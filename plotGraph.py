@@ -64,13 +64,65 @@ def plotServerTracesResults(serverTracesResults):
 
 
 
-
-
-
-
-
 def plotHMDTracesResults(HMDTracesResults):
-    print('hello')
+    try:
+        os.mkdir("{}".format(root_folder))
+    except:
+        pass
+
+    for resultItem in HMDTracesResults:
+        gameName,results = resultItem
+        try:
+            os.mkdir("{}/{}".format(root_folder,gameName))
+        except:
+            pass
+        try:
+            os.mkdir("{}/{}/{}".format(root_folder,gameName,"HMD"))
+        except:
+            pass
+
+        HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
+        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
+        HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, HMD_UP_DATA1_FRAMES_NBs, \
+        HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,\
+        HMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, \
+        HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,\
+        HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,\
+        HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, \
+        HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes, HMD_DWN_DATA2_FRAMES_Frames_Sizes, \
+        HMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
+        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
+        HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
+        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, \
+        HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB,\
+        HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
+        HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, \
+        HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, \
+        HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, \
+        HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = results 
+
+        newResults = eliminateRetransmittedFrames(results)
+        uniqueDataCombinedLists,retransmittedDataCombinedLists = combinedResultsLists(newResults)
+        HMD_UP_NBs,HMD_UPـTimes,HMD_UP_DataRates,HMD_UP_Data_Sizes,HMD_UP_Frames_Sizes,HMD_UP_Frames_SeqNB,HMD_DWN_NBs,HMD_DWNـTimes,\
+            HMD_DWN_DataRates,HMD_DWN_Data_Sizes,HMD_DWN_Frames_Sizes,HMD_DWN_Frames_SeqNB = uniqueDataCombinedLists
+        HMD_UP_RE_NBs,HMD_UP_RE_Times,HMD_UP_RE_DataRates,HMD_UP_RE_Data_Sizes,HMD_UP_RE_Frames_Sizes,HMD_UP_RE_Frames_SeqNB,HMD_DWN_RE_NBs,HMD_DWN_RE_Times,\
+            HMD_DWN_RE_DataRates,HMD_DWN_RE_Data_Sizes,HMD_DWN_RE_Frames_Sizes,HMD_DWN_RE_Frames_SeqNB = retransmittedDataCombinedLists
+        #print(computeOverallSucessRateSize(HMD_UP_Data_Sizes,HMD_UP_RE_Data_Sizes))
+        listOfResultsNB    = computePeriodicSucessRateNB(HMD_UPـTimes,HMD_UP_RE_Times,duration=1)
+        listOfResultsSizes = computePeriodicSucessRateSize(HMD_UPـTimes,HMD_UP_Data_Sizes,HMD_UP_RE_Times,HMD_UP_RE_Data_Sizes,duration=1)
+        for index in range(len(listOfResultsNB)):
+            print("{}  -  {}".format(listOfResultsNB[index],listOfResultsSizes[index]))
+
+
+        
+        # plotHMDNBofFrames(root_folder,gameName,results)
+        # plotServerNBofFrames(root_folder,gameName,results)
+        # plotServerFramesInstantaneousRates(root_folder,gameName,results)
+        # plotServerDataInstantaneousRates(root_folder,gameName,results)
+        # plotServerSizeofFrames(root_folder,gameName,results)
+        # plotServerSizeofData(root_folder,gameName,results)
+        # plotServerAVGSizeofFrames(root_folder,gameName,results)
+        # plotServerAVGSizeofData(root_folder,gameName,results)
 
 
 
@@ -1618,6 +1670,126 @@ def plotServerNBofFrames(root_folder,gameName,results):
 
 
 
+def plotHMDNBofFrames(root_folder,gameName,results):
+    result_folder_name = "server/NB_of_frames"
+    prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
+    
+    try:
+        os.mkdir(prefix)
+    except:
+        pass
+
+
+    HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
+        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
+        HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, HMD_UP_DATA1_FRAMES_NBs, \
+        HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,\
+        HMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, \
+        HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,\
+        HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,\
+        HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, \
+        HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes, HMD_DWN_DATA2_FRAMES_Frames_Sizes, \
+        HMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
+        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
+        HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
+        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, \
+        HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB,\
+        HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
+        HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, \
+        HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, \
+        HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, \
+        HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = results   
+
+    #################### Line Graph ####################
+    # line graph for nb of management frames for different time durations from HMD traces folder
+    try:
+        os.mkdir("{}/{}".format(prefix,"management_frames"))
+    except:
+        pass
+    
+    durations = [1,10,15,30,60]  # in seconds
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(HMD_UP_MANAGEMENT_FRAMES_Times,HMD_UP_DATA1_FRAMES_Times,HMD_UP_RE_DATA1_FRAMES_Times,HMD_UP_DATA2_FRAMES_Times,HMD_DWN_RE_DATA2_FRAMES_Times,HMD_UP_DATA3_FRAMES_Times,HMD_DWN_RE_DATA3_FRAMES_Times),
+                            (HMD_DWN_MANAGEMENT_FRAMES_Times,[],[],HMD_DWN_DATA2_FRAMES_Times,HMD_DWN_RE_DATA2_FRAMES_Times,HMD_DWN_DATA3_FRAMES_Times,HMD_DWN_RE_DATA3_FRAMES_Times)]
+    colors = ["red","blue","green","black","purple","cyan","pink"]
+    labels = ["management frames","data type1","retransmitted data type1","data type2","retransmitted data type2","data type3","retransmitted data type3"]
+    # firstFrame = min(HMD_UP_MANAGEMENT_FRAMES_Times[0],HMD_UP_DATA1_FRAMES_Times[0],HMD_UP_RE_DATA1_FRAMES_Times[0],HMD_UP_DATA2_FRAMES_Times[0],HMD_DWN_RE_DATA2_FRAMES_Times[0],HMD_UP_DATA3_FRAMES_Times[0],HMD_DWN_RE_DATA3_FRAMES_Times[0])
+    
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            folderPath = "{}/{}".format(prefix,flowDirections[i])
+            try:
+                os.mkdir(folderPath)
+            except:
+                pass
+            firstFrame = min(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1)[0] if i==0 else 100000000,flowDirectionsLists[i].__getitem__(2)[0] if i == 0 else 100000000,flowDirectionsLists[i].__getitem__(3)[0],
+                            flowDirectionsLists[i].__getitem__(4)[0],flowDirectionsLists[i].__getitem__(5)[0],flowDirectionsLists[i].__getitem__(6)[0])
+            for j in range(len(flowDirectionsLists[i])):
+                if(i == 1 and j in [1,2]):
+                    continue
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfNBOfFrames = computeNBOfFrames(newTimes,duration)
+                x = newTimesPeriods
+                y = listOfNBOfFrames
+                yLabel = '{}'.format(labels[j]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[j]),marker = '.',linestyle='-')
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('# of frames', fontsize=12)
+            plt.title("{} # of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_NBFrames.png'.format(folderPath,flowDirections[i],duration))
+            plt.show()
+    ####################################################
+
+
+
+    # #################### CDF  Graph ####################
+    # # CDF Graph for nb of frames for different time durations from server.csv trace
+    # for duration in durations:
+    #     for i in range(len(flowDirections)):    
+    #         newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
+    #         newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
+    #         listOfNBOfFramesBoth = computeNBOfFrames(newTimesBoth,duration)
+    #         newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
+    #         newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
+    #         listOfNBOfFramesUDP = computeNBOfFrames(newTimesUDP,duration)
+    #         newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
+    #         newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
+    #         listOfNBOfFramesTCP = computeNBOfFrames(newTimesTCP,duration)
+            
+    #         data1 = [float(i) for i in listOfNBOfFramesBoth]
+    #         data2 = [float(i) for i in listOfNBOfFramesUDP]
+    #         data3 = [float(i) for i in listOfNBOfFramesTCP]
+            
+    #         x1 = np.sort(data1)
+    #         x2 = np.sort(data2)
+    #         x3 = np.sort(data3)
+
+    #         y1 = np.arange(len(x1))/float(len(x1))
+    #         y2 = np.arange(len(x2))/float(len(x2))
+    #         y3 = np.arange(len(x3))/float(len(x3))
+
+    #         y1Label =  'Both'
+    #         y2Label =  'UDP'
+    #         y3Label =  'TCP'
+
+    #         plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.')
+    #         plt.plot(x2, y2,label=y2Label,c='blue',linestyle=':')
+    #         plt.plot(x3, y3,label=y3Label,c='green',linestyle='--')
+
+    #         plt.legend(loc='best', fontsize=10)
+    #         plt.grid(color='grey', linestyle='--', linewidth=0.5)
+    #         plt.xlabel('# of frames', fontsize=12)
+    #         plt.ylabel('CDF', fontsize=12)
+    #         plt.title("CDF {} # of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+    #         plt.savefig('{}/{}_duration_{}_NBFrames_CDF.png'.format(prefix,flowDirections[i],duration))
+    #         plt.show()
+    # ####################################################
+
+
+
 def plotServerFramesInstantaneousRates(root_folder,gameName,results):
     result_folder_name = "server/frames_instantaneous_rates"
     prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
@@ -2506,6 +2678,272 @@ def getElementsAtIndices(listOfElemets,listOfIndices):
 
 
 
+def eliminateRetransmittedFrames(results):
+    # This method is used to remove re-transmission attempts from the data1,data2, and data3 lists 
+    # input: list of HMD results
+    # output: a list of HMD results without the re-transmission attempts in data1, data2, and data3 lists
+    HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
+        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
+        HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, HMD_UP_DATA1_FRAMES_NBs, \
+        HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,\
+        HMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, \
+        HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,\
+        HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,\
+        HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, \
+        HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes, HMD_DWN_DATA2_FRAMES_Frames_Sizes, \
+        HMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
+        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
+        HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
+        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, \
+        HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB,\
+        HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
+        HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, \
+        HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, \
+        HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, \
+        HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = results  
+
+    newHMD_UP_DATA1_FRAMES_NBs           = []
+    newHMD_UP_DATA1_FRAMES_Times         = []
+    newHMD_UP_DATA1_FRAMES_DataRates     = [] 
+    newHMD_UP_DATA1_FRAMES_Frames_Sizes  = []
+    newHMD_UP_DATA1_FRAMES_Frames_SeqNB  = []
+    newHMD_UP_DATA2_FRAMES_NBs           = []
+    newHMD_UP_DATA2_FRAMES_Times         = []
+    newHMD_UP_DATA2_FRAMES_DataRates     = []
+    newHMD_UP_DATA2_FRAMES_Data_Sizes    = []
+    newHMD_UP_DATA2_FRAMES_Frames_Sizes  = []
+    newHMD_UP_DATA2_FRAMES_Frames_SeqNB  = []
+    newHMD_DWN_DATA2_FRAMES_NBs          = []
+    newHMD_DWN_DATA2_FRAMES_Times        = []
+    newHMD_DWN_DATA2_FRAMES_DataRates    = []
+    newHMD_DWN_DATA2_FRAMES_Data_Sizes   = []
+    newHMD_DWN_DATA2_FRAMES_Frames_Sizes = []
+    newHMD_DWN_DATA2_FRAMES_Frames_SeqNB = []
+    newHMD_UP_DATA3_FRAMES_NBs           = []
+    newHMD_UP_DATA3_FRAMES_Times         = []
+    newHMD_UP_DATA3_FRAMES_DataRates     = []
+    newHMD_UP_DATA3_FRAMES_Data_Sizes    = []
+    newHMD_UP_DATA3_FRAMES_Frames_Sizes  = []
+    newHMD_UP_DATA3_FRAMES_Frames_SeqNB  = []
+    newHMD_DWN_DATA3_FRAMES_NBs          = []
+    newHMD_DWN_DATA3_FRAMES_Times        = []
+    newHMD_DWN_DATA3_FRAMES_DataRates    = []
+    newHMD_DWN_DATA3_FRAMES_Data_Sizes   = []
+    newHMD_DWN_DATA3_FRAMES_Frames_Sizes = []
+    newHMD_DWN_DATA3_FRAMES_Frames_SeqNB = []
+
+    # Data I
+
+    newHMD_UP_DATA1_FRAMES_NBs,newHMD_UP_DATA1_FRAMES_Times,newHMD_UP_DATA1_FRAMES_DataRates, \
+        newHMD_UP_DATA1_FRAMES_Frames_Sizes,newHMD_UP_DATA1_FRAMES_Frames_SeqNB = getUniqueFrames((HMD_UP_DATA1_FRAMES_NBs,
+        HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,HMD_UP_DATA1_FRAMES_Frames_SeqNB))
+
+    
+    # Data II
+    newHMD_UP_DATA2_FRAMES_NBs, newHMD_UP_DATA2_FRAMES_Times, newHMD_UP_DATA2_FRAMES_DataRates, newHMD_UP_DATA2_FRAMES_Data_Sizes,\
+        newHMD_UP_DATA2_FRAMES_Frames_Sizes, newHMD_UP_DATA2_FRAMES_Frames_SeqNB = getUniqueFrames((HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, 
+        HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB))
+    
+    newHMD_DWN_DATA2_FRAMES_NBs, newHMD_DWN_DATA2_FRAMES_Times, newHMD_DWN_DATA2_FRAMES_DataRates, newHMD_DWN_DATA2_FRAMES_Data_Sizes,\
+        newHMD_DWN_DATA2_FRAMES_Frames_Sizes, newHMD_DWN_DATA2_FRAMES_Frames_SeqNB = getUniqueFrames((HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, 
+        HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes,HMD_DWN_DATA2_FRAMES_Frames_Sizes, HMD_DWN_DATA2_FRAMES_Frames_SeqNB))
+
+    
+    # Data III
+    newHMD_UP_DATA3_FRAMES_NBs, newHMD_UP_DATA3_FRAMES_Times, newHMD_UP_DATA3_FRAMES_DataRates, newHMD_UP_DATA3_FRAMES_Data_Sizes,\
+        newHMD_UP_DATA3_FRAMES_Frames_Sizes, newHMD_UP_DATA3_FRAMES_Frames_SeqNB = getUniqueFrames((HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, 
+        HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes,HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB))
+    
+    newHMD_DWN_DATA3_FRAMES_NBs, newHMD_DWN_DATA3_FRAMES_Times, newHMD_DWN_DATA3_FRAMES_DataRates, newHMD_DWN_DATA3_FRAMES_Data_Sizes,\
+        newHMD_DWN_DATA3_FRAMES_Frames_Sizes, newHMD_DWN_DATA3_FRAMES_Frames_SeqNB = getUniqueFrames((HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, 
+        HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB))
+
+
+    newResults = (HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,
+        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,
+        HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, newHMD_UP_DATA1_FRAMES_NBs, 
+        newHMD_UP_DATA1_FRAMES_Times, newHMD_UP_DATA1_FRAMES_DataRates, newHMD_UP_DATA1_FRAMES_Frames_Sizes,
+        newHMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, 
+        HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,
+        newHMD_UP_DATA2_FRAMES_NBs, newHMD_UP_DATA2_FRAMES_Times, newHMD_UP_DATA2_FRAMES_DataRates, newHMD_UP_DATA2_FRAMES_Data_Sizes,
+        newHMD_UP_DATA2_FRAMES_Frames_Sizes, newHMD_UP_DATA2_FRAMES_Frames_SeqNB, newHMD_DWN_DATA2_FRAMES_NBs, newHMD_DWN_DATA2_FRAMES_Times, 
+        newHMD_DWN_DATA2_FRAMES_DataRates, newHMD_DWN_DATA2_FRAMES_Data_Sizes, newHMD_DWN_DATA2_FRAMES_Frames_Sizes, 
+        newHMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,
+        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, 
+        HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,
+        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, newHMD_UP_DATA3_FRAMES_NBs, newHMD_UP_DATA3_FRAMES_Times, 
+        newHMD_UP_DATA3_FRAMES_DataRates, newHMD_UP_DATA3_FRAMES_Data_Sizes, newHMD_UP_DATA3_FRAMES_Frames_Sizes, newHMD_UP_DATA3_FRAMES_Frames_SeqNB,
+        newHMD_DWN_DATA3_FRAMES_NBs, newHMD_DWN_DATA3_FRAMES_Times, newHMD_DWN_DATA3_FRAMES_DataRates, newHMD_DWN_DATA3_FRAMES_Data_Sizes,
+        newHMD_DWN_DATA3_FRAMES_Frames_Sizes, newHMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, 
+        HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, 
+        HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, 
+        HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB)
+    return newResults
+
+
+
+def getUniqueFrames(setOfLists):
+    # This method is used by eliminateRetransmittedFrames method to remove re-transmission attempts from the data1,data2, and data3 lists 
+    # input: relevant HMD lists as a tuple of lists (5 in case of data 1 and 6 in case of data 2 & 3)
+    # output: the relevant HMD lists after removing the re-transmission attempts
+    newHMD_FRAMES_NBs          = []
+    newHMD_FRAMES_Times        = []
+    newHMD_FRAMES_DataRates    = []
+    newHMD_FRAMES_Data_Sizes   = []
+    newHMD_FRAMES_Frames_Sizes = []
+    newHMD_FRAMES_Frames_SeqNB = []
+    
+    if(len(setOfLists)==5): # DATA I
+        HMD_FRAMES_NBs,HMD_FRAMES_Times,HMD_FRAMES_DataRates,HMD_FRAMES_Frames_Sizes,HMD_FRAMES_Frames_SeqNB = setOfLists
+        for i in range (len(HMD_FRAMES_NBs)):
+            if(len(newHMD_FRAMES_Frames_SeqNB)-1 >= 0 and HMD_FRAMES_Frames_SeqNB[i] == newHMD_FRAMES_Frames_SeqNB[len(newHMD_FRAMES_Frames_SeqNB)-1]):
+                index = len(newHMD_FRAMES_Frames_SeqNB)-1
+                newHMD_FRAMES_NBs[index]          = HMD_FRAMES_NBs[i]
+                newHMD_FRAMES_Times[index]        = HMD_FRAMES_Times[i]
+                newHMD_FRAMES_DataRates[index]    = HMD_FRAMES_DataRates[i]
+                newHMD_FRAMES_Frames_Sizes[index] = HMD_FRAMES_Frames_Sizes[i]
+                newHMD_FRAMES_Frames_SeqNB[index] = HMD_FRAMES_Frames_SeqNB[i]
+            else:
+                newHMD_FRAMES_NBs.append(HMD_FRAMES_NBs[i])
+                newHMD_FRAMES_Times.append(HMD_FRAMES_Times[i])
+                newHMD_FRAMES_DataRates.append(HMD_FRAMES_DataRates[i])
+                newHMD_FRAMES_Frames_Sizes.append(HMD_FRAMES_Frames_Sizes[i])
+                newHMD_FRAMES_Frames_SeqNB.append(HMD_FRAMES_Frames_SeqNB[i])
+        newSetOfList = (newHMD_FRAMES_NBs,newHMD_FRAMES_Times,newHMD_FRAMES_DataRates,newHMD_FRAMES_Frames_Sizes,newHMD_FRAMES_Frames_SeqNB)
+
+    elif(len(setOfLists)>5): # DATA II & DATA III
+        HMD_FRAMES_NBs,HMD_FRAMES_Times,HMD_FRAMES_DataRates,HMD_FRAMES_Data_Sizes,HMD_FRAMES_Frames_Sizes,HMD_FRAMES_Frames_SeqNB = setOfLists
+        for i in range (len(HMD_FRAMES_NBs)):
+            if(len(newHMD_FRAMES_Frames_SeqNB)-1 >= 0 and HMD_FRAMES_Frames_SeqNB[i] == newHMD_FRAMES_Frames_SeqNB[len(newHMD_FRAMES_Frames_SeqNB)-1]):
+                index = len(newHMD_FRAMES_Frames_SeqNB)-1
+                newHMD_FRAMES_NBs[index]          = HMD_FRAMES_NBs[i]
+                newHMD_FRAMES_Times[index]        = HMD_FRAMES_Times[i]
+                newHMD_FRAMES_DataRates[index]    = HMD_FRAMES_DataRates[i]
+                newHMD_FRAMES_Data_Sizes[index]   = HMD_FRAMES_Data_Sizes[i]
+                newHMD_FRAMES_Frames_Sizes[index] = HMD_FRAMES_Frames_Sizes[i]
+                newHMD_FRAMES_Frames_SeqNB[index] = HMD_FRAMES_Frames_SeqNB[i]
+            else:
+                newHMD_FRAMES_NBs.append(HMD_FRAMES_NBs[i])
+                newHMD_FRAMES_Times.append(HMD_FRAMES_Times[i])
+                newHMD_FRAMES_DataRates.append(HMD_FRAMES_DataRates[i])
+                newHMD_FRAMES_Data_Sizes.append(HMD_FRAMES_Data_Sizes[i])
+                newHMD_FRAMES_Frames_Sizes.append(HMD_FRAMES_Frames_Sizes[i])
+                newHMD_FRAMES_Frames_SeqNB.append(HMD_FRAMES_Frames_SeqNB[i])
+    
+    newSetOfList = (newHMD_FRAMES_NBs,newHMD_FRAMES_Times,newHMD_FRAMES_DataRates,newHMD_FRAMES_Frames_Sizes,newHMD_FRAMES_Frames_SeqNB) if len(setOfLists)==5 else (newHMD_FRAMES_NBs,newHMD_FRAMES_Times,newHMD_FRAMES_DataRates,newHMD_FRAMES_Data_Sizes,newHMD_FRAMES_Frames_Sizes,newHMD_FRAMES_Frames_SeqNB)
+
+    return newSetOfList
+
+
+
+def combinedResultsLists(results,flag = 0):
+    # This method is used to combine all the results lists in a single ordered list 
+    # input: list of HMD results
+    #        a flag that accept a value of 0 or 1 (or anything else) where 0 mean combining the data frames (TYPE I, II, and III) only and 1 mean combining the data frames and management frames
+    # output: a tuple that contain lists of combined results with retransmission attempts
+    
+    HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
+        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
+        HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, HMD_UP_DATA1_FRAMES_NBs, \
+        HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,\
+        HMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, \
+        HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,\
+        HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,\
+        HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, \
+        HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes, HMD_DWN_DATA2_FRAMES_Frames_Sizes, \
+        HMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
+        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
+        HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
+        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, \
+        HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB,\
+        HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
+        HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, \
+        HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, \
+        HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, \
+        HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = results 
+    
+    # data frames (unique frames)
+    if flag == 0:
+        HMD_UP_NBs           = HMD_UP_DATA1_FRAMES_NBs + HMD_UP_DATA2_FRAMES_NBs + HMD_UP_DATA3_FRAMES_NBs
+        HMD_UP_Times         = HMD_UP_DATA1_FRAMES_Times + HMD_UP_DATA2_FRAMES_Times + HMD_UP_DATA3_FRAMES_Times
+        HMD_UP_DataRates     = HMD_UP_DATA1_FRAMES_DataRates + HMD_UP_DATA2_FRAMES_DataRates + HMD_UP_DATA3_FRAMES_DataRates
+        HMD_UP_Data_Sizes    = [0 for x in range(len(HMD_UP_DATA1_FRAMES_NBs))] + HMD_UP_DATA2_FRAMES_Data_Sizes + HMD_UP_DATA3_FRAMES_Data_Sizes
+        HMD_UP_Frames_Sizes  = HMD_UP_DATA1_FRAMES_Frames_Sizes + HMD_UP_DATA2_FRAMES_Frames_Sizes + HMD_UP_DATA3_FRAMES_Frames_Sizes
+        HMD_UP_Frames_SeqNB  = HMD_UP_DATA1_FRAMES_Frames_SeqNB + HMD_UP_DATA2_FRAMES_Frames_SeqNB + HMD_UP_DATA3_FRAMES_Frames_SeqNB
+        HMD_DWN_NBs          = HMD_DWN_DATA2_FRAMES_NBs + HMD_DWN_DATA3_FRAMES_NBs
+        HMD_DWN_Times        = HMD_DWN_DATA2_FRAMES_Times + HMD_DWN_DATA3_FRAMES_Times
+        HMD_DWN_DataRates    = HMD_DWN_DATA2_FRAMES_DataRates + HMD_DWN_DATA3_FRAMES_DataRates
+        HMD_DWN_Data_Sizes   = HMD_DWN_DATA2_FRAMES_Data_Sizes + HMD_DWN_DATA3_FRAMES_Data_Sizes
+        HMD_DWN_Frames_Sizes = HMD_DWN_DATA2_FRAMES_Frames_Sizes + HMD_DWN_DATA3_FRAMES_Frames_Sizes
+        HMD_DWN_Frames_SeqNB = HMD_DWN_DATA2_FRAMES_Frames_SeqNB + HMD_DWN_DATA3_FRAMES_Frames_SeqNB
+    
+    # data + management frames (unique frames)
+    else:
+        HMD_UP_NBs           = HMD_UP_MANAGEMENT_FRAMES_NBs + HMD_UP_DATA1_FRAMES_NBs + HMD_UP_DATA2_FRAMES_NBs + HMD_UP_DATA3_FRAMES_NBs
+        HMD_UP_Times         = HMD_UP_MANAGEMENT_FRAMES_Times + HMD_UP_DATA1_FRAMES_Times + HMD_UP_DATA2_FRAMES_Times + HMD_UP_DATA3_FRAMES_Times
+        HMD_UP_DataRates     = HMD_UP_MANAGEMENT_FRAMES_DataRates + HMD_UP_DATA1_FRAMES_DataRates + HMD_UP_DATA2_FRAMES_DataRates + HMD_UP_DATA3_FRAMES_DataRates
+        HMD_UP_Data_Sizes    = [0 for x in range(len(HMD_UP_MANAGEMENT_FRAMES_NBs))] + [0 for x in range(len(HMD_UP_DATA1_FRAMES_NBs))] + HMD_UP_DATA2_FRAMES_Data_Sizes + HMD_UP_DATA3_FRAMES_Data_Sizes
+        HMD_UP_Frames_Sizes  = HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes + HMD_UP_DATA1_FRAMES_Frames_Sizes + HMD_UP_DATA2_FRAMES_Frames_Sizes + HMD_UP_DATA3_FRAMES_Frames_Sizes
+        HMD_UP_Frames_SeqNB  = [-1 for x in range(len(HMD_UP_MANAGEMENT_FRAMES_NBs))] + HMD_UP_DATA1_FRAMES_Frames_SeqNB + HMD_UP_DATA2_FRAMES_Frames_SeqNB + HMD_UP_DATA3_FRAMES_Frames_SeqNB
+        HMD_DWN_NBs          = HMD_DWN_MANAGEMENT_FRAMES_NBs+ HMD_DWN_DATA2_FRAMES_NBs + HMD_DWN_DATA3_FRAMES_NBs
+        HMD_DWN_Times        = HMD_DWN_MANAGEMENT_FRAMES_Times + HMD_DWN_DATA2_FRAMES_Times + HMD_DWN_DATA3_FRAMES_Times
+        HMD_DWN_DataRates    = HMD_DWN_MANAGEMENT_FRAMES_DataRates + HMD_DWN_DATA2_FRAMES_DataRates + HMD_DWN_DATA3_FRAMES_DataRates
+        HMD_DWN_Data_Sizes   = [0 for x in range(len(HMD_DWN_MANAGEMENT_FRAMES_NBs))] + HMD_DWN_DATA2_FRAMES_Data_Sizes + HMD_DWN_DATA3_FRAMES_Data_Sizes
+        HMD_DWN_Frames_Sizes = HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes + HMD_DWN_DATA2_FRAMES_Frames_Sizes + HMD_DWN_DATA3_FRAMES_Frames_Sizes
+        HMD_DWN_Frames_SeqNB = [-1 for x in range(len(HMD_DWN_MANAGEMENT_FRAMES_NBs))]  + HMD_DWN_DATA2_FRAMES_Frames_SeqNB + HMD_DWN_DATA3_FRAMES_Frames_SeqNB
+    
+    # data frames (retransmitted frames)
+    HMD_UP_RE_NBs           = HMD_UP_RE_DATA1_FRAMES_NBs + HMD_UP_RE_DATA2_FRAMES_NBs + HMD_UP_RE_DATA3_FRAMES_NBs
+    HMD_UP_RE_Times         = HMD_UP_RE_DATA1_FRAMES_Times + HMD_UP_RE_DATA2_FRAMES_Times + HMD_UP_RE_DATA3_FRAMES_Times
+    HMD_UP_RE_DataRates     = HMD_UP_RE_DATA1_FRAMES_DataRates + HMD_UP_RE_DATA2_FRAMES_DataRates + HMD_UP_RE_DATA3_FRAMES_DataRates
+    HMD_UP_RE_Data_Sizes    = [0 for x in range(len(HMD_UP_RE_DATA1_FRAMES_NBs))] + HMD_UP_RE_DATA2_FRAMES_Data_Sizes + HMD_UP_RE_DATA3_FRAMES_Data_Sizes
+    HMD_UP_RE_Frames_Sizes  = HMD_UP_RE_DATA1_FRAMES_Frames_Sizes + HMD_UP_RE_DATA2_FRAMES_Frames_Sizes+ HMD_UP_RE_DATA3_FRAMES_Frames_Sizes
+    HMD_UP_RE_Frames_SeqNB  = HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB + HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB + HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB
+    HMD_DWN_RE_NBs          = HMD_DWN_RE_DATA2_FRAMES_NBs + HMD_DWN_RE_DATA3_FRAMES_NBs
+    HMD_DWN_RE_Times        = HMD_DWN_RE_DATA2_FRAMES_Times + HMD_DWN_RE_DATA3_FRAMES_Times
+    HMD_DWN_RE_DataRates    = HMD_DWN_RE_DATA2_FRAMES_DataRates + HMD_DWN_RE_DATA3_FRAMES_DataRates
+    HMD_DWN_RE_Data_Sizes   = HMD_DWN_RE_DATA2_FRAMES_Data_Sizes + HMD_DWN_RE_DATA3_FRAMES_Data_Sizes
+    HMD_DWN_RE_Frames_Sizes = HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes + HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes
+    HMD_DWN_RE_Frames_SeqNB = HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB + HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB
+
+    # sorting the unique frames
+    HMD_UP_NBs = [int(x) for x in HMD_UP_NBs]    
+    HMD_DWN_NBs = [int(x) for x in HMD_DWN_NBs]   
+    HMD_UP_NBs,HMD_UP_Times,HMD_UP_DataRates,HMD_UP_Data_Sizes,HMD_UP_Frames_Sizes,HMD_UP_Frames_SeqNB = zip(*sorted(zip(HMD_UP_NBs,HMD_UP_Times,HMD_UP_DataRates,HMD_UP_Data_Sizes,HMD_UP_Frames_Sizes,HMD_UP_Frames_SeqNB)))
+    HMD_UP_NBs,HMD_UP_Times,HMD_UP_DataRates,HMD_UP_Data_Sizes,HMD_UP_Frames_Sizes,HMD_UP_Frames_SeqNB = (list(t) for t in zip(*sorted(zip(HMD_UP_NBs,HMD_UP_Times,HMD_UP_DataRates,HMD_UP_Data_Sizes,HMD_UP_Frames_Sizes,HMD_UP_Frames_SeqNB))))
+    HMD_DWN_NBs,HMD_DWN_Times,HMD_DWN_DataRates,HMD_DWN_Data_Sizes,HMD_DWN_Frames_Sizes,HMD_DWN_Frames_SeqNB = zip(*sorted(zip(HMD_DWN_NBs,HMD_DWN_Times,HMD_DWN_DataRates,HMD_DWN_Data_Sizes,HMD_DWN_Frames_Sizes,HMD_DWN_Frames_SeqNB)))
+    HMD_DWN_NBs,HMD_DWN_Times,HMD_DWN_DataRates,HMD_DWN_Data_Sizes,HMD_DWN_Frames_Sizes,HMD_DWN_Frames_SeqNB = (list(t) for t in zip(*sorted(zip(HMD_DWN_NBs,HMD_DWN_Times,HMD_DWN_DataRates,HMD_DWN_Data_Sizes,HMD_DWN_Frames_Sizes,HMD_DWN_Frames_SeqNB))))
+    HMD_UP_NBs = [str(x) for x in HMD_UP_NBs]    
+    HMD_DWN_NBs = [str(x) for x in HMD_DWN_NBs] 
+
+    # sorting the retransmitted frames
+    HMD_UP_RE_NBs = [int(x) for x in HMD_UP_RE_NBs]    
+    HMD_DWN_RE_NBs = [int(x) for x in HMD_DWN_RE_NBs]   
+    HMD_UP_RE_NBs,HMD_UP_RE_Times,HMD_UP_RE_DataRates,HMD_UP_RE_Data_Sizes,HMD_UP_RE_Frames_Sizes,HMD_UP_RE_Frames_SeqNB = zip(*sorted(zip(HMD_UP_RE_NBs,HMD_UP_RE_Times,HMD_UP_RE_DataRates,HMD_UP_RE_Data_Sizes,HMD_UP_RE_Frames_Sizes,HMD_UP_RE_Frames_SeqNB)))
+    HMD_UP_RE_NBs,HMD_UP_RE_Times,HMD_UP_RE_DataRates,HMD_UP_RE_Data_Sizes,HMD_UP_RE_Frames_Sizes,HMD_UP_RE_Frames_SeqNB = (list(t) for t in zip(*sorted(zip(HMD_UP_RE_NBs,HMD_UP_RE_Times,HMD_UP_RE_DataRates,HMD_UP_RE_Data_Sizes,HMD_UP_RE_Frames_Sizes,HMD_UP_RE_Frames_SeqNB))))
+    HMD_DWN_RE_NBs,HMD_DWN_RE_Times,HMD_DWN_RE_DataRates,HMD_DWN_RE_Data_Sizes,HMD_DWN_RE_Frames_Sizes,HMD_DWN_RE_Frames_SeqNB = zip(*sorted(zip(HMD_DWN_RE_NBs,HMD_DWN_RE_Times,HMD_DWN_RE_DataRates,HMD_DWN_RE_Data_Sizes,HMD_DWN_RE_Frames_Sizes,HMD_DWN_RE_Frames_SeqNB)))
+    HMD_DWN_RE_NBs,HMD_DWN_RE_Times,HMD_DWN_RE_DataRates,HMD_DWN_RE_Data_Sizes,HMD_DWN_RE_Frames_Sizes,HMD_DWN_RE_Frames_SeqNB = (list(t) for t in zip(*sorted(zip(HMD_DWN_RE_NBs,HMD_DWN_RE_Times,HMD_DWN_RE_DataRates,HMD_DWN_RE_Data_Sizes,HMD_DWN_RE_Frames_Sizes,HMD_DWN_RE_Frames_SeqNB))))
+    HMD_UP_RE_NBs = [str(x) for x in HMD_UP_RE_NBs]    
+    HMD_DWN_RE_NBs = [str(x) for x in HMD_DWN_RE_NBs] 
+
+    uniqueDataCombinedLists = (HMD_UP_NBs,HMD_UP_Times,HMD_UP_DataRates,HMD_UP_Data_Sizes,HMD_UP_Frames_Sizes,HMD_UP_Frames_SeqNB,HMD_DWN_NBs,HMD_DWN_Times,HMD_DWN_DataRates,HMD_DWN_Data_Sizes,HMD_DWN_Frames_Sizes,HMD_DWN_Frames_SeqNB)
+    retransmittedDataCombinedLists = (HMD_UP_RE_NBs,HMD_UP_RE_Times,HMD_UP_RE_DataRates,HMD_UP_RE_Data_Sizes,HMD_UP_RE_Frames_Sizes,HMD_UP_RE_Frames_SeqNB,HMD_DWN_RE_NBs,HMD_DWN_RE_Times,HMD_DWN_RE_DataRates,HMD_DWN_RE_Data_Sizes,HMD_DWN_RE_Frames_Sizes,HMD_DWN_RE_Frames_SeqNB)
+    combinedLists = (uniqueDataCombinedLists,retransmittedDataCombinedLists)
+    return(combinedLists)
+
+
+
+def combinedResultsListsNoReTransmittedFrames(results,flag = 0):
+    # This method is used to combine all the results lists in a single ordered list after removing the retrnsmission attempts
+    # input: list of HMD results
+    #        a flag that accept a value of 0 or 1 (or anything else) where 0 mean combining the data frames (TYPE I, II, and III) only and 1 mean combining the data frames and management frames
+    # output: a tuple that contain lists of combined results without retransmission attempts
+    
+    newResults = eliminateRetransmittedFrames(results)
+    return combinedResultsLists(newResults,flag)
+
+
+
 def computeInstantaneousRates(listOfTimeStamps,listOfSizes,duration=1):
     # This method is used to compute the transmission rate (capacity) from the traces
     # input: listOfTimeStamps in ms starting from 0
@@ -2524,13 +2962,15 @@ def computeInstantaneousRates(listOfTimeStamps,listOfSizes,duration=1):
     for i in range(len(newListOfTimeStamps)):
         intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
         if intervalTime < duration:
-            sumOfSizes = sumOfSizes + float(listOfSizes[i])
+            tempSize = 0 if listOfSizes[i] == '' else float(listOfSizes[i])
+            sumOfSizes = sumOfSizes + tempSize
         else:
             instantaneousRate = (sumOfSizes * 8)/(duration * ((1024)**2))
             listOfInstantaneousRates.append(instantaneousRate)
             beginningOfInterval = beginningOfInterval + duration
             intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
-            sumOfSizes = float(listOfSizes[i])
+            tempSize = 0 if listOfSizes[i] == '' else float(listOfSizes[i])
+            sumOfSizes = tempSize
     if(len(listOfInstantaneousRates) < math.ceil((float(newListOfTimeStamps[len(newListOfTimeStamps)-1]) - float(newListOfTimeStamps[0]))/duration)):
             instantaneousRate = (sumOfSizes * 8)/(intervalTime * ((1024)**2)) 
             listOfInstantaneousRates.append(instantaneousRate)
@@ -2543,7 +2983,7 @@ def computeNBOfFrames(listOfTimeStamps,duration=1):
     # input: listOfTimeStamps in ms starting from 0
     #        duration of the # of frames in seconds
     # output: a list of average NB of frames for a period = the duration   
-    duration = 1 if duration == 0 else duration
+    duration = 1 if duration <= 0 else duration
     listOfNBOfFrames = []
     beginningOfInterval = 0
     intervalTime = 0
@@ -2587,12 +3027,14 @@ def computeTotalSize(listOfTimeStamps,listOfSizes,duration=1):
     for i in range(len(newListOfTimeStamps)):
         intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
         if intervalTime < duration:
-            size = size + float(listOfSizes[i])
+            tempSize = 0 if listOfSizes[i] == '' else float(listOfSizes[i])
+            size = size + tempSize
         else:
             listOfSizesOfFrames.append(size)
             beginningOfInterval = beginningOfInterval + duration
             intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
-            size = float(listOfSizes[i])
+            tempSize = 0 if listOfSizes[i] == '' else float(listOfSizes[i])
+            size = tempSize
     if(len(listOfSizesOfFrames) < math.ceil((float(newListOfTimeStamps[len(newListOfTimeStamps)-1]) - float(newListOfTimeStamps[0]))/duration)):
             size = size/intervalTime * duration
             listOfSizesOfFrames.append(size)
@@ -2619,16 +3061,162 @@ def computeAVGSize(listOfTimeStamps,listOfSizes,duration=1):
     for i in range(len(newListOfTimeStamps)):
         intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
         if intervalTime < duration:
-            size = size + float(listOfSizes[i])
+            tempSize = 0 if listOfSizes[i] == '' else float(listOfSizes[i])
+            size = size + tempSize
             counter = counter + 1
         else:
             avgSize = size/counter
             listOfAvgSizeOfFrames.append(avgSize)
             beginningOfInterval = beginningOfInterval + duration
             intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
-            size = float(listOfSizes[i])
+            tempSize = 0 if listOfSizes[i] == '' else float(listOfSizes[i])
+            size = tempSize
             counter = 1
     if(len(listOfAvgSizeOfFrames) < math.ceil((float(newListOfTimeStamps[len(newListOfTimeStamps)-1]) - float(newListOfTimeStamps[0]))/duration)):
             avgSize = size/counter
             listOfAvgSizeOfFrames.append(avgSize)
     return listOfAvgSizeOfFrames
+
+
+
+def computePeriodicNBOfHMDFrames(listOfTimeStamps,duration=1):
+    # This method is used to compute the periodic nb of frames
+    # prerequisite: it is used only by the method 'computePeriodicSucessRateNB'
+    # input: the list of time stamps of the frames
+    #        the period in seconds
+    # output: a dict of # of frames in form of {beginningOfInterval:NBOfFrames}
+    duration = 1 if duration <= 0 else duration
+    NBOfFramesDict = {}
+    beginningOfInterval = 0
+    intervalTime = 0
+    counter = 0
+    newListOfTimeStamps = [float(x)/1000 for x in listOfTimeStamps]
+    beginningOfInterval = math.floor(newListOfTimeStamps[0]/duration) * duration
+
+    for i in range(len(newListOfTimeStamps)):
+        intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+        if intervalTime < duration:
+            counter = counter + 1
+        else:
+            NBOfFramesDict[beginningOfInterval] = counter
+            beginningOfInterval = beginningOfInterval + duration
+            intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+            counter = 1
+    if(len(NBOfFramesDict.keys()) < math.ceil((float(newListOfTimeStamps[len(newListOfTimeStamps)-1]) - float(newListOfTimeStamps[0]))/duration)):
+            counter = counter/intervalTime * duration
+            NBOfFramesDict[beginningOfInterval] = counter
+    return NBOfFramesDict    
+
+
+
+def computePeriodicSizeOfHMDFrames(listOfTimeStamps,listOfSizes,duration=1):
+    # This method is used to compute the periodic Size of frames
+    # prerequisite: it is used only by the method 'computePeriodicSucessRateSize'
+    # input: the list of time stamps of the frames 
+    #        the list of frames sizes in bytes
+    #        the period in seconds
+    # output: a dict of # of frames in form of {beginningOfInterval:sizeOfFrames}
+    duration = 1 if duration <= 0 else duration
+    sizesOfFramesDict = {}   
+    beginningOfInterval = 0
+    intervalTime = 0
+    size = 0 
+    newListOfTimeStamps = [float(x)/1000 for x in listOfTimeStamps]
+    beginningOfInterval = math.floor(newListOfTimeStamps[0]/duration) * duration
+
+    for i in range(len(newListOfTimeStamps)):
+        intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+        if intervalTime < duration:
+            tempSize = 0 if listOfSizes[i] == '' else float(listOfSizes[i])
+            size = size + tempSize
+        else:
+            sizesOfFramesDict[beginningOfInterval] = size
+            beginningOfInterval = beginningOfInterval + duration
+            intervalTime = float(newListOfTimeStamps[i]) - beginningOfInterval
+            tempSize = 0 if listOfSizes[i] == '' else float(listOfSizes[i])
+            size = tempSize
+    if(len(sizesOfFramesDict.keys()) < math.ceil((float(newListOfTimeStamps[len(newListOfTimeStamps)-1]) - float(newListOfTimeStamps[0]))/duration)):
+            size = size/intervalTime * duration
+            sizesOfFramesDict[beginningOfInterval] = size
+    return sizesOfFramesDict
+
+
+
+def computeOverallSucessRateNB(HMD_NBs,HMD_RE_NBs):
+    # This method is used to compute the overall sucess rate based on the number of frames (ignoring the size of frames)
+    # prerequisite: the retransmission attempts has to be removed from the data lists of the HMD results 'results' by using the method 'eliminateRetransmittedFrames'
+    # input: the list of the frames NBs of the data
+    #        the list of the frames NBs of the retransmitted frames
+    # output: the overall sucess rate in form of a percentage 
+    return ((len(HMD_NBs)/(len(HMD_NBs) + len(HMD_RE_NBs)))*100)
+
+
+
+def computeOverallSucessRateSize(Sizes,RE_Sizes):
+    # This method is used to compute the overall sucess rate based on the size of the transmitted data 
+    # prerequisite: the retransmission attempts has to be removed from the data lists of the HMD results 'results' by using the method 'eliminateRetransmittedFrames'
+    # input: the list of the frames sizes of the data
+    #        the list of the frames sizes of the retransmitted frames
+    # output: the overall sucess rate in form of a percentage 
+    sumSizes = 0
+    sumReSizes = 0
+    for size in Sizes:
+        if size == '':
+            continue
+        else:
+            sumSizes = sumSizes + float(size)
+    for size in RE_Sizes:
+        if size == '':
+            continue
+        else:
+            sumReSizes = sumReSizes + float(size)
+    return ((sumSizes/(sumSizes+sumReSizes))*100)
+
+    
+
+def computePeriodicSucessRateNB(HMD_Times,HMD_RE_Times,duration=1):
+    # This method is used to compute the periodic sucess rate based on the number of frames (ignoring the size of frames)
+    # prerequisite: the retransmission attempts has to be removed from the data lists of the HMD results 'results' by using the method 'eliminateRetransmittedFrames'
+    # input: the list of time stamps of the data
+    #        the list of time stamps of the retransmitted frames
+    #        the period in seconds
+    # output: a list of periodic sucess rates in form of a percentage 
+    duration = 1 if duration <= 0 else duration
+    listOfSucessRates = []
+    HMD_Dict = computePeriodicNBOfHMDFrames(HMD_Times,duration)
+    HMD_RE_Dict = computePeriodicNBOfHMDFrames(HMD_RE_Times,duration)
+    for key in HMD_Dict.keys():
+        # the try except block is used to avoid throwing exceptions when there is no retransmitted frame at a specific period
+        try:
+            sucessRate = float(HMD_Dict[key]/(HMD_Dict[key]+HMD_RE_Dict[key])) * 100
+            listOfSucessRates.append(sucessRate)
+        except:
+            listOfSucessRates.append(100.00)
+
+    return listOfSucessRates
+
+
+
+def computePeriodicSucessRateSize(HMD_Times,Sizes,HMD_RE_Times,RE_Sizes,duration=1):
+    # This method is used to compute the periodic sucess rate based on the size of the transmitted data 
+    # prerequisite: the retransmission attempts has to be removed from the data lists of the HMD results 'results' by using the method 'eliminateRetransmittedFrames'
+    # input: the list of time stamps of the data
+    #        the list of the frames sizes of the data
+    #        the list of time stamps of the retransmitted frames
+    #        the list of the frames sizes of the retransmitted frames 
+    #        the period in seconds
+    # output: a list of periodic sucess rates in form of a percentage 
+    duration = 1 if duration <= 0 else duration
+    listOfSucessRates = []
+    HMD_Dict = computePeriodicSizeOfHMDFrames(HMD_Times,Sizes,duration)
+    HMD_RE_Dict = computePeriodicSizeOfHMDFrames(HMD_RE_Times,RE_Sizes,duration)
+
+    for key in HMD_Dict.keys():
+        # the try except block is used to avoid throwing exceptions when there is no retransmitted frame at a specific period
+        try:
+            sucessRate = float(HMD_Dict[key]/(HMD_Dict[key]+HMD_RE_Dict[key])) * 100
+            listOfSucessRates.append(sucessRate)
+        except:
+            listOfSucessRates.append(100.00)
+
+    return listOfSucessRates
