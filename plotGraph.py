@@ -7,6 +7,7 @@ import math
 
 
 root_folder = "plots"
+saved_graph_resolution = 300
 
 def plotLogsResults(results):
 
@@ -81,43 +82,42 @@ def plotHMDTracesResults(HMDTracesResults):
         except:
             pass
 
-        HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
-        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
-        HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, HMD_UP_DATA1_FRAMES_NBs, \
-        HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,\
-        HMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, \
-        HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,\
-        HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,\
-        HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, \
-        HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes, HMD_DWN_DATA2_FRAMES_Frames_Sizes, \
-        HMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
-        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
-        HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
-        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, \
-        HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB,\
-        HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
-        HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, \
-        HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, \
-        HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, \
-        HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = results 
+        # HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
+        # HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
+        # HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, HMD_UP_DATA1_FRAMES_NBs, \
+        # HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,\
+        # HMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, \
+        # HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,\
+        # HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,\
+        # HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, \
+        # HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes, HMD_DWN_DATA2_FRAMES_Frames_Sizes, \
+        # HMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
+        # HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
+        # HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
+        # HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, \
+        # HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB,\
+        # HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
+        # HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, \
+        # HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, \
+        # HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, \
+        # HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = results 
 
-        newResults = eliminateRetransmittedFrames(results)
-        uniqueDataCombinedLists,retransmittedDataCombinedLists = combinedResultsLists(newResults)
-        HMD_UP_NBs,HMD_UPـTimes,HMD_UP_DataRates,HMD_UP_Data_Sizes,HMD_UP_Frames_Sizes,HMD_UP_Frames_SeqNB,HMD_DWN_NBs,HMD_DWNـTimes,\
-            HMD_DWN_DataRates,HMD_DWN_Data_Sizes,HMD_DWN_Frames_Sizes,HMD_DWN_Frames_SeqNB = uniqueDataCombinedLists
-        HMD_UP_RE_NBs,HMD_UP_RE_Times,HMD_UP_RE_DataRates,HMD_UP_RE_Data_Sizes,HMD_UP_RE_Frames_Sizes,HMD_UP_RE_Frames_SeqNB,HMD_DWN_RE_NBs,HMD_DWN_RE_Times,\
-            HMD_DWN_RE_DataRates,HMD_DWN_RE_Data_Sizes,HMD_DWN_RE_Frames_Sizes,HMD_DWN_RE_Frames_SeqNB = retransmittedDataCombinedLists
-        #print(computeOverallSucessRateSize(HMD_UP_Data_Sizes,HMD_UP_RE_Data_Sizes))
-        listOfResultsNB    = computePeriodicSucessRateNB(HMD_UPـTimes,HMD_UP_RE_Times,duration=1)
-        listOfResultsSizes = computePeriodicSucessRateSize(HMD_UPـTimes,HMD_UP_Data_Sizes,HMD_UP_RE_Times,HMD_UP_RE_Data_Sizes,duration=1)
-        for index in range(len(listOfResultsNB)):
-            print("{}  -  {}".format(listOfResultsNB[index],listOfResultsSizes[index]))
+        # newResults = eliminateRetransmittedFrames(results)
+        # uniqueDataCombinedLists,retransmittedDataCombinedLists = combinedResultsLists(newResults)
+        # HMD_UP_NBs,HMD_UPـTimes,HMD_UP_DataRates,HMD_UP_Data_Sizes,HMD_UP_Frames_Sizes,HMD_UP_Frames_SeqNB,HMD_DWN_NBs,HMD_DWNـTimes,\
+        #     HMD_DWN_DataRates,HMD_DWN_Data_Sizes,HMD_DWN_Frames_Sizes,HMD_DWN_Frames_SeqNB = uniqueDataCombinedLists
+        # HMD_UP_RE_NBs,HMD_UP_RE_Times,HMD_UP_RE_DataRates,HMD_UP_RE_Data_Sizes,HMD_UP_RE_Frames_Sizes,HMD_UP_RE_Frames_SeqNB,HMD_DWN_RE_NBs,HMD_DWN_RE_Times,\
+        #     HMD_DWN_RE_DataRates,HMD_DWN_RE_Data_Sizes,HMD_DWN_RE_Frames_Sizes,HMD_DWN_RE_Frames_SeqNB = retransmittedDataCombinedLists
+        # #print(computeOverallSucessRateSize(HMD_UP_Data_Sizes,HMD_UP_RE_Data_Sizes))
+        # listOfResultsNB    = computePeriodicSucessRateNB(HMD_UPـTimes,HMD_UP_RE_Times,duration=1)
+        # listOfResultsSizes = computePeriodicSucessRateSize(HMD_UPـTimes,HMD_UP_Data_Sizes,HMD_UP_RE_Times,HMD_UP_RE_Data_Sizes,duration=1)
+        # for index in range(len(listOfResultsNB)):
+        #     print("{}  -  {}".format(listOfResultsNB[index],listOfResultsSizes[index]))
 
 
         
-        # plotHMDNBofFrames(root_folder,gameName,results)
-        # plotServerNBofFrames(root_folder,gameName,results)
-        # plotServerFramesInstantaneousRates(root_folder,gameName,results)
+        plotHMDNBofFrames(root_folder,gameName,results)
+        # plotHMDFramesInstantaneousRates(root_folder,gameName,results)
         # plotServerDataInstantaneousRates(root_folder,gameName,results)
         # plotServerSizeofFrames(root_folder,gameName,results)
         # plotServerSizeofData(root_folder,gameName,results)
@@ -193,7 +193,7 @@ def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatRes
     plt.ylabel('latency in (ms)', fontsize=12)
     plt.title("{}".format(gameName))
     #plt.yticks([0,20,40,60])
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -271,7 +271,7 @@ def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatRes
     plt.title("{}".format(gameName))
     plt.yticks([0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0])
     plt.xticks([0,10,20,30,40,50,60,70,80,90,100,110,120])
-    plt.savefig('{}/results2.png'.format(prefix))
+    plt.savefig('{}/results2.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -305,7 +305,7 @@ def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatRes
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('latency (ms)', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results3.png'.format(prefix))
+    plt.savefig('{}/results3.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################   
 
@@ -344,7 +344,7 @@ def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatRes
     plt.title("{}".format(gameName))
     plt.yticks([0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0])
     # plt.xticks([0,100,200,300,400,500,600,700,800,900,1000])
-    plt.savefig('{}/results4.png'.format(prefix))
+    plt.savefig('{}/results4.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -390,7 +390,7 @@ def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatRes
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('latency (ms)', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results5.png'.format(prefix))
+    plt.savefig('{}/results5.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ###################################################   
 
@@ -431,7 +431,7 @@ def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatRes
     plt.ylabel('CDF', fontsize=12)
     plt.title("{}".format(gameName))
     plt.yticks([0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0])
-    plt.savefig('{}/results6.png'.format(prefix))
+    plt.savefig('{}/results6.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -466,7 +466,7 @@ def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatRes
     plt.grid(color='grey', linestyle='--', linewidth=0.5)
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('avg latency (ms)', fontsize=12)
-    plt.savefig('{}/results7.png'.format(prefix))
+    plt.savefig('{}/results7.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -496,7 +496,7 @@ def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatRes
     plt.ylabel('CDF', fontsize=12)
     plt.title("{}".format(gameName))
     plt.yticks([0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0])
-    plt.savefig('{}/results8.png'.format(prefix))
+    plt.savefig('{}/results8.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -527,7 +527,7 @@ def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatRes
     plt.grid(color='grey', linestyle='--', linewidth=0.5)
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('avg latency (ms)', fontsize=12)
-    plt.savefig('{}/results9.png'.format(prefix))
+    plt.savefig('{}/results9.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -557,7 +557,7 @@ def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatRes
     plt.ylabel('CDF', fontsize=12)
     plt.title("{}".format(gameName))
     plt.yticks([0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0])
-    plt.savefig('{}/results10.png'.format(prefix))
+    plt.savefig('{}/results10.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -597,7 +597,7 @@ def plotFPS(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults
     plt.xlabel('times in (sec)', fontsize=12)
     plt.ylabel('fps', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -617,7 +617,7 @@ def plotFPS(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults
     plt.xlabel('times in (sec)', fontsize=12)
     plt.ylabel('FPS', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results2.png'.format(prefix))
+    plt.savefig('{}/results2.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -647,7 +647,7 @@ def plotFPS(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults
     plt.xlabel('times stamp in (sec)', fontsize=12)
     plt.ylabel('fps', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results3.png'.format(prefix))
+    plt.savefig('{}/results3.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -671,7 +671,7 @@ def plotFPS(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults
     plt.xlabel('times stamp in (sec)', fontsize=12)
     plt.ylabel('fps', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results4.png'.format(prefix))
+    plt.savefig('{}/results4.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -704,7 +704,7 @@ def plotpktsstats(root_folder,gameName,sessionLogResult):
     plt.xlabel('times in (sec)', fontsize=12)
     plt.ylabel('total pkts', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -719,7 +719,7 @@ def plotpktsstats(root_folder,gameName,sessionLogResult):
     plt.xlabel('times in (sec)', fontsize=12)
     plt.ylabel('# of pkts', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results2.png'.format(prefix))
+    plt.savefig('{}/results2.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -734,7 +734,7 @@ def plotpktsstats(root_folder,gameName,sessionLogResult):
     plt.xlabel('times in (sec)', fontsize=12)
     plt.ylabel('size in (MB)', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results3.png'.format(prefix))
+    plt.savefig('{}/results3.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -749,7 +749,7 @@ def plotpktsstats(root_folder,gameName,sessionLogResult):
     plt.xlabel('times in (sec)', fontsize=12)
     plt.ylabel('bitrate (Mbps)', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results4.png'.format(prefix))
+    plt.savefig('{}/results4.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -782,7 +782,7 @@ def plotBatteryPercentage(root_folder,gameName,sessionLogResult,OVRMetricsResult
     plt.xlabel('times in (sec)', fontsize=12)
     plt.ylabel('battery percentage', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -806,7 +806,7 @@ def plotBatteryPercentage(root_folder,gameName,sessionLogResult,OVRMetricsResult
     plt.xlabel('times stamp in (sec)', fontsize=12)
     plt.ylabel('battery percentage', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results2.png'.format(prefix))
+    plt.savefig('{}/results2.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -842,7 +842,7 @@ def plotTemperature(root_folder,gameName,OVRMetricsResult,logcatResults):
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('temperature in celsius', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -866,7 +866,7 @@ def plotTemperature(root_folder,gameName,OVRMetricsResult,logcatResults):
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('temperature in celsius', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results2.png'.format(prefix))
+    plt.savefig('{}/results2.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -914,7 +914,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of frames', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -938,7 +938,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of frames', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results2.png'.format(prefix))
+    plt.savefig('{}/results2.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -971,7 +971,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of frames', fontsize=12)
     plt.title("frames stats of {} during game running".format(gameName),fontsize=12)
-    plt.savefig('{}/results3.png'.format(prefix))
+    plt.savefig('{}/results3.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -994,7 +994,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of frames', fontsize=12)
     plt.title("frames stats of {} during game startup".format(gameName),fontsize=12)
-    plt.savefig('{}/results4.png'.format(prefix))
+    plt.savefig('{}/results4.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1020,7 +1020,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of frames', fontsize=12)
     plt.title("frames stats of {} during game loading".format(gameName),fontsize=12)
-    plt.savefig('{}/results5.png'.format(prefix))
+    plt.savefig('{}/results5.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1046,7 +1046,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of frames', fontsize=12)
     plt.title("frames stats of {} during game timeouts".format(gameName),fontsize=12)
-    plt.savefig('{}/results6.png'.format(prefix))
+    plt.savefig('{}/results6.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1073,7 +1073,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of dropped frames', fontsize=12)
     plt.title("dropped frames stats of {}".format(gameName),fontsize=12)
-    plt.savefig('{}/results7.png'.format(prefix))
+    plt.savefig('{}/results7.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1094,7 +1094,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of frames', fontsize=12)
     plt.title("Expected vs. Delivered # of frames of {}".format(gameName),fontsize=12)
-    plt.savefig('{}/results8.png'.format(prefix))
+    plt.savefig('{}/results8.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1112,7 +1112,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('avg # of frame submitting', fontsize=12)
     plt.title("frames re-submitting of {}".format(gameName),fontsize=12)
-    plt.savefig('{}/results9.png'.format(prefix))
+    plt.savefig('{}/results9.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1142,7 +1142,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of frames', fontsize=12)
     plt.title("frames stats of {} during game running".format(gameName),fontsize=12)
-    plt.savefig('{}/results10.png'.format(prefix))
+    plt.savefig('{}/results10.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1165,7 +1165,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of frames', fontsize=12)
     plt.title("frames stats of {} during game startup".format(gameName),fontsize=12)
-    plt.savefig('{}/results11.png'.format(prefix))
+    plt.savefig('{}/results11.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1191,7 +1191,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of frames', fontsize=12)
     plt.title("frames stats of {} during game loading".format(gameName),fontsize=12)
-    plt.savefig('{}/results12.png'.format(prefix))
+    plt.savefig('{}/results12.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1217,7 +1217,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of frames', fontsize=12)
     plt.title("frames stats of {} during game timeouts".format(gameName),fontsize=12)
-    plt.savefig('{}/results13.png'.format(prefix))
+    plt.savefig('{}/results13.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1235,7 +1235,7 @@ def plotFramesStats(root_folder,gameName,OVRMetricsResult,logcatResults,steamVRL
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of dropped frames', fontsize=12)
     plt.title("# of dropped frames of {} over the entire run".format(gameName),fontsize=12)
-    plt.savefig('{}/results14.png'.format(prefix))
+    plt.savefig('{}/results14.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1280,7 +1280,7 @@ def plotUtilization(root_folder,gameName,OVRMetricsResult,logcatResults):
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('utilization percentage', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1307,7 +1307,7 @@ def plotUtilization(root_folder,gameName,OVRMetricsResult,logcatResults):
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('utilization percentage', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results2.png'.format(prefix))
+    plt.savefig('{}/results2.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1331,7 +1331,7 @@ def plotUtilization(root_folder,gameName,OVRMetricsResult,logcatResults):
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('clock level [1-4]', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results3.png'.format(prefix))
+    plt.savefig('{}/results3.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1372,7 +1372,7 @@ def plotMaxRotationalSpeed(root_folder,gameName,OVRMetricsResult):
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('maximum rotational speed (degrees/sec)', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1413,7 +1413,7 @@ def plotFoveationLevel(root_folder,gameName,OVRMetricsResult,logcatResults):
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('foveation level [0-4]', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1434,7 +1434,7 @@ def plotFoveationLevel(root_folder,gameName,OVRMetricsResult,logcatResults):
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('foveation level [0-4]', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results2.png'.format(prefix))
+    plt.savefig('{}/results2.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1464,7 +1464,7 @@ def plotNumberOfTears(root_folder,gameName,logcatResults):
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of tears', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     #################################################### 
 
@@ -1493,7 +1493,7 @@ def plotPowerLevel(root_folder,gameName,logcatResults):
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('power level [0=Normal,1=Save,2=Danger]', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     #################################################### 
 
@@ -1522,7 +1522,7 @@ def plotLayersCount(root_folder,gameName,logcatResults):
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('# of layers', fontsize=12)
     plt.title("{}".format(gameName))
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     #################################################### 
 
@@ -1561,7 +1561,7 @@ def plotRunningTime(root_folder,gameName,steamVRLogResults):
     plt.grid(color='grey', linestyle='--', linewidth=0.5)
     plt.xlabel('timestamp in (sec)', fontsize=12)
     plt.ylabel('time in seconds', fontsize=12)
-    plt.savefig('{}/results1.png'.format(prefix))
+    plt.savefig('{}/results1.png'.format(prefix),dpi=saved_graph_resolution)
     plt.show()
     ####################################################
 
@@ -1619,7 +1619,7 @@ def plotServerNBofFrames(root_folder,gameName,results):
             plt.xlabel('time in (sec)', fontsize=12)
             plt.ylabel('# of frames', fontsize=12)
             plt.title("{} # of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
-            plt.savefig('{}/{}_duration_{}_NBFrames.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_NBFrames.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
@@ -1664,14 +1664,14 @@ def plotServerNBofFrames(root_folder,gameName,results):
             plt.xlabel('# of frames', fontsize=12)
             plt.ylabel('CDF', fontsize=12)
             plt.title("CDF {} # of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_NBFrames_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_NBFrames_CDF.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
 
 
 def plotHMDNBofFrames(root_folder,gameName,results):
-    result_folder_name = "server/NB_of_frames"
+    result_folder_name = "HMD/NB_of_frames"
     prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
     
     try:
@@ -1700,21 +1700,20 @@ def plotHMDNBofFrames(root_folder,gameName,results):
         HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, \
         HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = results   
 
-    #################### Line Graph ####################
-    # line graph for nb of management frames for different time durations from HMD traces folder
-    try:
-        os.mkdir("{}/{}".format(prefix,"management_frames"))
-    except:
-        pass
-    
     durations = [1,10,15,30,60]  # in seconds
     flowDirections = ["uplink","downlink"]
-    flowDirectionsLists = [(HMD_UP_MANAGEMENT_FRAMES_Times,HMD_UP_DATA1_FRAMES_Times,HMD_UP_RE_DATA1_FRAMES_Times,HMD_UP_DATA2_FRAMES_Times,HMD_DWN_RE_DATA2_FRAMES_Times,HMD_UP_DATA3_FRAMES_Times,HMD_DWN_RE_DATA3_FRAMES_Times),
+    flowDirectionsLists = [(HMD_UP_MANAGEMENT_FRAMES_Times,HMD_UP_DATA1_FRAMES_Times,HMD_UP_RE_DATA1_FRAMES_Times,HMD_UP_DATA2_FRAMES_Times,HMD_UP_RE_DATA2_FRAMES_Times,HMD_UP_DATA3_FRAMES_Times,HMD_UP_RE_DATA3_FRAMES_Times),
                             (HMD_DWN_MANAGEMENT_FRAMES_Times,[],[],HMD_DWN_DATA2_FRAMES_Times,HMD_DWN_RE_DATA2_FRAMES_Times,HMD_DWN_DATA3_FRAMES_Times,HMD_DWN_RE_DATA3_FRAMES_Times)]
     colors = ["red","blue","green","black","purple","cyan","pink"]
-    labels = ["management frames","data type1","retransmitted data type1","data type2","retransmitted data type2","data type3","retransmitted data type3"]
-    # firstFrame = min(HMD_UP_MANAGEMENT_FRAMES_Times[0],HMD_UP_DATA1_FRAMES_Times[0],HMD_UP_RE_DATA1_FRAMES_Times[0],HMD_UP_DATA2_FRAMES_Times[0],HMD_DWN_RE_DATA2_FRAMES_Times[0],HMD_UP_DATA3_FRAMES_Times[0],HMD_DWN_RE_DATA3_FRAMES_Times[0])
-    
+    lineStyles = ['-.',':',"--","-",'-.',':',"--"]
+    markers = [".",",","1","x","|","+","v"]
+    labels = ["management","data type1","retransmitted data type1","data type2","retransmitted data type2","data type3","retransmitted data type3"]
+
+
+
+
+    #################### Line Graph 1 ####################    
+    # Line Graph for nb of frames for different time durations from HMD traces folder (each direction will be in a graph)
     for duration in durations:
         for i in range(len(flowDirections)):
             folderPath = "{}/{}".format(prefix,flowDirections[i])
@@ -1739,54 +1738,390 @@ def plotHMDNBofFrames(root_folder,gameName,results):
             plt.xlabel('time in (sec)', fontsize=12)
             plt.ylabel('# of frames', fontsize=12)
             plt.title("{} # of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
-            plt.savefig('{}/{}_duration_{}_NBFrames.png'.format(folderPath,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_NBFrames.png'.format(folderPath,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
-    ####################################################
+    ######################################################
+
+
+    #################### Line Graph 2 ####################    
+    # Line Graph for nb of frames for different time durations from HMD traces folder (each data type will be in a graph)
+    for duration in durations:
+        for j in range(len(labels)):
+            firstFrame = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0]) if j not in [1,2] else flowDirectionsLists[0].__getitem__(j)[0]
+            for i in range(len(flowDirections)):
+                if(i == 1 and j in [1,2]):
+                        continue
+                folderPath = "{}/{}".format(prefix,labels[j])
+                try:
+                    os.mkdir(folderPath)
+                except:
+                    pass
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfNBOfFrames = computeNBOfFrames(newTimes,duration)
+                x = newTimesPeriods
+                y = listOfNBOfFrames
+                yLabel = '{}'.format(flowDirections[i]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[i]),marker = '.',linestyle='-')
+                
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('# of frames', fontsize=12)
+            plt.title("# of {} frames of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_NBFrames.png'.format(folderPath,labels[j],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
 
 
 
-    # #################### CDF  Graph ####################
-    # # CDF Graph for nb of frames for different time durations from server.csv trace
-    # for duration in durations:
-    #     for i in range(len(flowDirections)):    
-    #         newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
-    #         newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
-    #         listOfNBOfFramesBoth = computeNBOfFrames(newTimesBoth,duration)
-    #         newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
-    #         newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
-    #         listOfNBOfFramesUDP = computeNBOfFrames(newTimesUDP,duration)
-    #         newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
-    #         newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
-    #         listOfNBOfFramesTCP = computeNBOfFrames(newTimesTCP,duration)
-            
-    #         data1 = [float(i) for i in listOfNBOfFramesBoth]
-    #         data2 = [float(i) for i in listOfNBOfFramesUDP]
-    #         data3 = [float(i) for i in listOfNBOfFramesTCP]
-            
-    #         x1 = np.sort(data1)
-    #         x2 = np.sort(data2)
-    #         x3 = np.sort(data3)
+    #################### Line Graph 3 ####################
+    # Line Graph for nb of frames for all the frames from all data types for different time durations from HMD traces folder
+    for duration in durations: 
+        folderPath = "{}/{}".format(prefix,"all_data_types")
+        try:
+            os.mkdir(folderPath)
+        except:
+            pass
+        try:
+            listOfFolders = ["DMR","DR","DM","D","R"]
+            for tempFolder in listOfFolders:
+                os.mkdir("{}/{}".format(folderPath,tempFolder))
+        except:
+            pass
+        
+        # [D+M+R] all data frames + all management frames + all re-transmitted frames (lists suffix 1) 
+        uniqueDataCombinedLists_1,retransmittedDataCombinedLists_1 = combinedResultsLists(results,1)
+        HMD_UP_NBs_1,HMD_UP_Times_1,HMD_UP_DataRates_1,HMD_UP_Data_Sizes_1,HMD_UP_Frames_Sizes_1,HMD_UP_Frames_SeqNB_1,HMD_DWN_NBs_1,HMD_DWN_Times_1,HMD_DWN_DataRates_1,HMD_DWN_Data_Sizes_1,HMD_DWN_Frames_Sizes_1,HMD_DWN_Frames_SeqNB_1 = uniqueDataCombinedLists_1
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_1[0],HMD_UP_Times_1)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeNBOfFrames(newTimesX1,duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfRatesOfFramesY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_1[0],HMD_DWN_Times_1)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeNBOfFrames(newTimesX2,duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfRatesOfFramesY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('# of frames', fontsize=12)
+        plt.title("# of DMR frames of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DMR/{}_NBFrames.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
 
-    #         y1 = np.arange(len(x1))/float(len(x1))
-    #         y2 = np.arange(len(x2))/float(len(x2))
-    #         y3 = np.arange(len(x3))/float(len(x3))
+        # [D+R] all data frames + all re-transmitted frames (lists suffix 2) 
+        uniqueDataCombinedLists_2,retransmittedDataCombinedLists_2 = combinedResultsLists(results,0)
+        HMD_UP_NBs_2,HMD_UP_Times_2,HMD_UP_DataRates_2,HMD_UP_Data_Sizes_2,HMD_UP_Frames_Sizes_2,HMD_UP_Frames_SeqNB_2,HMD_DWN_NBs_2,HMD_DWN_Times_2,HMD_DWN_DataRates_2,HMD_DWN_Data_Sizes_2,HMD_DWN_Frames_Sizes_2,HMD_DWN_Frames_SeqNB_2 = uniqueDataCombinedLists_2
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_2[0],HMD_UP_Times_2)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeNBOfFrames(newTimesX1,duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfRatesOfFramesY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_2[0],HMD_DWN_Times_2)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeNBOfFrames(newTimesX2,duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfRatesOfFramesY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('# of frames', fontsize=12)
+        plt.title("# of DR frames of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DR/{}_NBFrames.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
 
-    #         y1Label =  'Both'
-    #         y2Label =  'UDP'
-    #         y3Label =  'TCP'
+        # [D+M] all data frames + all management frames (lists suffix 3) 
+        uniqueDataCombinedLists_3,retransmittedDataCombinedLists_3 = combinedResultsListsNoReTransmittedFrames(results,1)
+        HMD_UP_NBs_3,HMD_UP_Times_3,HMD_UP_DataRates_3,HMD_UP_Data_Sizes_3,HMD_UP_Frames_Sizes_3,HMD_UP_Frames_SeqNB_3,HMD_DWN_NBs_3,HMD_DWN_Times_3,HMD_DWN_DataRates_3,HMD_DWN_Data_Sizes_3,HMD_DWN_Frames_Sizes_3,HMD_DWN_Frames_SeqNB_3 = uniqueDataCombinedLists_3
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_3[0],HMD_UP_Times_3)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeNBOfFrames(newTimesX1,duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfRatesOfFramesY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_3[0],HMD_DWN_Times_3)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeNBOfFrames(newTimesX2,duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfRatesOfFramesY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('# of frames', fontsize=12)
+        plt.title("# of DM frames instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DM/{}_NBFrames.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
 
-    #         plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.')
-    #         plt.plot(x2, y2,label=y2Label,c='blue',linestyle=':')
-    #         plt.plot(x3, y3,label=y3Label,c='green',linestyle='--')
+        # [D] all data frames (lists suffix 4) 
+        uniqueDataCombinedLists_4,retransmittedDataCombinedLists_4 = combinedResultsListsNoReTransmittedFrames(results,0)
+        HMD_UP_NBs_3,HMD_UP_Times_4,HMD_UP_DataRates_4,HMD_UP_Data_Sizes_4,HMD_UP_Frames_Sizes_4,HMD_UP_Frames_SeqNB_4,HMD_DWN_NBs_4,HMD_DWN_Times_4,HMD_DWN_DataRates_4,HMD_DWN_Data_Sizes_4,HMD_DWN_Frames_Sizes_4,HMD_DWN_Frames_SeqNB_4 = uniqueDataCombinedLists_4
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_4[0],HMD_UP_Times_4)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeNBOfFrames(newTimesX1,duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfRatesOfFramesY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_4[0],HMD_DWN_Times_4)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeNBOfFrames(newTimesX2,duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfRatesOfFramesY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('# of frames', fontsize=12)
+        plt.title("# of D frames instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/D/{}_NBFrames.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
 
-    #         plt.legend(loc='best', fontsize=10)
-    #         plt.grid(color='grey', linestyle='--', linewidth=0.5)
-    #         plt.xlabel('# of frames', fontsize=12)
-    #         plt.ylabel('CDF', fontsize=12)
-    #         plt.title("CDF {} # of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-    #         plt.savefig('{}/{}_duration_{}_NBFrames_CDF.png'.format(prefix,flowDirections[i],duration))
-    #         plt.show()
-    # ####################################################
+        # [R] all re-transmitted frames (lists suffix 5)
+        HMD_UP_RE_NBs_5,HMD_UP_RE_Times_5,HMD_UP_RE_DataRates_5,HMD_UP_RE_Data_Sizes_5,HMD_UP_RE_Frames_Sizes_5,HMD_UP_RE_Frames_SeqNB_5,HMD_DWN_RE_NBs_5,HMD_DWN_RE_Times_5,HMD_DWN_RE_DataRates_5,HMD_DWN_RE_Data_Sizes_5,HMD_DWN_RE_Frames_Sizes_5,HMD_DWN_RE_Frames_SeqNB_5 = retransmittedDataCombinedLists_1
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_RE_Times_5[0],HMD_UP_RE_Times_5)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeNBOfFrames(newTimesX1,duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfRatesOfFramesY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_RE_Times_5[0],HMD_DWN_RE_Times_5)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeNBOfFrames(newTimesX2,duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfRatesOfFramesY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('# of frames', fontsize=12)
+        plt.title("# of R frames instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/R/{}_NBFrames.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+        ######################################################
+
+
+
+    #################### CDF  Graph 1 ####################
+    # CDF Graph for nb of frames for different time durations from HMD traces folder (each direction will be in a graph)
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            folderPath = "{}/{}".format(prefix,flowDirections[i])
+            try:
+                os.mkdir(folderPath)
+            except:
+                pass
+            firstFrame = min(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1)[0] if i==0 else 100000000,flowDirectionsLists[i].__getitem__(2)[0] if i == 0 else 100000000,flowDirectionsLists[i].__getitem__(3)[0],
+                            flowDirectionsLists[i].__getitem__(4)[0],flowDirectionsLists[i].__getitem__(5)[0],flowDirectionsLists[i].__getitem__(6)[0])
+            for j in range(len(flowDirectionsLists[i])):
+                if(i == 1 and j in [1,2]):
+                    continue
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfNBOfFrames = computeNBOfFrames(newTimes,duration)
+                data = [float(value) for value in listOfNBOfFrames]
+                x = np.sort(data)
+                y = np.arange(len(x))/float(len(x))
+                yLabel = '{}'.format(labels[j]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[j]),linestyle='{}'.format(lineStyles[j]))               
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('# of frames', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF {} # of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_duration_{}_NBFrames_CDF.png'.format(folderPath,flowDirections[i],duration),dpi= saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+
+    #################### CDF  Graph 2 ####################
+    # CDF Graph for nb of frames for different time durations from HMD traces folder (each type of frame will be in a graph)
+    for duration in durations:
+        for j in range(len(labels)):
+            firstFrame = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0]) if j not in [1,2] else flowDirectionsLists[0].__getitem__(j)[0]
+            for i in range(len(flowDirections)):
+                if(i == 1 and j in [1,2]):
+                        continue
+                folderPath = "{}/{}".format(prefix,labels[j])
+                try:
+                    os.mkdir(folderPath)
+                except:
+                    pass
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfNBOfFrames = computeNBOfFrames(newTimes,duration)
+                data = [float(value) for value in listOfNBOfFrames]
+                x = np.sort(data)
+                y = np.arange(len(x))/float(len(x))
+                yLabel = '{}'.format(flowDirections[i]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[i]),linestyle='{}'.format(lineStyles[i]))               
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('# of frames', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF # of {} frames of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_frames_duration_{}_NBFrames_CDF.png'.format(folderPath,labels[j],duration),dpi= saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+
+    #################### CDF  Graph 3 ####################
+    # CDF Graph for nb og frames for all the frames from all data types for different time durations from HMD traces folder
+    for duration in durations: 
+        folderPath = "{}/{}".format(prefix,"all_data_types")
+        try:
+            os.mkdir(folderPath)
+        except:
+            pass
+        try:
+            listOfFolders = ["DMR","DR","DM","D","R"]
+            for tempFolder in listOfFolders:
+                os.mkdir("{}/{}".format(folderPath,tempFolder))
+        except:
+            pass
+        
+        # [D+M+R] all data frames + all management frames + all re-transmitted frames (lists suffix 1) 
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_1[0],HMD_UP_Times_1)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeNBOfFrames(newTimesX1,duration)
+        data1 = [float(value) for value in listOfRatesOfFramesY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_1[0],HMD_DWN_Times_1)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeNBOfFrames(newTimesX2,duration)
+        data2 = [float(value) for value in listOfRatesOfFramesY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('# of frames', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF of NB of DMR frames of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DMR/{}_NBFrames_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [D+R] all data frames + all re-transmitted frames (lists suffix 2) 
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_2[0],HMD_UP_Times_2)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeNBOfFrames(newTimesX1,duration)
+        data1 = [float(value) for value in listOfRatesOfFramesY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_2[0],HMD_DWN_Times_2)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeNBOfFrames(newTimesX2,duration)
+        data2 = [float(value) for value in listOfRatesOfFramesY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('# of frames', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF of NB of DR frames of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DR/{}_NBFrames_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [D+M] all data frames + all management frames (lists suffix 3) 
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_3[0],HMD_UP_Times_3)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeNBOfFrames(newTimesX1,duration)
+        data1 = [float(value) for value in listOfRatesOfFramesY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_3[0],HMD_DWN_Times_3)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeNBOfFrames(newTimesX2,duration)
+        data2 = [float(value) for value in listOfRatesOfFramesY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('# of frames', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF of NB of DM frames of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DM/{}_NBFrames_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [D] all data frames (lists suffix 4) 
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_4[0],HMD_UP_Times_4)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeNBOfFrames(newTimesX1,duration)
+        data1 = [float(value) for value in listOfRatesOfFramesY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_4[0],HMD_DWN_Times_4)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeNBOfFrames(newTimesX2,duration)
+        data2 = [float(value) for value in listOfRatesOfFramesY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('# of frames', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF of NB of D frames of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/D/{}_NBFrames_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [R] all re-transmitted frames (lists suffix 5)
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_RE_Times_5[0],HMD_UP_RE_Times_5)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeNBOfFrames(newTimesX1,duration)
+        data1 = [float(value) for value in listOfRatesOfFramesY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_RE_Times_5[0],HMD_DWN_RE_Times_5)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeNBOfFrames(newTimesX2,duration)
+        data2 = [float(value) for value in listOfRatesOfFramesY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('# of frames', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF of NB of R frames of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/R/{}_NBFrames_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+        ######################################################
 
 
 
@@ -1844,7 +2179,7 @@ def plotServerFramesInstantaneousRates(root_folder,gameName,results):
             plt.xlabel('time in (sec)', fontsize=12)
             plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
             plt.title("{} instantaneous rates of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
-            plt.savefig('{}/{}_duration_{}_instantaneous_rates.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
@@ -1889,9 +2224,465 @@ def plotServerFramesInstantaneousRates(root_folder,gameName,results):
             plt.xlabel('instantaneous rates (Mbps)', fontsize=12)
             plt.ylabel('CDF', fontsize=12)
             plt.title("CDF {} instantaneous rates of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_instantaneous_rates_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates_CDF.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
+
+
+
+def plotHMDFramesInstantaneousRates(root_folder,gameName,results):
+    result_folder_name = "HMD/frames_instantaneous_rates"
+    prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
+    
+    try:
+        os.mkdir(prefix)
+    except:
+        pass
+
+    HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
+        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
+        HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, HMD_UP_DATA1_FRAMES_NBs, \
+        HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,\
+        HMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, \
+        HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,\
+        HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,\
+        HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, \
+        HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes, HMD_DWN_DATA2_FRAMES_Frames_Sizes, \
+        HMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
+        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
+        HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
+        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, \
+        HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB,\
+        HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
+        HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, \
+        HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, \
+        HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, \
+        HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = results 
+    
+
+    durations = [1,10,15,30,60]  # in seconds
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(HMD_UP_MANAGEMENT_FRAMES_Times,HMD_UP_DATA1_FRAMES_Times,HMD_UP_RE_DATA1_FRAMES_Times,HMD_UP_DATA2_FRAMES_Times,HMD_UP_RE_DATA2_FRAMES_Times,HMD_UP_DATA3_FRAMES_Times,HMD_UP_RE_DATA3_FRAMES_Times),
+                            (HMD_DWN_MANAGEMENT_FRAMES_Times,[],[],HMD_DWN_DATA2_FRAMES_Times,HMD_DWN_RE_DATA2_FRAMES_Times,HMD_DWN_DATA3_FRAMES_Times,HMD_DWN_RE_DATA3_FRAMES_Times)]
+    listOfFrameSizes = [(HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes,HMD_UP_DATA1_FRAMES_Frames_Sizes,HMD_UP_RE_DATA1_FRAMES_Frames_Sizes,HMD_UP_DATA2_FRAMES_Frames_Sizes,HMD_UP_RE_DATA2_FRAMES_Frames_Sizes,HMD_UP_DATA3_FRAMES_Frames_Sizes,HMD_UP_RE_DATA3_FRAMES_Frames_Sizes),
+                        (HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes,[],[],HMD_DWN_DATA2_FRAMES_Frames_Sizes,HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes,HMD_DWN_DATA3_FRAMES_Frames_Sizes,HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes)]
+    colors = ["red","blue","green","black","purple","cyan","pink"]
+    lineStyles = ['-.',':',"--","-",'-.',':',"--"]
+    markers = [".",",","1","x","|","+","v"]
+    labels = ["management","data type1","retransmitted data type1","data type2","retransmitted data type2","data type3","retransmitted data type3"]
+
+
+    #################### Line Graph 1 ####################
+    # Line Graph for instantaneous rates for different time durations from HMD traces folder (each direction will be in a graph)
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            folderPath = "{}/{}".format(prefix,flowDirections[i])
+            try:
+                os.mkdir(folderPath)
+            except:
+                pass
+            firstFrame = min(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1)[0] if i==0 else 100000000,flowDirectionsLists[i].__getitem__(2)[0] if i == 0 else 100000000,flowDirectionsLists[i].__getitem__(3)[0],
+                            flowDirectionsLists[i].__getitem__(4)[0],flowDirectionsLists[i].__getitem__(5)[0],flowDirectionsLists[i].__getitem__(6)[0])
+            for j in range(len(flowDirectionsLists[i])):
+                if(i == 1 and j in [1,2]):
+                    continue
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfFrameSizes[i].__getitem__(j),duration)
+                x = newTimesPeriods
+                y = listOfRatesOfFrames
+                yLabel = '{}'.format(labels[j]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[j]),marker = '.',linestyle='-')
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
+            plt.title("{} instantaneous rates of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates.png'.format(folderPath,flowDirections[i],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+
+    #################### Line Graph 2 ####################
+    # Line Graph for instantaneous rates for different time durations from HMD traces folder (each data type will be in a graph)
+    for duration in durations:
+        for j in range(len(labels)):
+            firstFrame = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0]) if j not in [1,2] else flowDirectionsLists[0].__getitem__(j)[0]
+            for i in range(len(flowDirections)):
+                if(i == 1 and j in [1,2]):
+                        continue
+                folderPath = "{}/{}".format(prefix,labels[j])
+                try:
+                    os.mkdir(folderPath)
+                except:
+                    pass
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfFrameSizes[i].__getitem__(j),duration)
+                x = newTimesPeriods
+                y = listOfRatesOfFrames
+                yLabel = '{}'.format(flowDirections[i]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[i]),marker = '.',linestyle='-')
+                
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
+            plt.title("{} instantaneous rates of frames of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates.png'.format(folderPath,labels[j],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+    #################### Line Graph 3 ####################
+    # Line Graph for instantaneous rates for all the frames from all data types for different time durations from HMD traces folder
+    for duration in durations: 
+        folderPath = "{}/{}".format(prefix,"all_data_types")
+        try:
+            os.mkdir(folderPath)
+        except:
+            pass
+        try:
+            listOfFolders = ["DMR","DR","DM","D","R"]
+            for tempFolder in listOfFolders:
+                os.mkdir("{}/{}".format(folderPath,tempFolder))
+        except:
+            pass
+        
+        # [D+M+R] all data frames + all management frames + all re-transmitted frames (lists suffix 1) 
+        uniqueDataCombinedLists_1,retransmittedDataCombinedLists_1 = combinedResultsLists(results,1)
+        HMD_UP_NBs_1,HMD_UP_Times_1,HMD_UP_DataRates_1,HMD_UP_Data_Sizes_1,HMD_UP_Frames_Sizes_1,HMD_UP_Frames_SeqNB_1,HMD_DWN_NBs_1,HMD_DWN_Times_1,HMD_DWN_DataRates_1,HMD_DWN_Data_Sizes_1,HMD_DWN_Frames_Sizes_1,HMD_DWN_Frames_SeqNB_1 = uniqueDataCombinedLists_1
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_1[0],HMD_UP_Times_1)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeInstantaneousRates(newTimesX1,HMD_UP_Frames_Sizes_1,duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfRatesOfFramesY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_1[0],HMD_DWN_Times_1)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeInstantaneousRates(newTimesX2,HMD_DWN_Frames_Sizes_1,duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfRatesOfFramesY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
+        plt.title("DMR instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DMR/{}_instantaneous_rate.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [D+R] all data frames + all re-transmitted frames (lists suffix 2) 
+        uniqueDataCombinedLists_2,retransmittedDataCombinedLists_2 = combinedResultsLists(results,0)
+        HMD_UP_NBs_2,HMD_UP_Times_2,HMD_UP_DataRates_2,HMD_UP_Data_Sizes_2,HMD_UP_Frames_Sizes_2,HMD_UP_Frames_SeqNB_2,HMD_DWN_NBs_2,HMD_DWN_Times_2,HMD_DWN_DataRates_2,HMD_DWN_Data_Sizes_2,HMD_DWN_Frames_Sizes_2,HMD_DWN_Frames_SeqNB_2 = uniqueDataCombinedLists_2
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_2[0],HMD_UP_Times_2)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeInstantaneousRates(newTimesX1,HMD_UP_Frames_Sizes_2,duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfRatesOfFramesY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_2[0],HMD_DWN_Times_2)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeInstantaneousRates(newTimesX2,HMD_DWN_Frames_Sizes_2,duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfRatesOfFramesY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
+        plt.title("DR instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DR/{}_instantaneous_rate.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [D+M] all data frames + all management frames (lists suffix 3) 
+        uniqueDataCombinedLists_3,retransmittedDataCombinedLists_3 = combinedResultsListsNoReTransmittedFrames(results,1)
+        HMD_UP_NBs_3,HMD_UP_Times_3,HMD_UP_DataRates_3,HMD_UP_Data_Sizes_3,HMD_UP_Frames_Sizes_3,HMD_UP_Frames_SeqNB_3,HMD_DWN_NBs_3,HMD_DWN_Times_3,HMD_DWN_DataRates_3,HMD_DWN_Data_Sizes_3,HMD_DWN_Frames_Sizes_3,HMD_DWN_Frames_SeqNB_3 = uniqueDataCombinedLists_3
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_3[0],HMD_UP_Times_3)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeInstantaneousRates(newTimesX1,HMD_UP_Frames_Sizes_3,duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfRatesOfFramesY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_3[0],HMD_DWN_Times_3)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeInstantaneousRates(newTimesX2,HMD_DWN_Frames_Sizes_3,duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfRatesOfFramesY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
+        plt.title("DM instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DM/{}_instantaneous_rate.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [D] all data frames (lists suffix 4) 
+        uniqueDataCombinedLists_4,retransmittedDataCombinedLists_4 = combinedResultsListsNoReTransmittedFrames(results,0)
+        HMD_UP_NBs_3,HMD_UP_Times_4,HMD_UP_DataRates_4,HMD_UP_Data_Sizes_4,HMD_UP_Frames_Sizes_4,HMD_UP_Frames_SeqNB_4,HMD_DWN_NBs_4,HMD_DWN_Times_4,HMD_DWN_DataRates_4,HMD_DWN_Data_Sizes_4,HMD_DWN_Frames_Sizes_4,HMD_DWN_Frames_SeqNB_4 = uniqueDataCombinedLists_4
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_4[0],HMD_UP_Times_4)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeInstantaneousRates(newTimesX1,HMD_UP_Frames_Sizes_4,duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfRatesOfFramesY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_4[0],HMD_DWN_Times_4)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeInstantaneousRates(newTimesX2,HMD_DWN_Frames_Sizes_4,duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfRatesOfFramesY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
+        plt.title("D instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/D/{}_instantaneous_rate.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [R] all re-transmitted frames (lists suffix 5)
+        HMD_UP_RE_NBs_5,HMD_UP_RE_Times_5,HMD_UP_RE_DataRates_5,HMD_UP_RE_Data_Sizes_5,HMD_UP_RE_Frames_Sizes_5,HMD_UP_RE_Frames_SeqNB_5,HMD_DWN_RE_NBs_5,HMD_DWN_RE_Times_5,HMD_DWN_RE_DataRates_5,HMD_DWN_RE_Data_Sizes_5,HMD_DWN_RE_Frames_Sizes_5,HMD_DWN_RE_Frames_SeqNB_5 = retransmittedDataCombinedLists_1
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_RE_Times_5[0],HMD_UP_RE_Times_5)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeInstantaneousRates(newTimesX1,HMD_UP_RE_Frames_Sizes_5,duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfRatesOfFramesY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_RE_Times_5[0],HMD_DWN_RE_Times_5)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeInstantaneousRates(newTimesX2,HMD_DWN_RE_Frames_Sizes_5,duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfRatesOfFramesY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
+        plt.title("R instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/R/{}_instantaneous_rate.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+        ######################################################
+
+
+
+    #################### CDF  Graph 1 ####################
+    # CDF Graph for instantaneous rates for different time durations from HMD traces folder (each direction will be in a graph)
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            folderPath = "{}/{}".format(prefix,flowDirections[i])
+            try:
+                os.mkdir(folderPath)
+            except:
+                pass
+            firstFrame = min(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1)[0] if i==0 else 100000000,flowDirectionsLists[i].__getitem__(2)[0] if i == 0 else 100000000,flowDirectionsLists[i].__getitem__(3)[0],
+                            flowDirectionsLists[i].__getitem__(4)[0],flowDirectionsLists[i].__getitem__(5)[0],flowDirectionsLists[i].__getitem__(6)[0])
+            for j in range(len(flowDirectionsLists[i])):
+                if(i == 1 and j in [1,2]):
+                    continue
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfFrameSizes[i].__getitem__(j),duration)
+                data = [float(value) for value in listOfRatesOfFrames]
+                x = np.sort(data)
+                y = np.arange(len(x))/float(len(x))
+                yLabel = '{}'.format(labels[j]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[j]),linestyle='{}'.format(lineStyles[j]))
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('instantaneous rate (Mbps)', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF {} instantaneous rates of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates_CDF.png'.format(folderPath,flowDirections[i],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+
+    #################### CDF  Graph 2 ####################
+    # CDF Graph for instantaneous rates for different time durations from HMD traces folder (each data type will be in a graph)
+    for duration in durations:
+        for j in range(len(labels)):
+            firstFrame = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0]) if j not in [1,2] else flowDirectionsLists[0].__getitem__(j)[0]
+            for i in range(len(flowDirections)):
+                if(i == 1 and j in [1,2]):
+                        continue
+                folderPath = "{}/{}".format(prefix,labels[j])
+                try:
+                    os.mkdir(folderPath)
+                except:
+                    pass
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfFrameSizes[i].__getitem__(j),duration)
+                data = [float(value) for value in listOfRatesOfFrames]
+                x = np.sort(data)
+                y = np.arange(len(x))/float(len(x))
+                yLabel = '{}'.format(flowDirections[i]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[i]),linestyle='{}'.format(lineStyles[i]))
+                
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('instantaneous rate (Mbps)', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF of {} frames instantaneous rates of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates_CDF.png'.format(folderPath,labels[j],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+    #################### CDF  Graph 3 ####################
+    # CDF Graph for instantaneous rates for all the frames from all data types for different time durations from HMD traces folder
+    for duration in durations: 
+        folderPath = "{}/{}".format(prefix,"all_data_types")
+        try:
+            os.mkdir(folderPath)
+        except:
+            pass
+        try:
+            listOfFolders = ["DMR","DR","DM","D","R"]
+            for tempFolder in listOfFolders:
+                os.mkdir("{}/{}".format(folderPath,tempFolder))
+        except:
+            pass
+        
+        # [D+M+R] all data frames + all management frames + all re-transmitted frames (lists suffix 1) 
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_1[0],HMD_UP_Times_1)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeInstantaneousRates(newTimesX1,HMD_UP_Frames_Sizes_1,duration)
+        data1 = [float(value) for value in listOfRatesOfFramesY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_1[0],HMD_DWN_Times_1)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeInstantaneousRates(newTimesX2,HMD_DWN_Frames_Sizes_1,duration)
+        data2 = [float(value) for value in listOfRatesOfFramesY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('instantaneous rate (Mbps)', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF of DMR frames instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DMR/{}_instantaneous_rate_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [D+R] all data frames + all re-transmitted frames (lists suffix 2) 
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_2[0],HMD_UP_Times_2)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeInstantaneousRates(newTimesX1,HMD_UP_Frames_Sizes_2,duration)
+        data1 = [float(value) for value in listOfRatesOfFramesY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_2[0],HMD_DWN_Times_2)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeInstantaneousRates(newTimesX2,HMD_DWN_Frames_Sizes_2,duration)
+        data2 = [float(value) for value in listOfRatesOfFramesY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('instantaneous rate (Mbps)', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF DR frames instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DR/{}_instantaneous_rate_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [D+M] all data frames + all management frames (lists suffix 3) 
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_3[0],HMD_UP_Times_3)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeInstantaneousRates(newTimesX1,HMD_UP_Frames_Sizes_3,duration)
+        data1 = [float(value) for value in listOfRatesOfFramesY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_3[0],HMD_DWN_Times_3)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeInstantaneousRates(newTimesX2,HMD_DWN_Frames_Sizes_3,duration)
+        data2 = [float(value) for value in listOfRatesOfFramesY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('instantaneous rate (Mbps)', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF DM frames instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DM/{}_instantaneous_rate_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [D] all data frames (lists suffix 4) 
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_4[0],HMD_UP_Times_4)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeInstantaneousRates(newTimesX1,HMD_UP_Frames_Sizes_4,duration)
+        data1 = [float(value) for value in listOfRatesOfFramesY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_4[0],HMD_DWN_Times_4)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeInstantaneousRates(newTimesX2,HMD_DWN_Frames_Sizes_4,duration)
+        data2 = [float(value) for value in listOfRatesOfFramesY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('instantaneous rate (Mbps)', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF D frames instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/D/{}_instantaneous_rate_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [R] all re-transmitted frames (lists suffix 5)
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_RE_Times_5[0],HMD_UP_RE_Times_5)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfRatesOfFramesY1 = computeInstantaneousRates(newTimesX1,HMD_UP_RE_Frames_Sizes_5,duration)
+        data1 = [float(value) for value in listOfRatesOfFramesY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_RE_Times_5[0],HMD_DWN_RE_Times_5)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfRatesOfFramesY2 = computeInstantaneousRates(newTimesX2,HMD_DWN_RE_Frames_Sizes_5,duration)
+        data2 = [float(value) for value in listOfRatesOfFramesY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('instantaneous rate (Mbps)', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF R frames instantaneous rates of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/R/{}_instantaneous_rate_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+        ######################################################
+
 
 
 
@@ -1949,7 +2740,7 @@ def plotServerDataInstantaneousRates(root_folder,gameName,results):
             plt.xlabel('time in (sec)', fontsize=12)
             plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
             plt.title("{} instantaneous rates of data of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
-            plt.savefig('{}/{}_duration_{}_instantaneous_rates.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
@@ -1994,7 +2785,7 @@ def plotServerDataInstantaneousRates(root_folder,gameName,results):
             plt.xlabel('instantaneous rates (Mbps)', fontsize=12)
             plt.ylabel('CDF', fontsize=12)
             plt.title("CDF {} instantaneous rates (Mbps) of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_instantaneous_rates_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates_CDF.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
@@ -2053,7 +2844,7 @@ def plotServerSizeofFrames(root_folder,gameName,results):
         plt.xlabel('time in (sec)', fontsize=12)
         plt.ylabel('frame size (Bytes)', fontsize=12)
         plt.title("{} size of all frames of {} for {} frames starting from the second {}".format(flowDirections[i],gameName,NBofFrames,plotStartTime),fontsize="9")
-        plt.savefig('{}/{}_sizes_of_all_frames.png'.format(prefix,flowDirections[i]))
+        plt.savefig('{}/{}_sizes_of_all_frames.png'.format(prefix,flowDirections[i]),dpi=saved_graph_resolution)
         plt.show()
     ####################################################
 
@@ -2095,7 +2886,7 @@ def plotServerSizeofFrames(root_folder,gameName,results):
             plt.xlabel('time in (sec)', fontsize=12)
             plt.ylabel('frame size (Bytes)', fontsize=12)
             plt.title("{} size of {} frames of {} for {} frames starting from the second {}".format(flowDirections[i],protocol,gameName,NBofFrames,plotStartTime),fontsize=9)
-            plt.savefig('{}/{}_sizes_of_{}_frames.png'.format(prefix,flowDirections[i],protocol))
+            plt.savefig('{}/{}_sizes_of_{}_frames.png'.format(prefix,flowDirections[i],protocol),dpi=saved_graph_resolution)
             plt.show()
             protocolIndex = protocolIndex + 1
    
@@ -2143,7 +2934,7 @@ def plotServerSizeofFrames(root_folder,gameName,results):
             plt.xlabel('time in (sec)', fontsize=12)
             plt.ylabel('total frames size (MB)', fontsize=12)
             plt.title("{} total size of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_size_of_frames.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_size_of_frames.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
@@ -2188,7 +2979,7 @@ def plotServerSizeofFrames(root_folder,gameName,results):
             plt.xlabel('total frames size (MB)', fontsize=12)
             plt.ylabel('CDF', fontsize=12)
             plt.title("CDF {} size of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_sizs_of_frames_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_sizs_of_frames_CDF.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
@@ -2247,7 +3038,7 @@ def plotServerSizeofData(root_folder,gameName,results):
         plt.xlabel('time in (sec)', fontsize=12)
         plt.ylabel('data size (Bytes)', fontsize=12)
         plt.title("{} size of data of {} for {} frames starting from the second {}".format(flowDirections[i],gameName,NBofFrames,plotStartTime),fontsize="9")
-        plt.savefig('{}/{}_sizes_of_all_data.png'.format(prefix,flowDirections[i]))
+        plt.savefig('{}/{}_sizes_of_all_data.png'.format(prefix,flowDirections[i]),dpi=saved_graph_resolution)
         plt.show()
     ####################################################
 
@@ -2289,7 +3080,7 @@ def plotServerSizeofData(root_folder,gameName,results):
             plt.xlabel('time in (sec)', fontsize=12)
             plt.ylabel('frame size (Bytes)', fontsize=12)
             plt.title("{} size of {} data of {} for {} frames starting from the second {}".format(flowDirections[i],protocol,gameName,NBofFrames,plotStartTime),fontsize=9)
-            plt.savefig('{}/{}_sizes_of_{}_data.png'.format(prefix,flowDirections[i],protocol))
+            plt.savefig('{}/{}_sizes_of_{}_data.png'.format(prefix,flowDirections[i],protocol),dpi=saved_graph_resolution)
             plt.show()
             protocolIndex = protocolIndex + 1
    
@@ -2337,7 +3128,7 @@ def plotServerSizeofData(root_folder,gameName,results):
             plt.xlabel('time in (sec)', fontsize=12)
             plt.ylabel('total data size (MB)', fontsize=12)
             plt.title("{} total size data of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_size_of_data.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_size_of_data.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
@@ -2382,7 +3173,7 @@ def plotServerSizeofData(root_folder,gameName,results):
             plt.xlabel('total data size (MB)', fontsize=12)
             plt.ylabel('CDF', fontsize=12)
             plt.title("CDF {} size of data of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_sizs_of_data_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_sizs_of_data_CDF.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
@@ -2445,7 +3236,7 @@ def plotServerAVGSizeofFrames(root_folder,gameName,results):
             plt.xlabel('time in (sec)', fontsize=12)
             plt.ylabel('avg frames size (bytes)', fontsize=12)
             plt.title("{} avg size of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_avg_size_of_frames.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_avg_size_of_frames.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
@@ -2490,7 +3281,7 @@ def plotServerAVGSizeofFrames(root_folder,gameName,results):
             plt.xlabel('avg frames size (bytes)', fontsize=12)
             plt.ylabel('CDF', fontsize=12)
             plt.title("CDF {} avg size of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_avg_sizs_of_frames_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_avg_sizs_of_frames_CDF.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
@@ -2552,7 +3343,7 @@ def plotServerAVGSizeofData(root_folder,gameName,results):
             plt.xlabel('time in (sec)', fontsize=12)
             plt.ylabel('avg data size (bytes)', fontsize=12)
             plt.title("{} avg size data of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_avg_size_of_data.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_avg_size_of_data.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
@@ -2597,7 +3388,7 @@ def plotServerAVGSizeofData(root_folder,gameName,results):
             plt.xlabel('avg data size (bytes)', fontsize=12)
             plt.ylabel('CDF', fontsize=12)
             plt.title("CDF {} avg size of data of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_avg_sizs_of_data_CDF.png'.format(prefix,flowDirections[i],duration))
+            plt.savefig('{}/{}_duration_{}_avg_sizs_of_data_CDF.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
