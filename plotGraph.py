@@ -116,7 +116,7 @@ def plotHMDTracesResults(HMDTracesResults):
 
 
         
-        plotHMDNBofFrames(root_folder,gameName,results)
+        # plotHMDNBofFrames(root_folder,gameName,results)
         # plotHMDFramesInstantaneousRates(root_folder,gameName,results)
         # plotServerDataInstantaneousRates(root_folder,gameName,results)
         # plotServerSizeofFrames(root_folder,gameName,results)
