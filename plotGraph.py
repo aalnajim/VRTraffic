@@ -118,9 +118,9 @@ def plotHMDTracesResults(HMDTracesResults):
         
         # plotHMDNBofFrames(root_folder,gameName,results)
         # plotHMDFramesInstantaneousRates(root_folder,gameName,results)
-        plotHMDDataInstantaneousRates(root_folder,gameName,results)
-        plotHMDSizeofFrames(root_folder,gameName,results)
-        # plotServerSizeofData(root_folder,gameName,results)
+        # plotHMDDataInstantaneousRates(root_folder,gameName,results)
+        # plotHMDSizeofFrames(root_folder,gameName,results)
+        # plotHMDSizeofData(root_folder,gameName,results)
         # plotServerAVGSizeofFrames(root_folder,gameName,results)
         # plotServerAVGSizeofData(root_folder,gameName,results)
 
@@ -2824,7 +2824,7 @@ def plotHMDDataInstantaneousRates(root_folder,gameName,results):
     flowDirections = ["uplink","downlink"]
     flowDirectionsLists = [(HMD_UP_DATA2_FRAMES_Times,HMD_UP_RE_DATA2_FRAMES_Times,HMD_UP_DATA3_FRAMES_Times,HMD_UP_RE_DATA3_FRAMES_Times),
                             (HMD_DWN_DATA2_FRAMES_Times,HMD_DWN_RE_DATA2_FRAMES_Times,HMD_DWN_DATA3_FRAMES_Times,HMD_DWN_RE_DATA3_FRAMES_Times)]
-    listOfFrameSizes = [(HMD_UP_DATA2_FRAMES_Data_Sizes,HMD_UP_RE_DATA2_FRAMES_Data_Sizes,HMD_UP_DATA3_FRAMES_Data_Sizes,HMD_UP_RE_DATA3_FRAMES_Data_Sizes),
+    listOfDataSizes = [(HMD_UP_DATA2_FRAMES_Data_Sizes,HMD_UP_RE_DATA2_FRAMES_Data_Sizes,HMD_UP_DATA3_FRAMES_Data_Sizes,HMD_UP_RE_DATA3_FRAMES_Data_Sizes),
                         (HMD_DWN_DATA2_FRAMES_Data_Sizes,HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,HMD_DWN_DATA3_FRAMES_Data_Sizes,HMD_DWN_RE_DATA3_FRAMES_Data_Sizes)]
     colors = ["black","purple","cyan","pink"]
     lineStyles = ["-",'-.',':',"--"]
@@ -2845,7 +2845,7 @@ def plotHMDDataInstantaneousRates(root_folder,gameName,results):
             for j in range(len(flowDirectionsLists[i])):
                 newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
                 newTimesPeriods = convertTimeToPeriods(newTimes,duration)
-                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfFrameSizes[i].__getitem__(j),duration)
+                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfDataSizes[i].__getitem__(j),duration)
                 x = newTimesPeriods
                 y = listOfRatesOfFrames
                 yLabel = '{}'.format(labels[j]) 
@@ -2874,7 +2874,7 @@ def plotHMDDataInstantaneousRates(root_folder,gameName,results):
                     pass
                 newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
                 newTimesPeriods = convertTimeToPeriods(newTimes,duration)
-                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfFrameSizes[i].__getitem__(j),duration)
+                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfDataSizes[i].__getitem__(j),duration)
                 x = newTimesPeriods
                 y = listOfRatesOfFrames
                 yLabel = '{}'.format(flowDirections[i]) 
@@ -2995,7 +2995,7 @@ def plotHMDDataInstantaneousRates(root_folder,gameName,results):
             for j in range(len(flowDirectionsLists[i])):
                 newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
                 newTimesPeriods = convertTimeToPeriods(newTimes,duration)
-                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfFrameSizes[i].__getitem__(j),duration)
+                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfDataSizes[i].__getitem__(j),duration)
                 data = [float(value) for value in listOfRatesOfFrames]
                 x = np.sort(data)
                 y = np.arange(len(x))/float(len(x))
@@ -3025,7 +3025,7 @@ def plotHMDDataInstantaneousRates(root_folder,gameName,results):
                     pass
                 newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
                 newTimesPeriods = convertTimeToPeriods(newTimes,duration)
-                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfFrameSizes[i].__getitem__(j),duration)
+                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfDataSizes[i].__getitem__(j),duration)
                 data = [float(value) for value in listOfRatesOfFrames]
                 x = np.sort(data)
                 y = np.arange(len(x))/float(len(x))
@@ -3975,6 +3975,351 @@ def plotServerSizeofData(root_folder,gameName,results):
             plt.savefig('{}/{}_duration_{}_sizs_of_data_CDF.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
+
+
+
+def plotHMDSizeofData(root_folder,gameName,results):
+    result_folder_name = "HMD/size_of_data"
+    prefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name)
+    
+    try:
+        os.mkdir(prefix)
+    except:
+        pass
+
+    HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
+        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
+        HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, HMD_UP_DATA1_FRAMES_NBs, \
+        HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,\
+        HMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, \
+        HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,\
+        HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,\
+        HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, \
+        HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes, HMD_DWN_DATA2_FRAMES_Frames_Sizes, \
+        HMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
+        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
+        HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
+        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, \
+        HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB,\
+        HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
+        HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, \
+        HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, \
+        HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, \
+        HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = results 
+    
+
+    durations = [1,10,15,30,60]  # in seconds
+    flowDirections = ["uplink","downlink"]
+    flowDirectionsLists = [(HMD_UP_DATA2_FRAMES_Times,HMD_UP_RE_DATA2_FRAMES_Times,HMD_UP_DATA3_FRAMES_Times,HMD_UP_RE_DATA3_FRAMES_Times),
+                            (HMD_DWN_DATA2_FRAMES_Times,HMD_DWN_RE_DATA2_FRAMES_Times,HMD_DWN_DATA3_FRAMES_Times,HMD_DWN_RE_DATA3_FRAMES_Times)]
+    listOfDataSizes = [([float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_UP_DATA2_FRAMES_Data_Sizes],[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_UP_RE_DATA2_FRAMES_Data_Sizes],[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_UP_DATA3_FRAMES_Data_Sizes],[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_UP_RE_DATA3_FRAMES_Data_Sizes]),
+                        ([float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_DWN_DATA2_FRAMES_Data_Sizes],[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_DWN_RE_DATA2_FRAMES_Data_Sizes],[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_DWN_DATA3_FRAMES_Data_Sizes],[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_DWN_RE_DATA3_FRAMES_Data_Sizes])]
+    colors = ["black","purple","cyan","pink"]
+    lineStyles = ["-",'-.',':',"--"]
+    markers = [".",",","1","x"]
+    labels = ["data type2","retransmitted data type2","data type3","retransmitted data type3"]
+
+
+    #################### Line Graph 1 ####################
+    # Line Graph for total size of data for different time durations from HMD traces folder (each direction will be in a graph)
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            folderPath = "{}/{}".format(prefix,flowDirections[i])
+            try:
+                os.mkdir(folderPath)
+            except:
+                pass
+            firstFrame = min(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1)[0],flowDirectionsLists[i].__getitem__(2)[0],flowDirectionsLists[i].__getitem__(3)[0])
+            for j in range(len(flowDirectionsLists[i])):
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfTotalSizesOfData = computeTotalSize(newTimes,listOfDataSizes[i].__getitem__(j),duration)
+                x = newTimesPeriods
+                y = listOfTotalSizesOfData
+                yLabel = '{}'.format(labels[j]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[j]),marker = '.',linestyle='-')
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('total data size (MB)', fontsize=12)
+            plt.title("{} total size of data of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_size_of_data.png'.format(folderPath,flowDirections[i],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+
+    #################### Line Graph 2 ####################
+    # Line Graph for total size of data for different time durations from HMD traces folder (each data type will be in a graph)
+    for duration in durations:
+        for j in range(len(labels)):
+            firstFrame = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0])
+            for i in range(len(flowDirections)):
+                folderPath = "{}/{}".format(prefix,labels[j])
+                try:
+                    os.mkdir(folderPath)
+                except:
+                    pass
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfTotalSizesOfData = computeTotalSize(newTimes,listOfDataSizes[i].__getitem__(j),duration)
+                x = newTimesPeriods
+                y = listOfTotalSizesOfData
+                yLabel = '{}'.format(flowDirections[i]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[i]),marker = '.',linestyle='-')
+                
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('total data size (MB)', fontsize=12)
+            plt.title("{} total size of data of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_size_of_data.png'.format(folderPath,labels[j],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+    #################### Line Graph 3 ####################
+    # Line Graph for total size of data for all the frames from all data types for different time durations from HMD traces folder
+    for duration in durations: 
+        folderPath = "{}/{}".format(prefix,"all_data_types")
+        try:
+            os.mkdir(folderPath)
+        except:
+            pass
+        try:
+            listOfFolders = ["DR","D","R"]
+            for tempFolder in listOfFolders:
+                os.mkdir("{}/{}".format(folderPath,tempFolder))
+        except:
+            pass
+        
+        # [D+R] all data frames + all re-transmitted frames (lists suffix 1) 
+        uniqueDataCombinedLists_1,retransmittedDataCombinedLists_1 = combinedResultsLists(results,0)
+        HMD_UP_NBs_1,HMD_UP_Times_1,HMD_UP_DataRates_1,HMD_UP_Data_Sizes_1,HMD_UP_Frames_Sizes_1,HMD_UP_Frames_SeqNB_1,HMD_DWN_NBs_1,HMD_DWN_Times_1,HMD_DWN_DataRates_1,HMD_DWN_Data_Sizes_1,HMD_DWN_Frames_Sizes_1,HMD_DWN_Frames_SeqNB_1 = uniqueDataCombinedLists_1
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_1[0],HMD_UP_Times_1)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfTotalSizesOfDataY1 = computeTotalSize(newTimesX1,[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_UP_Data_Sizes_1],duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfTotalSizesOfDataY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_1[0],HMD_DWN_Times_1)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfTotalSizesOfDataY2 = computeTotalSize(newTimesX2,[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_DWN_Data_Sizes_1],duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfTotalSizesOfDataY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('total data size (MB)', fontsize=12)
+        plt.title("DR total size of data of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DR/{}_size_of_data.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [D] all data frames (lists suffix 2) 
+        uniqueDataCombinedLists_2,retransmittedDataCombinedLists_2 = combinedResultsListsNoReTransmittedFrames(results,0)
+        HMD_UP_NBs_2,HMD_UP_Times_2,HMD_UP_DataRates_2,HMD_UP_Data_Sizes_2,HMD_UP_Frames_Sizes_2,HMD_UP_Frames_SeqNB_2,HMD_DWN_NBs_2,HMD_DWN_Times_2,HMD_DWN_DataRates_2,HMD_DWN_Data_Sizes_2,HMD_DWN_Frames_Sizes_2,HMD_DWN_Frames_SeqNB_2 = uniqueDataCombinedLists_2
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_2[0],HMD_UP_Times_2)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfTotalSizesOfDataY1 = computeTotalSize(newTimesX1,[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_UP_Data_Sizes_2],duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfTotalSizesOfDataY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_2[0],HMD_DWN_Times_2)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfTotalSizesOfDataY2 = computeTotalSize(newTimesX2,[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_DWN_Data_Sizes_2],duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfTotalSizesOfDataY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('total data size (MB)', fontsize=12)
+        plt.title("D total size of data of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/D/{}_size_of_data.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [R] all re-transmitted frames (lists suffix 3)
+        HMD_UP_RE_NBs_3,HMD_UP_RE_Times_3,HMD_UP_RE_DataRates_3,HMD_UP_RE_Data_Sizes_3,HMD_UP_RE_Frames_Sizes_3,HMD_UP_RE_Frames_SeqNB_3,HMD_DWN_RE_NBs_3,HMD_DWN_RE_Times_3,HMD_DWN_RE_DataRates_3,HMD_DWN_RE_Data_Sizes_3,HMD_DWN_RE_Frames_Sizes_3,HMD_DWN_RE_Frames_SeqNB_3 = retransmittedDataCombinedLists_1
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_RE_Times_3[0],HMD_UP_RE_Times_3)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfTotalSizesOfDataY1 = computeTotalSize(newTimesX1,[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_UP_RE_Data_Sizes_3],duration)
+        x1 = newTimesPeriodsX1
+        y1 = listOfTotalSizesOfDataY1
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_RE_Times_3[0],HMD_DWN_RE_Times_3)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfTotalSizesOfDataY2 = computeTotalSize(newTimesX2,[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_DWN_RE_Data_Sizes_3],duration)
+        x2 = newTimesPeriodsX2
+        y2 = listOfTotalSizesOfDataY2
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('time in (sec)', fontsize=12)
+        plt.ylabel('total data size (MB)', fontsize=12)
+        plt.title("R total size of data of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/R/{}_size_of_data.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+        ######################################################
+
+
+
+    #################### CDF  Graph 1 ####################
+    # CDF Graph for total size of data for different time durations from HMD traces folder (each direction will be in a graph)
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            folderPath = "{}/{}".format(prefix,flowDirections[i])
+            try:
+                os.mkdir(folderPath)
+            except:
+                pass
+            firstFrame = min(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1)[0],flowDirectionsLists[i].__getitem__(2)[0],flowDirectionsLists[i].__getitem__(3)[0])
+            for j in range(len(flowDirectionsLists[i])):
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfTotalSizesOfData = computeTotalSize(newTimes,listOfDataSizes[i].__getitem__(j),duration)
+                data = [float(value) for value in listOfTotalSizesOfData]
+                x = np.sort(data)
+                y = np.arange(len(x))/float(len(x))
+                yLabel = '{}'.format(labels[j]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[j]),linestyle='{}'.format(lineStyles[j]))
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('total data size (MB)', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF {} total size of data of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_size_of_data_CDF.png'.format(folderPath,flowDirections[i],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+
+    #################### CDF  Graph 2 ####################
+    # CDF Graph for total size of data for different time durations from HMD traces folder (each data type will be in a graph)
+    for duration in durations:
+        for j in range(len(labels)):
+            firstFrame = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0])
+            for i in range(len(flowDirections)):
+                folderPath = "{}/{}".format(prefix,labels[j])
+                try:
+                    os.mkdir(folderPath)
+                except:
+                    pass
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfTotalSizesOfData = computeTotalSize(newTimes,listOfDataSizes[i].__getitem__(j),duration)
+                data = [float(value) for value in listOfTotalSizesOfData]
+                x = np.sort(data)
+                y = np.arange(len(x))/float(len(x))
+                yLabel = '{}'.format(flowDirections[i]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[i]),linestyle='{}'.format(lineStyles[i]))
+                
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('total data size (MB)', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF of {} total size of data of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_size_of_data_CDF.png'.format(folderPath,labels[j],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+    #################### CDF  Graph 3 ####################
+    # CDF Graph for total size of data for all the frames from all data types for different time durations from HMD traces folder
+    for duration in durations: 
+        folderPath = "{}/{}".format(prefix,"all_data_types")
+        try:
+            os.mkdir(folderPath)
+        except:
+            pass
+        try:
+            listOfFolders = ["DR","D","R"]
+            for tempFolder in listOfFolders:
+                os.mkdir("{}/{}".format(folderPath,tempFolder))
+        except:
+            pass
+        
+        # [D+R] all data frames + all re-transmitted frames (lists suffix 1) 
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_1[0],HMD_UP_Times_1)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfTotalSizesOfDataY1 = computeTotalSize(newTimesX1,[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_UP_Data_Sizes_1],duration)
+        data1 = [float(value) for value in listOfTotalSizesOfDataY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_1[0],HMD_DWN_Times_1)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfTotalSizesOfDataY2 = computeTotalSize(newTimesX2,[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_DWN_Data_Sizes_1],duration)
+        data2 = [float(value) for value in listOfTotalSizesOfDataY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('total data size (MB)', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF of DR total size of data of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/DR/{}_size_of_data_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [D] all data frames (lists suffix 2) 
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_Times_2[0],HMD_UP_Times_2)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfTotalSizesOfDataY1 = computeTotalSize(newTimesX1,[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_UP_Data_Sizes_2],duration)
+        data1 = [float(value) for value in listOfTotalSizesOfDataY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_Times_2[0],HMD_DWN_Times_2)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfTotalSizesOfDataY2 = computeTotalSize(newTimesX2,[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_DWN_Data_Sizes_2],duration)
+        data2 = [float(value) for value in listOfTotalSizesOfDataY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('total data size (MB)', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF of D total size of data of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/D/{}_size_of_data_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+
+        # [R] all data frames + all management frames (lists suffix 3) 
+        newTimesX1 = relativeTimeFromAPointOfTime(HMD_UP_RE_Times_3[0],HMD_UP_RE_Times_3)
+        newTimesPeriodsX1 = convertTimeToPeriods(newTimesX1,duration)
+        listOfTotalSizesOfDataY1 = computeTotalSize(newTimesX1,[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_UP_RE_Data_Sizes_3],duration)
+        data1 = [float(value) for value in listOfTotalSizesOfDataY1]
+        x1 = np.sort(data1)
+        y1 = np.arange(len(x1))/float(len(x1))
+        y1Label = "uplink"
+        plt.plot(x1,y1,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        newTimesX2 = relativeTimeFromAPointOfTime(HMD_DWN_RE_Times_3[0],HMD_DWN_RE_Times_3)
+        newTimesPeriodsX2 = convertTimeToPeriods(newTimesX2,duration)
+        listOfTotalSizesOfDataY2 = computeTotalSize(newTimesX2,[float(0) if x == '' else (float(x)/(1024**2)) for x in HMD_DWN_RE_Data_Sizes_3],duration)
+        data2 = [float(value) for value in listOfTotalSizesOfDataY2]
+        x2 = np.sort(data2)
+        y2 = np.arange(len(x2))/float(len(x2))
+        y2Label = "downlink"
+        plt.plot(x2,y2,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        plt.legend(loc='best', fontsize=10)
+        plt.grid(color='grey', linestyle='--', linewidth=0.5)
+        plt.xlabel('total data size (MB)', fontsize=12)
+        plt.ylabel('CDF', fontsize=12)
+        plt.title("CDF of R total size of data of {} for a duration of {} sec".format(gameName,duration),fontsize=10)
+        plt.savefig('{}/R/{}_size_of_data_CDF.png'.format(folderPath,duration),dpi=saved_graph_resolution)
+        plt.show()
+        ######################################################
 
 
 
