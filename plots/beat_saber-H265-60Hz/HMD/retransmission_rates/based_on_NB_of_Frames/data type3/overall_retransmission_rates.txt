@@ -1,0 +1,4 @@
+
+[+] the overall retrnamission rate of data type3-uplink is 14.335603282695999
+[+] the overall retrnamission rate of data type3-downlink is 2.7345202197529943
+[+] the overall retrnamission rate of data type3-both_directions is 10.324883970010717

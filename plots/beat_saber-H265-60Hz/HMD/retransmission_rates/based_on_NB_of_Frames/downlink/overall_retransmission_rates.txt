@@ -1,0 +1,5 @@
+
+[+] the overall retrnamission rate of data type2-downlink is 5.431309904153352
+[+] the overall retrnamission rate of data type3-downlink is 2.7345202197529943
+[+] the overall retrnamission rate of all data types-downlink is 2.7339146830073133
+[+] the overall retrnamission rate of all_data_types-downlink is 2.7339146830073133

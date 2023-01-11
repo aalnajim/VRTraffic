@@ -1,0 +1,4 @@
+
+[+] the overall sucess rate of all_data_types-uplink is 86.87571220873119
+[+] the overall sucess rate of all_data_types-downlink is 97.26608531699269
+[+] the overall sucess rate of all_data_types-both_directions is 90.33998637959034
