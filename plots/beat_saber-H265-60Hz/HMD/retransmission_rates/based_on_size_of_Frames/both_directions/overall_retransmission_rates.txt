@@ -1,0 +1,5 @@
+
+[+] the overall retrnamission rate of data type1-both_directions is 0.7648183556405428
+[+] the overall retrnamission rate of data type2-both_directions is 13.458619564000102
+[+] the overall retrnamission rate of data type3-both_directions is 6.676283049415247
+[+] the overall retrnamission rate of all_data_types-both_directions is 6.431436016136587

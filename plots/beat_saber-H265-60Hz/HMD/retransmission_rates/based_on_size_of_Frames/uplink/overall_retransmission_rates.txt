@@ -1,0 +1,5 @@
+
+[+] the overall retrnamission rate of data type1-uplink is 0.7648183556405428
+[+] the overall retrnamission rate of data type2-uplink is 21.182797762404164
+[+] the overall retrnamission rate of data type3-uplink is 14.450102109730963
+[+] the overall retrnamission rate of all_data_types-uplink is 13.343374618557135

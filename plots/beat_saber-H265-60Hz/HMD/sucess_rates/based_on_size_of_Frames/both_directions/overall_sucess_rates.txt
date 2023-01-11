@@ -1,0 +1,5 @@
+
+[+] the overall sucess rate of data type1-both_directions is 99.23518164435946
+[+] the overall sucess rate of data type2-both_directions is 86.5413804359999
+[+] the overall sucess rate of data type3-both_directions is 93.32371695058475
+[+] the overall sucess rate of all_data_types-both_directions is 93.56856398386341

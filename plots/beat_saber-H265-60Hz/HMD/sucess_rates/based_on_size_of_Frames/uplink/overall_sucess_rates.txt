@@ -1,0 +1,5 @@
+
+[+] the overall sucess rate of data type1-uplink is 99.23518164435946
+[+] the overall sucess rate of data type2-uplink is 78.81720223759584
+[+] the overall sucess rate of data type3-uplink is 85.54989789026904
+[+] the overall sucess rate of all_data_types-uplink is 86.65662538144286

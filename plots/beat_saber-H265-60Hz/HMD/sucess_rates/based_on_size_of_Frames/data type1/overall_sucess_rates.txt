@@ -1,0 +1,3 @@
+
+[+] the overall sucess rate of data type1-uplink is 99.23518164435946
+[+] the overall sucess rate of data type1-both_directions is 99.23518164435946

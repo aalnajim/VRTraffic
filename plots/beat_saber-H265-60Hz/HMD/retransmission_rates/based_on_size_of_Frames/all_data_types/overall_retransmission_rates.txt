@@ -1,0 +1,4 @@
+
+[+] the overall retrnamission rate of all_data_types-uplink is 13.343374618557135
+[+] the overall retrnamission rate of all_data_types-downlink is 2.920053383750158
+[+] the overall retrnamission rate of all_data_types-both_directions is 6.431436016136587

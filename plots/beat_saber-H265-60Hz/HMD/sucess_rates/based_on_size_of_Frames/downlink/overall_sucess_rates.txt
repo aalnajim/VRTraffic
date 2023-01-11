@@ -1,0 +1,4 @@
+
+[+] the overall sucess rate of data type2-downlink is 94.16306493531086
+[+] the overall sucess rate of data type3-downlink is 97.01922431908693
+[+] the overall sucess rate of all_data_types-downlink is 97.07994661624984

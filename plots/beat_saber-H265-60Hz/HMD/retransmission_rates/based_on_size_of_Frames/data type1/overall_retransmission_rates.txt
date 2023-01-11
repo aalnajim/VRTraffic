@@ -1,0 +1,3 @@
+
+[+] the overall retrnamission rate of data type1-uplink is 0.7648183556405428
+[+] the overall retrnamission rate of data type1-both_directions is 0.7648183556405428
