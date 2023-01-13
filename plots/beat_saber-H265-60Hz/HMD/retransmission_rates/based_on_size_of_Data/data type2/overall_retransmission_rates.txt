@@ -1,0 +1,4 @@
+
+[+] the overall retrnamission rate of data type2-uplink is 22.095149045439328
+[+] the overall retrnamission rate of data type2-downlink is 6.075765000544493
+[+] the overall retrnamission rate of data type2-both_directions is 13.985667034178604

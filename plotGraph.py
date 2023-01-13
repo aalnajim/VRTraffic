@@ -55,13 +55,13 @@ def plotServerTracesResults(serverTracesResults):
             os.mkdir("{}/{}/{}".format(root_folder,gameName,"server"))
         except:
             pass
-        plotServerNBofFrames(root_folder,gameName,results)
+        # plotServerNBofFrames(root_folder,gameName,results)
         plotServerFramesInstantaneousRates(root_folder,gameName,results)
-        plotServerDataInstantaneousRates(root_folder,gameName,results)
-        plotServerSizeofFrames(root_folder,gameName,results)
-        plotServerSizeofData(root_folder,gameName,results)
-        plotServerAVGSizeofFrames(root_folder,gameName,results)
-        plotServerAVGSizeofData(root_folder,gameName,results)
+        # plotServerDataInstantaneousRates(root_folder,gameName,results)
+        # plotServerSizeofFrames(root_folder,gameName,results)
+        # plotServerSizeofData(root_folder,gameName,results)
+        # plotServerAVGSizeofFrames(root_folder,gameName,results)
+        # plotServerAVGSizeofData(root_folder,gameName,results)
 
 
 
@@ -124,8 +124,8 @@ def plotHMDTracesResults(HMDTracesResults):
         # plotHMDAVGSizeofFrames(root_folder,gameName,results)
         # plotHMDAVGSizeofData(root_folder,gameName,results)
         # plotHMDSucessRateNB(root_folder,gameName,results)
-        plotHMDSucessRateFrameSize(root_folder,gameName,results)
-        # plotHMDSucessRateDataSize(root_folder,gameName,results)
+        # plotHMDSucessRateFrameSize(root_folder,gameName,results)
+        plotHMDSucessRateDataSize(root_folder,gameName,results)
 
 
 def plotLatency(root_folder,gameName,sessionLogResult,OVRMetricsResult,logcatResults,steamVRLogResults):
@@ -1583,45 +1583,81 @@ def plotServerNBofFrames(root_folder,gameName,results):
         server_UP_TCP_Times,server_UP_TCP_Data_Sizes,server_UP_TCP_Frames_Sizes,server_UP_UDP_NBs,server_UP_UDP_Times,\
         server_UP_UDP_Data_Sizes,server_UP_UDP_Frames_Sizes,server_DWN_BOTH_NBs,server_DWN_BOTH_Times,server_DWN_BOTH_Data_Sizes,\
         server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
-        server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results     
+        server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results
+    
+    # server both uplink and downlink times
+    server_BOTH_Times = server_UP_BOTH_Times + server_DWN_BOTH_Times  
+    server_UDP_Times = server_UP_UDP_Times + server_DWN_UDP_Times  
+    server_TCP_Times = server_UP_TCP_Times + server_DWN_TCP_Times  
+    server_BOTH_Times.sort()
+    server_UDP_Times.sort()
+    server_TCP_Times.sort()
 
-    #################### Line Graph ####################
-    # line graph for nb of frames for different time durations from server.csv trace
+
     durations = [1,10,15,30,60]  # in seconds
-    flowDirections = ["uplink","downlink"]
+    flowDirections = ["uplink","downlink","both_directions"]
     flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
-                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
-    
-    
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times),
+                            (server_BOTH_Times,server_UDP_Times,server_TCP_Times)]
+    colors = ["red","blue","green","black","purple","cyan","pink"]
+    lineStyles = ['-.',':',"--","-",'-.',':',"--"]
+    markers = [".",",","1","x","|","+","v"]
+    labels = ["both_protocols","UDP","TCP"]
+
+
+    #################### Line Graph 1 ####################
+    # line graph for nb of frames for different time durations from server.csv trace
     for duration in durations:
         for i in range(len(flowDirections)):
-            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
-            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
-            listOfNBOfFramesBoth = computeNBOfFrames(newTimesBoth,duration)
-            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
-            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
-            listOfNBOfFramesUDP = computeNBOfFrames(newTimesUDP,duration)
-            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
-            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
-            listOfNBOfFramesTCP = computeNBOfFrames(newTimesTCP,duration)
-            x1 = newTimesPeriodsBoth
-            y1 = listOfNBOfFramesBoth
-            y1Label = 'Both'
-            x2 = newTimesPeriodsUDP
-            y2 = listOfNBOfFramesUDP
-            y2Label = 'UDP'
-            x3 = newTimesPeriodsTCP
-            y3 = listOfNBOfFramesTCP
-            y3Label = 'TCP'      
-            plt.plot(x1,y1,label=y1Label,c='red',marker = '.',linestyle='-')
-            plt.plot(x2,y2,label=y2Label,c='blue',marker = '.',linestyle='-')
-            plt.plot(x3,y3,label=y3Label,c='green',marker = '.',linestyle='-')
+            folderPath = "{}/{}".format(prefix,flowDirections[i])
+            try:
+                os.mkdir(folderPath)
+            except:
+                pass
+            for j in range(len(flowDirectionsLists[i])):
+                newTimes = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfNBOfFrames = computeNBOfFrames(newTimes,duration)
+                x = newTimesPeriods
+                y = listOfNBOfFrames
+                yLabel = '{}'.format(labels[j]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[j]),marker = '.',linestyle='-')
             plt.legend(loc='best', fontsize=10)
             plt.grid(color='grey', linestyle='--', linewidth=0.5)
             plt.xlabel('time in (sec)', fontsize=12)
             plt.ylabel('# of frames', fontsize=12)
             plt.title("{} # of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
-            plt.savefig('{}/{}_duration_{}_NBFrames.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
+            plt.savefig('{}/{}_duration_{}_NBFrames.png'.format(folderPath,flowDirections[i],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ####################################################
+
+
+
+    ################## Line Graph 2 ####################
+    # line graph for nb of frames for different time durations from server.csv trace (each protocol at a graph)
+    for duration in durations:
+        for j in range(len(labels)):
+            firstFrame = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0])
+            for i in range(len(flowDirections)):
+                folderPath = "{}/{}".format(prefix,labels[j])
+                try:
+                    os.mkdir(folderPath)
+                except:
+                    pass
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfNBOfFrames = computeNBOfFrames(newTimes,duration)
+                x = newTimesPeriods
+                y = listOfNBOfFrames
+                yLabel = '{}'.format(flowDirections[i]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[i]),marker = '.',linestyle='-')
+                
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('# of frames', fontsize=12)
+            plt.title("# of {} frames of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_NBFrames.png'.format(folderPath,labels[j],duration),dpi=saved_graph_resolution)
             plt.show()
     ####################################################
 
@@ -1630,45 +1666,59 @@ def plotServerNBofFrames(root_folder,gameName,results):
     #################### CDF  Graph ####################
     # CDF Graph for nb of frames for different time durations from server.csv trace
     for duration in durations:
-        for i in range(len(flowDirections)):    
-            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
-            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
-            listOfNBOfFramesBoth = computeNBOfFrames(newTimesBoth,duration)
-            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
-            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
-            listOfNBOfFramesUDP = computeNBOfFrames(newTimesUDP,duration)
-            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
-            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
-            listOfNBOfFramesTCP = computeNBOfFrames(newTimesTCP,duration)
-            
-            data1 = [float(i) for i in listOfNBOfFramesBoth]
-            data2 = [float(i) for i in listOfNBOfFramesUDP]
-            data3 = [float(i) for i in listOfNBOfFramesTCP]
-            
-            x1 = np.sort(data1)
-            x2 = np.sort(data2)
-            x3 = np.sort(data3)
-
-            y1 = np.arange(len(x1))/float(len(x1))
-            y2 = np.arange(len(x2))/float(len(x2))
-            y3 = np.arange(len(x3))/float(len(x3))
-
-            y1Label =  'Both'
-            y2Label =  'UDP'
-            y3Label =  'TCP'
-
-            plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.')
-            plt.plot(x2, y2,label=y2Label,c='blue',linestyle=':')
-            plt.plot(x3, y3,label=y3Label,c='green',linestyle='--')
-
+        for i in range(len(flowDirections)):
+            folderPath = "{}/{}".format(prefix,flowDirections[i])
+            try:
+                os.mkdir(folderPath)
+            except:
+                pass
+            for j in range(len(flowDirectionsLists[i])):
+                newTimes = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfNBOfFrames = computeNBOfFrames(newTimes,duration)
+                data = [float(value) for value in listOfNBOfFrames]
+                x = np.sort(data)
+                y = np.arange(len(x))/float(len(x))
+                yLabel = '{}'.format(labels[j]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[j]),linestyle='{}'.format(lineStyles[j]))               
             plt.legend(loc='best', fontsize=10)
             plt.grid(color='grey', linestyle='--', linewidth=0.5)
             plt.xlabel('# of frames', fontsize=12)
             plt.ylabel('CDF', fontsize=12)
             plt.title("CDF {} # of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_NBFrames_CDF.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
+            plt.savefig('{}/{}_duration_{}_NBFrames_CDF.png'.format(folderPath,flowDirections[i],duration),dpi= saved_graph_resolution)
             plt.show()
     ####################################################
+
+
+
+    #################### CDF  Graph 2 ####################
+    # CDF Graph for nb of frames for different time durations from server.csv traces folder (each type of frame will be in a graph)
+    for duration in durations:
+        for j in range(len(labels)):
+            firstFrame = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0])
+            for i in range(len(flowDirections)):
+                folderPath = "{}/{}".format(prefix,labels[j])
+                try:
+                    os.mkdir(folderPath)
+                except:
+                    pass
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfNBOfFrames = computeNBOfFrames(newTimes,duration)
+                data = [float(value) for value in listOfNBOfFrames]
+                x = np.sort(data)
+                y = np.arange(len(x))/float(len(x))
+                yLabel = '{}'.format(flowDirections[i]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[i]),linestyle='{}'.format(lineStyles[i]))               
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('# of frames', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF # of {} frames of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=9)
+            plt.savefig('{}/{}_frames_duration_{}_NBFrames_CDF.png'.format(folderPath,labels[j],duration),dpi= saved_graph_resolution)
+            plt.show()
+    ######################################################
 
 
 
@@ -2141,92 +2191,148 @@ def plotServerFramesInstantaneousRates(root_folder,gameName,results):
         server_DWN_BOTH_Frames_Sizes,server_DWN_TCP_NBs,server_DWN_TCP_Times,server_DWN_TCP_Data_Sizes,server_DWN_TCP_Frames_Sizes,\
         server_DWN_UDP_NBs,server_DWN_UDP_Times,server_DWN_UDP_Data_Sizes,server_DWN_UDP_Frames_Sizes = results     
 
-    #################### Line Graph ####################
-    # line graph for instantaneous rates for different time durations from server.csv trace
+    # server both uplink and downlink times
+    server_BOTH_Times = server_UP_BOTH_Times + server_DWN_BOTH_Times  
+    server_UDP_Times = server_UP_UDP_Times + server_DWN_UDP_Times  
+    server_TCP_Times = server_UP_TCP_Times + server_DWN_TCP_Times
+    server_BOTH_Sizes = server_UP_BOTH_Frames_Sizes + server_DWN_BOTH_Frames_Sizes
+    server_UDP_Sizes = server_UP_UDP_Frames_Sizes + server_DWN_UDP_Frames_Sizes
+    server_TCP_Sizes = server_UP_TCP_Frames_Sizes + server_DWN_TCP_Frames_Sizes
+    server_BOTH_Times,server_BOTH_Sizes = sort_two_lists(server_BOTH_Times,server_BOTH_Sizes)
+    server_UDP_Times,server_UDP_Sizes = sort_two_lists(server_UDP_Times,server_UDP_Sizes)
+    server_TCP_Times,server_TCP_Sizes = sort_two_lists(server_TCP_Times,server_TCP_Sizes)
+
+
     durations = [1,10,15,30,60]  # in seconds
-    flowDirections = ["uplink","downlink"]
+    flowDirections = ["uplink","downlink","both_directions"]
     flowDirectionsLists = [(server_UP_BOTH_Times,server_UP_UDP_Times,server_UP_TCP_Times),
-                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times)]
+                            (server_DWN_BOTH_Times,server_DWN_UDP_Times,server_DWN_TCP_Times),
+                            (server_BOTH_Times,server_UDP_Times,server_TCP_Times)]
     listOfFrameSizes = [(server_UP_BOTH_Frames_Sizes,server_UP_UDP_Frames_Sizes,server_UP_TCP_Frames_Sizes),
-                        (server_DWN_BOTH_Frames_Sizes,server_DWN_UDP_Frames_Sizes,server_DWN_TCP_Frames_Sizes)]
-    
-    
+                        (server_DWN_BOTH_Frames_Sizes,server_DWN_UDP_Frames_Sizes,server_DWN_TCP_Frames_Sizes),
+                        (server_BOTH_Sizes,server_UDP_Sizes,server_TCP_Sizes)]
+    colors = ["red","blue","green","black","purple","cyan","pink"]
+    lineStyles = ['-.',':',"--","-",'-.',':',"--"]
+    markers = [".",",","1","x","|","+","v"]
+    labels = ["both_protocols","UDP","TCP"]
+
+
+    #################### Line Graph 2 ####################
+    # line graph for instantaneous rates for different time durations from server.csv trace (each direction will be in a graph)
     for duration in durations:
         for i in range(len(flowDirections)):
-            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
-            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
-            listOfRatesOfFramesBoth = computeInstantaneousRates(newTimesBoth,listOfFrameSizes[i].__getitem__(0),duration)
-            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
-            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
-            listOfRatesOfFramesUDP = computeInstantaneousRates(newTimesUDP,listOfFrameSizes[i].__getitem__(1),duration)
-            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
-            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
-            listOfRatesOfFramesTCP = computeInstantaneousRates(newTimesTCP,listOfFrameSizes[i].__getitem__(2),duration)
-            x1 = newTimesPeriodsBoth
-            y1 = listOfRatesOfFramesBoth
-            y1Label = 'Both'
-            x2 = newTimesPeriodsUDP
-            y2 = listOfRatesOfFramesUDP
-            y2Label = 'UDP'
-            x3 = newTimesPeriodsTCP
-            y3 = listOfRatesOfFramesTCP
-            y3Label = 'TCP'      
-            plt.plot(x1,y1,label=y1Label,c='red',marker = '.',linestyle='-')
-            plt.plot(x2,y2,label=y2Label,c='blue',marker = '.',linestyle='-')
-            plt.plot(x3,y3,label=y3Label,c='green',marker = '.',linestyle='-')
+            folderPath = "{}/{}".format(prefix,flowDirections[i])
+            try:
+                os.mkdir(folderPath)
+            except:
+                pass
+            for j in range(len(flowDirectionsLists[i])):
+                newTimes = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfFrameSizes[i].__getitem__(j),duration)
+                x = newTimesPeriods
+                y = listOfRatesOfFrames
+                yLabel = '{}'.format(labels[j]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[j]),marker = '.',linestyle='-')
             plt.legend(loc='best', fontsize=10)
             plt.grid(color='grey', linestyle='--', linewidth=0.5)
             plt.xlabel('time in (sec)', fontsize=12)
             plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
             plt.title("{} instantaneous rates of frames of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
-            plt.savefig('{}/{}_duration_{}_instantaneous_rates.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates.png'.format(folderPath,flowDirections[i],duration),dpi=saved_graph_resolution)
             plt.show()
-    ####################################################
+    ######################################################
 
 
 
-    #################### CDF  Graph ####################
-    # CDF Graph for instantaneous rates for different time durations from server.csv trace
+    #################### Line Graph 2 ####################
+    # Line Graph for instantaneous rates for different time durations from server.csv trace folder (each data type will be in a graph)
     for duration in durations:
-        for i in range(len(flowDirections)):    
-            newTimesBoth = relativeTime(flowDirectionsLists[i].__getitem__(0))
-            newTimesPeriodsBoth = convertTimeToPeriods(newTimesBoth,duration)
-            listOfRatesOfFramesBoth = computeInstantaneousRates(newTimesBoth,listOfFrameSizes[i].__getitem__(0),duration)
-            newTimesUDP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(1))
-            newTimesPeriodsUDP = convertTimeToPeriods(newTimesUDP,duration)
-            listOfRatesOfFramesUDP = computeInstantaneousRates(newTimesUDP,listOfFrameSizes[i].__getitem__(1),duration)
-            newTimesTCP = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(2))
-            newTimesPeriodsTCP = convertTimeToPeriods(newTimesTCP,duration)
-            listOfRatesOfFramesTCP = computeInstantaneousRates(newTimesTCP,listOfFrameSizes[i].__getitem__(2),duration)
-            
-            data1 = [float(i) for i in listOfRatesOfFramesBoth]
-            data2 = [float(i) for i in listOfRatesOfFramesUDP]
-            data3 = [float(i) for i in listOfRatesOfFramesTCP]
-            
-            x1 = np.sort(data1)
-            x2 = np.sort(data2)
-            x3 = np.sort(data3)
-
-            y1 = np.arange(len(x1))/float(len(x1))
-            y2 = np.arange(len(x2))/float(len(x2))
-            y3 = np.arange(len(x3))/float(len(x3))
-
-            y1Label =  'Both'
-            y2Label =  'UDP'
-            y3Label =  'TCP'
-
-            plt.plot(x1, y1,label=y1Label,c='red',linestyle='-.')
-            plt.plot(x2, y2,label=y2Label,c='blue',linestyle=':')
-            plt.plot(x3, y3,label=y3Label,c='green',linestyle='--')
-
+        for j in range(len(labels)):
+            firstFrame = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0])
+            for i in range(len(flowDirections)):
+                folderPath = "{}/{}".format(prefix,labels[j])
+                try:
+                    os.mkdir(folderPath)
+                except:
+                    pass
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfFrameSizes[i].__getitem__(j),duration)
+                x = newTimesPeriods
+                y = listOfRatesOfFrames
+                yLabel = '{}'.format(flowDirections[i]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[i]),marker = '.',linestyle='-')
+                
             plt.legend(loc='best', fontsize=10)
             plt.grid(color='grey', linestyle='--', linewidth=0.5)
-            plt.xlabel('instantaneous rates (Mbps)', fontsize=12)
-            plt.ylabel('CDF', fontsize=12)
-            plt.title("CDF {} instantaneous rates of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=9)
-            plt.savefig('{}/{}_duration_{}_instantaneous_rates_CDF.png'.format(prefix,flowDirections[i],duration),dpi=saved_graph_resolution)
+            plt.xlabel('time in (sec)', fontsize=12)
+            plt.ylabel('instantaneous rate (Mbps)', fontsize=12)
+            plt.title("{} instantaneous rates of frames of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates.png'.format(folderPath,labels[j],duration),dpi=saved_graph_resolution)
             plt.show()
-    ####################################################
+    ######################################################
+
+
+
+    #################### CDF  Graph 1 ####################
+    # CDF Graph for instantaneous rates for different time durations from server.csv trace
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            folderPath = "{}/{}".format(prefix,flowDirections[i])
+            try:
+                os.mkdir(folderPath)
+            except:
+                pass
+            for j in range(len(flowDirectionsLists[i])):
+                newTimes = relativeTimeFromAPointOfTime(flowDirectionsLists[i].__getitem__(0)[0],flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfFrameSizes[i].__getitem__(j),duration)
+                data = [float(value) for value in listOfRatesOfFrames]
+                x = np.sort(data)
+                y = np.arange(len(x))/float(len(x))
+                yLabel = '{}'.format(labels[j]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[j]),linestyle='{}'.format(lineStyles[j]))
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('instantaneous rate (Mbps)', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF {} instantaneous rates of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates_CDF.png'.format(folderPath,flowDirections[i],duration),dpi=saved_graph_resolution)
+            plt.show()
+
+    ######################################################
+
+
+
+    #################### CDF  Graph 2 ####################
+    # CDF Graph for instantaneous rates for different time durations from server.csv trace (each data type will be in a graph)
+    for duration in durations:
+        for j in range(len(labels)):
+            firstFrame = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0])
+            for i in range(len(flowDirections)):
+                folderPath = "{}/{}".format(prefix,labels[j])
+                try:
+                    os.mkdir(folderPath)
+                except:
+                    pass
+                newTimes = relativeTimeFromAPointOfTime(firstFrame,flowDirectionsLists[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfRatesOfFrames = computeInstantaneousRates(newTimes,listOfFrameSizes[i].__getitem__(j),duration)
+                data = [float(value) for value in listOfRatesOfFrames]
+                x = np.sort(data)
+                y = np.arange(len(x))/float(len(x))
+                yLabel = '{}'.format(flowDirections[i]) 
+                plt.plot(x,y,label=yLabel,c='{}'.format(colors[i]),linestyle='{}'.format(lineStyles[i]))
+                
+            plt.legend(loc='best', fontsize=10)
+            plt.grid(color='grey', linestyle='--', linewidth=0.5)
+            plt.xlabel('instantaneous rate (Mbps)', fontsize=12)
+            plt.ylabel('CDF', fontsize=12)
+            plt.title("CDF of {} frames instantaneous rates of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=10)
+            plt.savefig('{}/{}_duration_{}_instantaneous_rates_CDF.png'.format(folderPath,labels[j],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
 
 
 
@@ -5931,7 +6037,7 @@ def plotHMDSucessRateFrameSize(root_folder,gameName,results):
     firstFrame = [0.0,0.0,0.0]
 
     #################### Line Graph 1 ####################    
-    # Line Graph for sucess and retransmission rates based on the # of frames for different time durations from HMD traces folder (each direction will be in a graph)
+    # Line Graph for sucess and retransmission rates based on the size of frames for different time durations from HMD traces folder (each direction will be in a graph)
     overallRatesFlag = True
     firstIteration = True
     for duration in durations:
@@ -6018,7 +6124,7 @@ def plotHMDSucessRateFrameSize(root_folder,gameName,results):
 
 
     #################### Line Graph 2 ####################    
-    # Line Graph for sucess and retransmission rates based on the # of frames for different time durations from HMD traces folder (each data type will be in a graph)
+    # Line Graph for sucess and retransmission rates based on the size of frames for different time durations from HMD traces folder (each data type will be in a graph)
     overallRatesFlag = True
     firstIteration = True
     for duration in durations:
@@ -6106,7 +6212,7 @@ def plotHMDSucessRateFrameSize(root_folder,gameName,results):
 
 
     #################### Line Graph 3 ####################
-    # Line Graph for sucess and retransmission rates based on the # of frames for different time durations from HMD traces folder (for all data types and both directions [uplink and downlink])
+    # Line Graph for sucess and retransmission rates based on the size of frames for different time durations from HMD traces folder (for all data types and both directions [uplink and downlink])
     
     sucessFolderPath = "{}/{}".format(sucessPrefix,"{}_{}".format(labels[3],flowDirections[2]))
     retransmissionFolderPath = "{}/{}".format(retransmissionPrefix,"{}_{}".format(labels[3],flowDirections[2]))
@@ -6193,7 +6299,7 @@ def plotHMDSucessRateFrameSize(root_folder,gameName,results):
         plt.show()
 
     #################### CDF  Graph 1 ####################
-    # CDF Graph for sucess and retransmission rates based on the # of frames for different time durations from HMD traces folder (each direction will be in a graph)
+    # CDF Graph for sucess and retransmission rates based on the size of frames for different time durations from HMD traces folder (each direction will be in a graph)
     for duration in durations:
         for i in range(len(flowDirections)):
             sucessFolderPath = "{}/{}".format(sucessPrefix,flowDirections[i])
@@ -6242,7 +6348,7 @@ def plotHMDSucessRateFrameSize(root_folder,gameName,results):
 
 
     #################### CDF  Graph 2 ####################
-    # CDF Graph for sucess and retransmission rates based on the # of frames for different time durations from HMD traces folder (each data type will be in a graph)
+    # CDF Graph for sucess and retransmission rates based on the size of frames for different time durations from HMD traces folder (each data type will be in a graph)
     for duration in durations:
         for j in range(len(labels)):
             firstTime = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0]) if not j == 0 else flowDirectionsLists[0].__getitem__(j)[0]
@@ -6292,7 +6398,7 @@ def plotHMDSucessRateFrameSize(root_folder,gameName,results):
 
 
     #################### CDF  Graph 3 ####################
-    # CDF Graph for sucess and retransmission rates based on the # of frames for different time durations from HMD traces folder (for all data types and both directions [uplink and downlink])
+    # CDF Graph for sucess and retransmission rates based on the size of frames for different time durations from HMD traces folder (for all data types and both directions [uplink and downlink])
     
     sucessFolderPath = "{}/{}".format(sucessPrefix,"{}_{}".format(labels[3],flowDirections[2]))
     retransmissionFolderPath = "{}/{}".format(retransmissionPrefix,"{}_{}".format(labels[3],flowDirections[2]))
@@ -6344,6 +6450,515 @@ def plotHMDSucessRateFrameSize(root_folder,gameName,results):
         fig2.savefig('{}/{}_duration_{}_retransmissionRate_CDF.png'.format(retransmissionFolderPath,labels[3],duration),dpi=saved_graph_resolution)
         fig3.savefig('{}/{}_duration_{}_sucessANDretransmissionRate_CDF.png'.format(sucessFolderPath,labels[3],duration),dpi=saved_graph_resolution)
         fig3.savefig('{}/{}_duration_{}_sucessANDretransmissionRate_CDF.png'.format(retransmissionFolderPath,labels[3],duration),dpi=saved_graph_resolution)
+        plt.show()
+    ######################################################
+
+
+
+def plotHMDSucessRateDataSize(root_folder,gameName,results):
+    result_folder_name_sucess = "HMD/sucess_rates"
+    result_folder_name_retransmission = "HMD/retransmission_rates"
+    tempSucessPrefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name_sucess)
+    tempRetransmissionPrefix = "{}/{}/{}".format(root_folder,gameName,result_folder_name_retransmission)
+    sucessPrefix = "{}/{}".format(tempSucessPrefix,"based_on_size_of_Data")
+    retransmissionPrefix = "{}/{}".format(tempRetransmissionPrefix,"based_on_size_of_Data")
+    try:
+        os.mkdir(tempSucessPrefix)
+        os.mkdir(tempRetransmissionPrefix)
+    except:
+        pass
+    try:
+        os.mkdir(sucessPrefix)
+        os.mkdir(retransmissionPrefix)
+    except:
+        pass
+
+    print("\033[93m{}\033[00m" .format("overall rates based on size of frames: "))
+
+    newResults = eliminateRetransmittedFrames(results)
+    HMD_UP_MANAGEMENT_FRAMES_NBs, HMD_UP_MANAGEMENT_FRAMES_Times, HMD_UP_MANAGEMENT_FRAMES_DataRates,\
+        HMD_UP_MANAGEMENT_FRAMES_Frames_Sizes, HMD_DWN_MANAGEMENT_FRAMES_NBs, HMD_DWN_MANAGEMENT_FRAMES_Times,\
+        HMD_DWN_MANAGEMENT_FRAMES_DataRates, HMD_DWN_MANAGEMENT_FRAMES_Frames_Sizes, HMD_UP_DATA1_FRAMES_NBs, \
+        HMD_UP_DATA1_FRAMES_Times, HMD_UP_DATA1_FRAMES_DataRates, HMD_UP_DATA1_FRAMES_Frames_Sizes,\
+        HMD_UP_DATA1_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA1_FRAMES_NBs, HMD_UP_RE_DATA1_FRAMES_Times, \
+        HMD_UP_RE_DATA1_FRAMES_DataRates, HMD_UP_RE_DATA1_FRAMES_Frames_Sizes, HMD_UP_RE_DATA1_FRAMES_Frames_SeqNB,\
+        HMD_UP_DATA2_FRAMES_NBs, HMD_UP_DATA2_FRAMES_Times, HMD_UP_DATA2_FRAMES_DataRates, HMD_UP_DATA2_FRAMES_Data_Sizes,\
+        HMD_UP_DATA2_FRAMES_Frames_Sizes, HMD_UP_DATA2_FRAMES_Frames_SeqNB, HMD_DWN_DATA2_FRAMES_NBs, HMD_DWN_DATA2_FRAMES_Times, \
+        HMD_DWN_DATA2_FRAMES_DataRates, HMD_DWN_DATA2_FRAMES_Data_Sizes, HMD_DWN_DATA2_FRAMES_Frames_Sizes, \
+        HMD_DWN_DATA2_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA2_FRAMES_NBs, HMD_UP_RE_DATA2_FRAMES_Times, HMD_UP_RE_DATA2_FRAMES_DataRates,\
+        HMD_UP_RE_DATA2_FRAMES_Data_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_Sizes, HMD_UP_RE_DATA2_FRAMES_Frames_SeqNB, \
+        HMD_DWN_RE_DATA2_FRAMES_NBs, HMD_DWN_RE_DATA2_FRAMES_Times, HMD_DWN_RE_DATA2_FRAMES_DataRates, HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,\
+        HMD_DWN_RE_DATA2_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA2_FRAMES_Frames_SeqNB, HMD_UP_DATA3_FRAMES_NBs, HMD_UP_DATA3_FRAMES_Times, \
+        HMD_UP_DATA3_FRAMES_DataRates, HMD_UP_DATA3_FRAMES_Data_Sizes, HMD_UP_DATA3_FRAMES_Frames_Sizes, HMD_UP_DATA3_FRAMES_Frames_SeqNB,\
+        HMD_DWN_DATA3_FRAMES_NBs, HMD_DWN_DATA3_FRAMES_Times, HMD_DWN_DATA3_FRAMES_DataRates, HMD_DWN_DATA3_FRAMES_Data_Sizes,\
+        HMD_DWN_DATA3_FRAMES_Frames_Sizes, HMD_DWN_DATA3_FRAMES_Frames_SeqNB, HMD_UP_RE_DATA3_FRAMES_NBs, HMD_UP_RE_DATA3_FRAMES_Times, \
+        HMD_UP_RE_DATA3_FRAMES_DataRates, HMD_UP_RE_DATA3_FRAMES_Data_Sizes, HMD_UP_RE_DATA3_FRAMES_Frames_Sizes, \
+        HMD_UP_RE_DATA3_FRAMES_Frames_SeqNB, HMD_DWN_RE_DATA3_FRAMES_NBs, HMD_DWN_RE_DATA3_FRAMES_Times, HMD_DWN_RE_DATA3_FRAMES_DataRates, \
+        HMD_DWN_RE_DATA3_FRAMES_Data_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_Sizes, HMD_DWN_RE_DATA3_FRAMES_Frames_SeqNB = newResults   
+    
+    uniqueDataCombinedLists,retransmittedDataCombinedLists = combinedResultsLists(results,0)
+    HMD_UP_NBs,HMD_UP_Times,HMD_UP_DataRates,HMD_UP_Data_Sizes,HMD_UP_Frames_Sizes,HMD_UP_Frames_SeqNB,HMD_DWN_NBs,HMD_DWN_Times,HMD_DWN_DataRates,HMD_DWN_Data_Sizes,HMD_DWN_Frames_Sizes,HMD_DWN_Frames_SeqNB = uniqueDataCombinedLists
+    HMD_UP_RE_NBs,HMD_UP_RE_Times,HMD_UP_RE_DataRates,HMD_UP_RE_Data_Sizes,HMD_UP_RE_Frames_Sizes,HMD_UP_RE_Frames_SeqNB,HMD_DWN_RE_NBs,HMD_DWN_RE_Times,HMD_DWN_RE_DataRates,HMD_DWN_RE_Data_Sizes,HMD_DWN_RE_Frames_Sizes,HMD_DWN_RE_Frames_SeqNB = retransmittedDataCombinedLists
+    
+    # times and sizes of frames for both directions of each data type and retransmission data types
+    tempHMD_DATA2_FRAMES_Times = HMD_UP_DATA2_FRAMES_Times + HMD_DWN_DATA2_FRAMES_Times
+    tempHMD_DATA3_FRAMES_Times = HMD_UP_DATA3_FRAMES_Times + HMD_DWN_DATA3_FRAMES_Times
+    tempHMD_DATA_FRAMES_Times  = HMD_UP_Times + HMD_DWN_Times
+    tempHMD_DATA2_FRAMES_Data_Sizes = HMD_UP_DATA2_FRAMES_Data_Sizes + HMD_DWN_DATA2_FRAMES_Data_Sizes
+    tempHMD_DATA3_FRAMES_Data_Sizes = HMD_UP_DATA3_FRAMES_Data_Sizes + HMD_DWN_DATA3_FRAMES_Data_Sizes
+    tempHMD_DATA_FRAMES_Data_Sizes  = HMD_UP_Data_Sizes + HMD_DWN_Data_Sizes
+    tempHMD_DATA2_FRAMES_Times, tempHMD_DATA2_FRAMES_Data_Sizes = sort_two_lists(tempHMD_DATA2_FRAMES_Times, tempHMD_DATA2_FRAMES_Data_Sizes)
+    tempHMD_DATA3_FRAMES_Times, tempHMD_DATA3_FRAMES_Data_Sizes = sort_two_lists(tempHMD_DATA3_FRAMES_Times, tempHMD_DATA3_FRAMES_Data_Sizes)
+    tempHMD_DATA_FRAMES_Times, tempHMD_DATA_FRAMES_Data_Sizes   = sort_two_lists(tempHMD_DATA_FRAMES_Times, tempHMD_DATA_FRAMES_Data_Sizes)
+
+    tempHMD_RE_DATA2_FRAMES_Times = HMD_UP_RE_DATA2_FRAMES_Times + HMD_DWN_RE_DATA2_FRAMES_Times
+    tempHMD_RE_DATA3_FRAMES_Times = HMD_UP_RE_DATA3_FRAMES_Times + HMD_DWN_RE_DATA3_FRAMES_Times
+    tempHMD_RE_DATA_FRAMES_Times  = HMD_UP_RE_Times + HMD_DWN_RE_Times
+    tempHMD_RE_DATA2_FRAMES_Data_Sizes = HMD_UP_RE_DATA2_FRAMES_Data_Sizes + HMD_DWN_RE_DATA2_FRAMES_Data_Sizes
+    tempHMD_RE_DATA3_FRAMES_Data_Sizes = HMD_UP_RE_DATA3_FRAMES_Data_Sizes + HMD_DWN_RE_DATA3_FRAMES_Data_Sizes
+    tempHMD_RE_DATA_FRAMES_Data_Sizes  = HMD_UP_RE_Data_Sizes + HMD_DWN_RE_Data_Sizes
+    tempHMD_RE_DATA2_FRAMES_Times, tempHMD_RE_DATA2_FRAMES_Data_Sizes = sort_two_lists(tempHMD_RE_DATA2_FRAMES_Times, tempHMD_RE_DATA2_FRAMES_Data_Sizes)
+    tempHMD_RE_DATA3_FRAMES_Times, tempHMD_RE_DATA3_FRAMES_Data_Sizes = sort_two_lists(tempHMD_RE_DATA3_FRAMES_Times, tempHMD_RE_DATA3_FRAMES_Data_Sizes)
+    tempHMD_RE_DATA_FRAMES_Times, tempHMD_RE_DATA_FRAMES_Data_Sizes   = sort_two_lists(tempHMD_RE_DATA_FRAMES_Times, tempHMD_RE_DATA_FRAMES_Data_Sizes)
+
+    # times of sizes frames for both directions for all data types and retransmission data types
+    tempHMD_Data_Times    =  tempHMD_DATA2_FRAMES_Times + tempHMD_DATA3_FRAMES_Times
+    tempHMD_RE_Data_Times =  tempHMD_RE_DATA2_FRAMES_Times + tempHMD_RE_DATA3_FRAMES_Times
+    tempHMD_Data_Data_Sizes    = tempHMD_DATA2_FRAMES_Data_Sizes + tempHMD_DATA3_FRAMES_Data_Sizes
+    tempHMD_RE_Data_Data_Sizes = tempHMD_RE_DATA2_FRAMES_Data_Sizes + tempHMD_RE_DATA3_FRAMES_Data_Sizes
+    tempHMD_Data_Times,tempHMD_Data_Data_Sizes = sort_two_lists(tempHMD_Data_Times,tempHMD_Data_Data_Sizes)
+    tempHMD_RE_Data_Times,tempHMD_RE_Data_Data_Sizes = sort_two_lists(tempHMD_RE_Data_Times,tempHMD_RE_Data_Data_Sizes)
+
+    durations = [1,10,15,30,60]  # in seconds
+    flowDirections = ["uplink","downlink","both_directions"]
+    flowDirectionsLists = [(HMD_UP_DATA2_FRAMES_Times,HMD_UP_DATA3_FRAMES_Times,HMD_UP_Times),
+                            (HMD_DWN_DATA2_FRAMES_Times,HMD_DWN_DATA3_FRAMES_Times,HMD_DWN_Times),
+                            (tempHMD_DATA2_FRAMES_Times,tempHMD_DATA3_FRAMES_Times,tempHMD_DATA_FRAMES_Times)]
+    flowDirectionsLists_RE = [(HMD_UP_RE_DATA2_FRAMES_Times,HMD_UP_RE_DATA3_FRAMES_Times,HMD_UP_RE_Times),
+                            (HMD_DWN_RE_DATA2_FRAMES_Times,HMD_DWN_RE_DATA3_FRAMES_Times,HMD_DWN_RE_Times),
+                            (tempHMD_RE_DATA2_FRAMES_Times,tempHMD_RE_DATA3_FRAMES_Times,tempHMD_RE_DATA_FRAMES_Times)]
+    listOfDataSizes =   [(HMD_UP_DATA2_FRAMES_Data_Sizes,HMD_UP_DATA3_FRAMES_Data_Sizes,HMD_UP_Data_Sizes),
+                            (HMD_DWN_DATA2_FRAMES_Data_Sizes,HMD_DWN_DATA3_FRAMES_Data_Sizes,HMD_DWN_Data_Sizes),
+                            (tempHMD_DATA2_FRAMES_Data_Sizes,tempHMD_DATA3_FRAMES_Data_Sizes,tempHMD_DATA_FRAMES_Data_Sizes)]
+    listOfDataSizes_RE =[(HMD_UP_RE_DATA2_FRAMES_Data_Sizes,HMD_UP_RE_DATA3_FRAMES_Data_Sizes,HMD_UP_RE_Data_Sizes),
+                            (HMD_DWN_RE_DATA2_FRAMES_Data_Sizes,HMD_DWN_RE_DATA3_FRAMES_Data_Sizes,HMD_DWN_RE_Data_Sizes),
+                            (tempHMD_RE_DATA2_FRAMES_Data_Sizes,tempHMD_RE_DATA3_FRAMES_Data_Sizes,tempHMD_RE_DATA_FRAMES_Data_Sizes)]
+    
+    colors = ["red","blue","green","black","purple","cyan","pink"]
+    lineStyles = ['-.',':',"--","-",'-.',':',"--"]
+    markers = [".",",","1","x","|","+","v"]
+    labels = ["data type2","data type3","all_data_types"]
+    firstFrame = [0.0,0.0,0.0]
+
+    #################### Line Graph 1 ####################    
+    # Line Graph for sucess and retransmission rates based on the size of payload for different time durations from HMD traces folder (each direction will be in a graph)
+    overallRatesFlag = True
+    firstIteration = True
+    for duration in durations:
+        if(not firstIteration):
+            overallRatesFlag = False
+        firstIteration = False
+        for i in range(len(flowDirections)):
+            sucessFolderPath = "{}/{}".format(sucessPrefix,flowDirections[i])
+            retransmissionFolderPath = "{}/{}".format(retransmissionPrefix,flowDirections[i])
+            try:
+                os.mkdir(sucessFolderPath)
+                os.mkdir(retransmissionFolderPath)
+            except:
+                pass
+            firstFrame[i] = min(flowDirectionsLists[i].__getitem__(0)[0] if i==0 else 100000000,flowDirectionsLists[i].__getitem__(1)[0],flowDirectionsLists[i].__getitem__(2)[0])
+            fig1, ax1 = plt.subplots()
+            fig2, ax2 = plt.subplots()
+            for j in range(len(flowDirectionsLists[i])):
+                # compute the overall sucess and retransmission rates based on frames sizes
+                if(overallRatesFlag):
+                    overallSucessRate = computeOverallSucessRateSize(listOfDataSizes[i].__getitem__(j),listOfDataSizes_RE[i].__getitem__(j))
+                    overallRetransmissionRate = 100 - overallSucessRate
+                    sucessRateText = "[+] the overall sucess rate of {}-{} is {}".format(labels[j],flowDirections[i],overallSucessRate)
+                    retransmissionRateText = "[+] the overall retrnamission rate of {}-{} is {}".format(labels[j],flowDirections[i],overallRetransmissionRate)
+                    sucessFileTitle = "overall_sucess_rates.txt"
+                    retransmissionFileTitle = "overall_retransmission_rates.txt"
+                    sucessFilePath = "{}/{}".format(sucessFolderPath,sucessFileTitle)
+                    retransmissionFilePath = "{}/{}".format(retransmissionFolderPath,retransmissionFileTitle)
+                    # write the overall sucess rate to the 'overall_sucess_rates.txt' file
+                    try:
+                        if(not checkExistence(sucessFilePath,sucessRateText)):
+                            f = open(sucessFilePath, "a")
+                            f.write("\n{}".format(sucessRateText))
+                            f.close()
+                    except:
+                        f = open(sucessFilePath, "a")
+                        f.write("\n{}".format(sucessRateText))
+                        f.close()
+
+                    # write the overall retransmission rate to the 'overall_retransmission_rates.txt' file
+                    try:
+                        if(not checkExistence(retransmissionFilePath,retransmissionRateText)):
+                            f = open(retransmissionFilePath, "a")
+                            f.write("\n{}".format(retransmissionRateText))
+                            f.close()
+                    except:
+                        f = open(retransmissionFilePath, "a")
+                        f.write("\n{}".format(retransmissionRateText))
+                        f.close()
+
+                    # print the result in the console
+                    print("\033[96m\t{}\033[00m" .format(sucessRateText))
+                    print("\033[91m\t{}\033[00m" .format(retransmissionRateText))
+                    print()
+
+                # compute the periodic sucess and retransmission rates
+                newTimes = relativeTimeFromAPointOfTime(firstFrame[i],flowDirectionsLists[i].__getitem__(j))
+                newTimes_RE = relativeTimeFromAPointOfTime(firstFrame[i],flowDirectionsLists_RE[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfSucessRates = computePeriodicSucessRateSize(newTimes,listOfDataSizes[i].__getitem__(j),newTimes_RE,listOfDataSizes_RE[i].__getitem__(j),duration)
+                listOfRetransmissionRates = [100-x for x in listOfSucessRates]
+                x = newTimesPeriods
+                y_sucess = listOfSucessRates
+                y_RE = listOfRetransmissionRates
+                yLabel = '{}'.format(labels[j]) 
+                ax1.plot(x,y_sucess,label=yLabel,c='{}'.format(colors[j]),marker = '.',linestyle='-')
+                ax2.plot(x,y_RE,label=yLabel,c='{}'.format(colors[j]),marker = '.',linestyle='-')
+            ax1.legend(loc='best', fontsize=10)
+            ax2.legend(loc='best', fontsize=10)
+            ax1.grid(color='grey', linestyle='--', linewidth=0.5)
+            ax2.grid(color='grey', linestyle='--', linewidth=0.5)
+            ax1.set_xlabel('time in (sec)', fontsize=12)
+            ax2.set_xlabel('time in (sec)', fontsize=12)
+            ax1.set_ylabel('sucess rate percentage', fontsize=12)
+            ax2.set_ylabel('retransmission rate percentage', fontsize=12)
+            ax1.set_title("{} sucess rate of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            ax2.set_title("{} retransmission rate of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            fig1.savefig('{}/{}_duration_{}_sucessRate.png'.format(sucessFolderPath,flowDirections[i],duration),dpi=saved_graph_resolution)
+            fig2.savefig('{}/{}_duration_{}_retransmissionRate.png'.format(retransmissionFolderPath,flowDirections[i],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+    #################### Line Graph 2 ####################    
+    # Line Graph for sucess and retransmission rates based on the size of payload for different time durations from HMD traces folder (each data type will be in a graph)
+    overallRatesFlag = True
+    firstIteration = True
+    for duration in durations:
+        if(not firstIteration):
+            overallRatesFlag = False
+        firstIteration = False
+        for j in range(len(labels)):
+            firstTime = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0]) if not j == 0 else flowDirectionsLists[0].__getitem__(j)[0]
+            fig1, ax1 = plt.subplots()
+            fig2, ax2 = plt.subplots()
+            for i in range(len(flowDirections)):
+                sucessFolderPath = "{}/{}".format(sucessPrefix,labels[j])
+                retransmissionFolderPath = "{}/{}".format(retransmissionPrefix,labels[j])
+                try:
+                    os.mkdir(sucessFolderPath)
+                    os.mkdir(retransmissionFolderPath)
+                except:
+                    pass
+                # compute the overall sucess and retransmission rates
+                if(overallRatesFlag):
+                    overallSucessRate = computeOverallSucessRateSize(listOfDataSizes[i].__getitem__(j),listOfDataSizes_RE[i].__getitem__(j))
+                    overallRetransmissionRate = 100 - overallSucessRate
+                    sucessRateText = "[+] the overall sucess rate of {}-{} is {}".format(labels[j],flowDirections[i],overallSucessRate)
+                    retransmissionRateText = "[+] the overall retrnamission rate of {}-{} is {}".format(labels[j],flowDirections[i],overallRetransmissionRate)
+                    sucessFileTitle = "overall_sucess_rates.txt"
+                    retransmissionFileTitle = "overall_retransmission_rates.txt"
+                    sucessFilePath = "{}/{}".format(sucessFolderPath,sucessFileTitle)
+                    retransmissionFilePath = "{}/{}".format(retransmissionFolderPath,retransmissionFileTitle)
+                    # write the overall sucess rate to the 'overall_sucess_rates.txt' file
+                    try:
+                        if(not checkExistence(sucessFilePath,sucessRateText)):
+                            f = open(sucessFilePath, "a")
+                            f.write("\n{}".format(sucessRateText))
+                            f.close()
+                    except:
+                        f = open(sucessFilePath, "a")
+                        f.write("\n{}".format(sucessRateText))
+                        f.close()
+
+                    # write the overall retransmission rate to the 'overall_retransmission_rates.txt' file
+                    try:
+                        if(not checkExistence(retransmissionFilePath,retransmissionRateText)):
+                            f = open(retransmissionFilePath, "a")
+                            f.write("\n{}".format(retransmissionRateText))
+                            f.close()
+                    except:
+                        f = open(retransmissionFilePath, "a")
+                        f.write("\n{}".format(retransmissionRateText))
+                        f.close()
+
+                    # print the result in the console
+                    print("\033[96m\t{}\033[00m" .format(sucessRateText))
+                    print("\033[91m\t{}\033[00m" .format(retransmissionRateText))
+                    print()
+
+                # compute the periodic sucess and retransmission rates    
+                newTimes = relativeTimeFromAPointOfTime(firstTime,flowDirectionsLists[i].__getitem__(j))
+                newTimes_RE = relativeTimeFromAPointOfTime(firstTime,flowDirectionsLists_RE[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfSucessRates = computePeriodicSucessRateSize(newTimes,listOfDataSizes[i].__getitem__(j),newTimes_RE,listOfDataSizes_RE[i].__getitem__(j),duration)
+                listOfRetransmissionRates = [100-x for x in listOfSucessRates]
+                x = newTimesPeriods
+                y_sucess = listOfSucessRates
+                y_RE = listOfRetransmissionRates
+                yLabel = '{}'.format(flowDirections[i]) 
+                ax1.plot(x,y_sucess,label=yLabel,c='{}'.format(colors[i]),marker = '.',linestyle='-')
+                ax2.plot(x,y_RE,label=yLabel,c='{}'.format(colors[i]),marker = '.',linestyle='-')                
+            ax1.legend(loc='best', fontsize=10)
+            ax2.legend(loc='best', fontsize=10)
+            ax1.grid(color='grey', linestyle='--', linewidth=0.5)
+            ax2.grid(color='grey', linestyle='--', linewidth=0.5)
+            ax1.set_xlabel('time in (sec)', fontsize=12)
+            ax2.set_xlabel('time in (sec)', fontsize=12)
+            ax1.set_ylabel('sucess rate percentage', fontsize=12)
+            ax2.set_ylabel('retransmission rate percentage', fontsize=12)
+            ax1.set_title("{} sucess rate of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=10)
+            ax2.set_title("{} retransmission rate of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=10)
+            fig1.savefig('{}/{}_duration_{}_sucessRate.png'.format(sucessFolderPath,labels[j],duration),dpi=saved_graph_resolution)
+            fig2.savefig('{}/{}_duration_{}_retransmissionRate.png'.format(retransmissionFolderPath,labels[j],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+
+    #################### Line Graph 3 ####################
+    # Line Graph for sucess and retransmission rates the size of payload for different time durations from HMD traces folder (for all data types and both directions [uplink and downlink])
+    
+    sucessFolderPath = "{}/{}".format(sucessPrefix,"{}_{}".format(labels[2],flowDirections[2]))
+    retransmissionFolderPath = "{}/{}".format(retransmissionPrefix,"{}_{}".format(labels[2],flowDirections[2]))
+    try:
+        os.mkdir(sucessFolderPath)
+        os.mkdir(retransmissionFolderPath)
+    except:
+        pass
+    overallSucessRate = computeOverallSucessRateNB(tempHMD_Data_Data_Sizes,tempHMD_RE_Data_Data_Sizes)
+    overallRetransmissionRate = 100 - overallSucessRate
+    sucessRateText = "[+] the overall sucess rate of {}-{} is {}".format(labels[2],flowDirections[2],overallSucessRate)
+    retransmissionRateText = "[+] the overall retrnamission rate of {}-{} is {}".format(labels[2],flowDirections[2],overallRetransmissionRate)
+    sucessFileTitle = "overall_sucess_rates.txt"
+    retransmissionFileTitle = "overall_retransmission_rates.txt"
+    sucessFilePath = "{}/{}".format(sucessFolderPath,sucessFileTitle)
+    retransmissionFilePath = "{}/{}".format(retransmissionFolderPath,retransmissionFileTitle)
+    # write the overall sucess rate to the 'overall_sucess_rates.txt' file
+    try:
+        if(not checkExistence(sucessFilePath,sucessRateText)):
+            f = open(sucessFilePath, "a")
+            f.write("\n{}".format(sucessRateText))
+            f.close()
+    except:
+        f = open(sucessFilePath, "a")
+        f.write("\n{}".format(sucessRateText))
+        f.close()
+
+    # write the overall retransmission rate to the 'overall_retransmission_rates.txt' file
+    try:
+        if(not checkExistence(retransmissionFilePath,retransmissionRateText)):
+            f = open(retransmissionFilePath, "a")
+            f.write("\n{}".format(retransmissionRateText))
+            f.close()
+    except:
+        f = open(retransmissionFilePath, "a")
+        f.write("\n{}".format(retransmissionRateText))
+        f.close()
+
+    # print the result in the console
+    print("\033[96m\t{}\033[00m" .format(sucessRateText))
+    print("\033[91m\t{}\033[00m" .format(retransmissionRateText))
+    print()
+
+
+    for duration in durations: 
+        # [D] all data frames
+        fig1, ax1 = plt.subplots()
+        fig2, ax2 = plt.subplots() 
+        fig3, ax3 = plt.subplots() 
+        newTimes = relativeTimeFromAPointOfTime(tempHMD_Data_Times[0],tempHMD_Data_Times)
+        newTimes_RE = relativeTimeFromAPointOfTime(tempHMD_Data_Times[0],tempHMD_RE_Data_Times)
+        newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+        listOfSucessRates = computePeriodicSucessRateSize(newTimes,tempHMD_Data_Data_Sizes,newTimes_RE,tempHMD_RE_Data_Data_Sizes,duration)
+        listOfRetransmissionRates = [100-x for x in listOfSucessRates]
+        x = newTimesPeriods
+        y1 = listOfSucessRates
+        y2 = listOfRetransmissionRates
+        ylabel  = "all data types - both directions"
+        y1Label = "sucess rate"
+        y2Label = "retransmission rate"
+        ax1.plot(x,y1,label=yLabel,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        ax2.plot(x,y2,label=yLabel,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        ax3.plot(x,y1,label=y1Label,c='{}'.format(colors[0]),marker = '.',linestyle='-')
+        ax3.plot(x,y2,label=y2Label,c='{}'.format(colors[1]),marker = '.',linestyle='-')
+        ax1.legend(loc='best', fontsize=10)
+        ax2.legend(loc='best', fontsize=10)
+        ax3.legend(loc='best', fontsize=10)
+        ax1.grid(color='grey', linestyle='--', linewidth=0.5)
+        ax2.grid(color='grey', linestyle='--', linewidth=0.5)
+        ax3.grid(color='grey', linestyle='--', linewidth=0.5)
+        ax1.set_xlabel('time in (sec)', fontsize=12)
+        ax2.set_xlabel('time in (sec)', fontsize=12)
+        ax3.set_xlabel('time in (sec)', fontsize=12)
+        ax1.set_ylabel('sucess rate percentage', fontsize=12)
+        ax2.set_ylabel('retransmission rate percentage', fontsize=12)
+        ax3.set_ylabel('rate percentage', fontsize=12)
+        ax1.set_title("{}-{} sucess rate of {} \nfor a duration of {} sec".format(labels[2],flowDirections[2],gameName,duration),fontsize=10)
+        ax2.set_title("{}-{} retransmission rate of {} \nfor a duration of {} sec".format(labels[2],flowDirections[2],gameName,duration),fontsize=10)
+        ax3.set_title("{}-{} sucess and retransmission rates of {} \nfor a duration of {} sec".format(labels[2],flowDirections[2],gameName,duration),fontsize=10)
+        fig1.savefig('{}/{}_duration_{}_sucessRate.png'.format(sucessFolderPath,labels[2],duration),dpi=saved_graph_resolution)
+        fig2.savefig('{}/{}_duration_{}_retransmissionRate.png'.format(retransmissionFolderPath,labels[2],duration),dpi=saved_graph_resolution)
+        fig3.savefig('{}/{}_duration_{}_sucessANDretransmissionRate.png'.format(sucessFolderPath,labels[2],duration),dpi=saved_graph_resolution)
+        fig3.savefig('{}/{}_duration_{}_sucessANDretransmissionRate.png'.format(retransmissionFolderPath,labels[2],duration),dpi=saved_graph_resolution)
+        plt.show()
+    ######################################################
+
+
+
+    #################### CDF  Graph 1 ####################
+    # CDF Graph for sucess and retransmission rates based on the size of payload for different time durations from HMD traces folder (each direction will be in a graph)
+    for duration in durations:
+        for i in range(len(flowDirections)):
+            sucessFolderPath = "{}/{}".format(sucessPrefix,flowDirections[i])
+            retransmissionFolderPath = "{}/{}".format(retransmissionPrefix,flowDirections[i])
+            try:
+                os.mkdir(sucessFolderPath)
+                os.mkdir(retransmissionFolderPath)
+            except:
+                pass
+            firstFrame[i] = min(flowDirectionsLists[i].__getitem__(0)[0] if i==0 else 100000000,flowDirectionsLists[i].__getitem__(1)[0],flowDirectionsLists[i].__getitem__(2)[0])
+            fig1, ax1 = plt.subplots()
+            fig2, ax2 = plt.subplots()
+            for j in range(len(flowDirectionsLists[i])):
+                # compute the periodic sucess and retransmission rates
+                newTimes = relativeTimeFromAPointOfTime(firstFrame[i],flowDirectionsLists[i].__getitem__(j))
+                newTimes_RE = relativeTimeFromAPointOfTime(firstFrame[i],flowDirectionsLists_RE[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfSucessRates = computePeriodicSucessRateSize(newTimes,listOfDataSizes[i].__getitem__(j),newTimes_RE,listOfDataSizes_RE[i].__getitem__(j),duration)
+                listOfRetransmissionRates = [100-x for x in listOfSucessRates]
+                data_sucess = [float(value) for value in listOfSucessRates]
+                x_sucess = np.sort(data_sucess)
+                y_sucess = np.arange(len(x_sucess))/float(len(x_sucess))
+                data_retransmission = [float(value) for value in listOfRetransmissionRates]
+                x_retransmission = np.sort(data_retransmission)
+                y_retransmission = np.arange(len(x_retransmission))/float(len(x_retransmission))
+                yLabel = '{}'.format(labels[j]) 
+                ax1.plot(x_sucess,y_sucess,label=yLabel,c='{}'.format(colors[j]),linestyle='{}'.format(lineStyles[j]))
+                ax2.plot(x_retransmission,y_retransmission,label=yLabel,c='{}'.format(colors[j]),linestyle='{}'.format(lineStyles[j]))
+            ax1.legend(loc='best', fontsize=10)
+            ax2.legend(loc='best', fontsize=10)
+            ax1.grid(color='grey', linestyle='--', linewidth=0.5)
+            ax2.grid(color='grey', linestyle='--', linewidth=0.5)
+            ax1.set_xlabel('sucess rate percentage', fontsize=12)
+            ax2.set_xlabel('retransmission rate percentage', fontsize=12)
+            ax1.set_ylabel('CDF', fontsize=12)
+            ax2.set_ylabel('CDF', fontsize=12)
+            ax1.set_title("CDF of {} sucess rate of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            ax2.set_title("CDF of {} retransmission rate of {} for a duration of {} sec".format(flowDirections[i],gameName,duration),fontsize=10)
+            fig1.savefig('{}/{}_duration_{}_sucessRate_CDF.png'.format(sucessFolderPath,flowDirections[i],duration),dpi=saved_graph_resolution)
+            fig2.savefig('{}/{}_duration_{}_retransmissionRate_CDF.png'.format(retransmissionFolderPath,flowDirections[i],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+
+    #################### CDF  Graph 2 ####################
+    # CDF Graph for sucess and retransmission rates based on the size of payload for different time durations from HMD traces folder (each data type will be in a graph)
+    for duration in durations:
+        for j in range(len(labels)):
+            firstTime = min(flowDirectionsLists[0].__getitem__(j)[0],flowDirectionsLists[1].__getitem__(j)[0]) if not j == 0 else flowDirectionsLists[0].__getitem__(j)[0]
+            fig1, ax1 = plt.subplots()
+            fig2, ax2 = plt.subplots()
+            for i in range(len(flowDirections)):
+                sucessFolderPath = "{}/{}".format(sucessPrefix,labels[j])
+                retransmissionFolderPath = "{}/{}".format(retransmissionPrefix,labels[j])
+                try:
+                    os.mkdir(sucessFolderPath)
+                    os.mkdir(retransmissionFolderPath)
+                except:
+                    pass
+                # compute the periodic sucess and retransmission rates    
+                newTimes = relativeTimeFromAPointOfTime(firstTime,flowDirectionsLists[i].__getitem__(j))
+                newTimes_RE = relativeTimeFromAPointOfTime(firstTime,flowDirectionsLists_RE[i].__getitem__(j))
+                newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+                listOfSucessRates = computePeriodicSucessRateSize(newTimes,listOfDataSizes[i].__getitem__(j),newTimes_RE,listOfDataSizes_RE[i].__getitem__(j),duration)
+                listOfRetransmissionRates = [100-x for x in listOfSucessRates]
+                data_sucess = [float(value) for value in listOfSucessRates]
+                x_sucess = np.sort(data_sucess)
+                y_sucess = np.arange(len(x_sucess))/float(len(x_sucess))
+                data_retransmission = [float(value) for value in listOfRetransmissionRates]
+                x_retransmission = np.sort(data_retransmission)
+                y_retransmission = np.arange(len(x_retransmission))/float(len(x_retransmission))
+                yLabel = '{}'.format(flowDirections[i]) 
+                ax1.plot(x_sucess,y_sucess,label=yLabel,c='{}'.format(colors[i]),linestyle='{}'.format(lineStyles[i]))
+                ax2.plot(x_retransmission,y_retransmission,label=yLabel,c='{}'.format(colors[i]),linestyle='{}'.format(lineStyles[i]))
+                
+            ax1.legend(loc='best', fontsize=10)
+            ax2.legend(loc='best', fontsize=10)
+            ax1.grid(color='grey', linestyle='--', linewidth=0.5)
+            ax2.grid(color='grey', linestyle='--', linewidth=0.5)
+            ax1.set_xlabel('sucess rate percentage', fontsize=12)
+            ax2.set_xlabel('retransmission rate percentage', fontsize=12)
+            ax1.set_ylabel('CDF', fontsize=12)
+            ax2.set_ylabel('CDF', fontsize=12)
+            ax1.set_title("CDF of {} sucess rate of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=10)
+            ax2.set_title("CDF of {} retransmission rate of {} for a duration of {} sec".format(labels[j],gameName,duration),fontsize=10)
+            fig1.savefig('{}/{}_duration_{}_sucessRate_CDF.png'.format(sucessFolderPath,labels[j],duration),dpi=saved_graph_resolution)
+            fig2.savefig('{}/{}_duration_{}_retransmissionRateCDF.png'.format(retransmissionFolderPath,labels[j],duration),dpi=saved_graph_resolution)
+            plt.show()
+    ######################################################
+
+
+
+    #################### CDF  Graph 3 ####################
+    # CDF Graph for sucess and retransmission rates based on the size of payload for different time durations from HMD traces folder (for all data types and both directions [uplink and downlink])
+    
+    sucessFolderPath = "{}/{}".format(sucessPrefix,"{}_{}".format(labels[2],flowDirections[2]))
+    retransmissionFolderPath = "{}/{}".format(retransmissionPrefix,"{}_{}".format(labels[2],flowDirections[2]))
+    try:
+        os.mkdir(sucessFolderPath)
+        os.mkdir(retransmissionFolderPath)
+    except:
+        pass
+
+    for duration in durations: 
+        # [D] all data frames
+        fig1, ax1 = plt.subplots()
+        fig2, ax2 = plt.subplots() 
+        fig3, ax3 = plt.subplots() 
+        newTimes = relativeTimeFromAPointOfTime(tempHMD_Data_Times[0],tempHMD_Data_Times)
+        newTimes_RE = relativeTimeFromAPointOfTime(tempHMD_Data_Times[0],tempHMD_RE_Data_Times)
+        newTimesPeriods = convertTimeToPeriods(newTimes,duration)
+        listOfSucessRates = computePeriodicSucessRateSize(newTimes,tempHMD_Data_Data_Sizes,newTimes_RE,tempHMD_RE_Data_Data_Sizes,duration)
+        listOfRetransmissionRates = [100-x for x in listOfSucessRates]
+        data_sucess = [float(value) for value in listOfSucessRates]
+        data_retransmission = [float(value) for value in listOfRetransmissionRates]
+        x_sucess = np.sort(data_sucess)
+        x_retransmission = np.sort(data_retransmission)
+        y_sucess = np.arange(len(x_sucess))/float(len(x_sucess))
+        y_retransmission = np.arange(len(x_retransmission))/float(len(x_retransmission))
+        ylabel  = "all data types - both directions"
+        y1Label = "sucess rate"
+        y2Label = "retransmission rate"
+        ax1.plot(x_sucess,y_sucess,label=yLabel,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        ax2.plot(x_retransmission,y_retransmission,label=yLabel,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        ax3.plot(x_sucess,y_sucess,label=y1Label,c='{}'.format(colors[0]),linestyle='{}'.format(lineStyles[0]))
+        ax3.plot(x_retransmission,y_retransmission,label=y2Label,c='{}'.format(colors[1]),linestyle='{}'.format(lineStyles[1]))
+        ax1.legend(loc='best', fontsize=10)
+        ax2.legend(loc='best', fontsize=10)
+        ax3.legend(loc='best', fontsize=10)
+        ax1.grid(color='grey', linestyle='--', linewidth=0.5)
+        ax2.grid(color='grey', linestyle='--', linewidth=0.5)
+        ax3.grid(color='grey', linestyle='--', linewidth=0.5)
+        ax1.set_xlabel('sucess rate percentage', fontsize=12)
+        ax2.set_xlabel('retransmission rate percentage', fontsize=12)
+        ax3.set_xlabel('rate percentage', fontsize=12)
+        ax1.set_ylabel('CDF', fontsize=12)
+        ax2.set_ylabel('CDF', fontsize=12)
+        ax3.set_ylabel('CDF', fontsize=12)
+        ax1.set_title("{}-{} CDF of sucess rate of {} \nfor a duration of {} sec".format(labels[2],flowDirections[2],gameName,duration),fontsize=10)
+        ax2.set_title("{}-{} CDF of retransmission rate of {} \nfor a duration of {} sec".format(labels[2],flowDirections[2],gameName,duration),fontsize=10)
+        ax3.set_title("{}-{} CDF of sucess and retransmission rates of {} \nfor a duration of {} sec".format(labels[2],flowDirections[2],gameName,duration),fontsize=10)
+        fig1.savefig('{}/{}_duration_{}_sucessRate_CDF.png'.format(sucessFolderPath,labels[2],duration),dpi=saved_graph_resolution)
+        fig2.savefig('{}/{}_duration_{}_retransmissionRate_CDF.png'.format(retransmissionFolderPath,labels[2],duration),dpi=saved_graph_resolution)
+        fig3.savefig('{}/{}_duration_{}_sucessANDretransmissionRate_CDF.png'.format(sucessFolderPath,labels[2],duration),dpi=saved_graph_resolution)
+        fig3.savefig('{}/{}_duration_{}_sucessANDretransmissionRate_CDF.png'.format(retransmissionFolderPath,labels[2],duration),dpi=saved_graph_resolution)
         plt.show()
     ######################################################
 

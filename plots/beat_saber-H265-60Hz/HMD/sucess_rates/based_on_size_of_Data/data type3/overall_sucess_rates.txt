@@ -1,0 +1,4 @@
+
+[+] the overall sucess rate of data type3-uplink is 85.49344116627363
+[+] the overall sucess rate of data type3-downlink is 97.02059011781768
+[+] the overall sucess rate of data type3-both_directions is 94.02704771015063

@@ -1,0 +1,4 @@
+
+[+] the overall sucess rate of data type2-uplink is 77.90485095456067
+[+] the overall sucess rate of data type2-downlink is 93.9242349994555
+[+] the overall sucess rate of data type2-both_directions is 86.0143329658214

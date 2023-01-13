@@ -1857,8 +1857,8 @@ def main():
     serverTracesResults, HMDTracesResults = processTracesFolder(tracesFolder,startTime,endTime,HMD_IP,server_IP,HMD_MAC,server_MAC,AP_MAC1,AP_MAC2)
     
     # plotGraph.plotLogsResults(LogsFolderResults)
-    # plotGraph.plotServerTracesResults(serverTracesResults)
-    plotGraph.plotHMDTracesResults(HMDTracesResults)
+    plotGraph.plotServerTracesResults(serverTracesResults)
+    # plotGraph.plotHMDTracesResults(HMDTracesResults)
 
 
     # for resultItem in HMDTracesResults:
